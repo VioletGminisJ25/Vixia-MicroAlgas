@@ -1,3 +1,8 @@
+"""
+Este modulo se encarga de gestionar los datos de la aplicacion.
+Contiene funciones para obtener colores, temperatura, pH, y manejar archivos JSON.
+"""
+
 from flask import jsonify
 import random
 import os
@@ -15,12 +20,18 @@ temp = 0
 
 
 def get_colors():
+    """
+    Genera un diccionario de colores con valores booleanos aleatorios.
+    """
     for color in colors:
         colors[color] = random.choice([True, False])
     return colors
 
 
 def get_ph_temp():
+    """
+    Genera un diccionario con valores aleatorios de pH y temperatura.
+    """
     ph = random.uniform(0, 14)
     temp = random.uniform(0, 40)
     details = {"ph": round(ph, 2), "temperature": round(temp, 2)}
@@ -28,6 +39,9 @@ def get_ph_temp():
 
 
 def get_rgb():
+    """
+    Genera un diccionario con valores RGB aleatorios.
+    """
     color = {}
     color.update(
         {
@@ -40,6 +54,11 @@ def get_rgb():
 
 
 def file_path_handler(path):
+    """
+    Maneja la apertura de un archivo en la ruta especificada.
+    Si la ruta es correcta, abre el archivo y devuelve un mensaje de éxito.
+    Si la ruta no es correcta, devuelve un mensaje de error.
+    """
     try:
         os.startfile(path)
         return jsonify({"message": "La ruta es correcta"}), 200
@@ -52,6 +71,9 @@ def file_path_handler(path):
 
 
 def data_handler():
+    """
+    Genera un diccionario con datos de colores, temperatura, pH y longitud de onda.
+    """
     return {
         "colors": get_colors(),
         "rgb": get_rgb(),
@@ -61,6 +83,12 @@ def data_handler():
 
 
 def get_hours(data):
+    """
+    Obtiene las horas de los datos de un archivo JSON.
+    Genera la ruta del archivo JSON basado en la fecha proporcionada en los datos.
+    Si el archivo no existe, devuelve un mensaje de error.
+    Si el archivo existe, carga los datos y devuelve una lista de horas.
+    """
 
     path, status, date = generate_path_file(data)
     if status != 200:
@@ -79,6 +107,12 @@ def get_hours(data):
 
 
 def get_comparation(data):
+    """
+    Obtiene la comparacion de los datos de un archivo JSON.
+    Genera la ruta del archivo JSON basado en la fecha proporcionada en los datos.
+    Si el archivo no existe, devuelve un mensaje de error.
+    Si el archivo existe, carga los datos y devuelve la comparacion de los datos.
+    """
     path, status, date = generate_path_file(data)
     if status != 200:
         return jsonify(path), status
@@ -95,6 +129,11 @@ def get_comparation(data):
 
 
 def get_file_data(path):
+    """
+    Abre un archivo JSON en la ruta especificada y devuelve su contenido.
+    Si el archivo no existe, devuelve un mensaje de error.
+    Si hay un error de entrada/salida, devuelve un mensaje de error.
+    """
     print(path)
     try:
         with open(path, "r") as f:
@@ -106,6 +145,11 @@ def get_file_data(path):
 
 
 def generate_path_file(data):
+    """
+    Genera la ruta del archivo JSON basado en la fecha proporcionada en los datos.
+    Si la fecha no es valida, devuelve un mensaje de error.
+    Si la fecha es valida, devuelve la ruta del archivo JSON y la fecha formateada.
+    """
     raw_date = data.get("date")
     try:
         if len(raw_date) == 10:
@@ -124,6 +168,11 @@ def generate_path_file(data):
 
 
 def get_ph_temp_average(data):
+    """
+    Obtiene el promedio diario de temperatura y pH de los datos de un archivo JSON.
+    Genera la ruta del archivo JSON basado en el año proporcionado en los datos.
+    Si el archivo no existe, devuelve un mensaje de error.
+    """
     daily_values = defaultdict(lambda: {"temperature": [], "ph": []})
     year = data.get("year")
     base_path = f"bd/data/{year}"

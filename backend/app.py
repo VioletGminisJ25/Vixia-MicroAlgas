@@ -1,3 +1,8 @@
+"""
+Punto de entrada principal para la aplicación Flask.
+Este archivo inicializa la aplicación Flask, configura CORS y registra las rutas de autenticación.
+"""
+
 from flask import Flask
 from routes.auth_routes import auth_routes
 from flask_cors import CORS
