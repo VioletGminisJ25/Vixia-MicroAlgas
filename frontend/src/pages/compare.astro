@@ -1,0 +1,19 @@
+---
+import "../styles/global.css";
+import Calendar from "../components/componentes_react/SelectorFecha";
+import Layout from "../layouts/Layout.astro";
+import Heather from "../components/Cabecera.astro";
+import CompareComponet from "../components/CompararData.astro";
+---
+
+<script>
+    if (!localStorage.getItem("isAuth")) {
+        // Si no tiene token, redirige al login
+        window.location.href = "/login";
+    }
+</script>
+
+<Layout testTitle="Compare">
+    <Heather texto="Compare" />
+    <CompareComponet />
+</Layout>

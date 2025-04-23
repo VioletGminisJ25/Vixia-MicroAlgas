@@ -1,0 +1,12 @@
+---
+import "../styles/global.css";
+import Heather from "../components/Heather.astro";
+import Layout from "../layouts/Layout.astro";
+import RegisterForm from "../components/forms/RegisterForm.astro";
+const a = import.meta.env.JAVI_URL;
+---
+
+<Layout>
+        <Heather />
+        <RegisterForm />
+</Layout>

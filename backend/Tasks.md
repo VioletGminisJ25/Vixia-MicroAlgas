@@ -1,0 +1,4 @@
+- [ ] TODO Modificar ruta datos para cuando hace el get se establece la conexión con el arduino y recoge los datos y genera el json y lo envia como respuesta a la petición
+- [ ] TODO Ver arduino y comunicacion con eso para generarme el json que se va a guardar 
+- [ ] TODO Almacenar datos por fecha completa en json y carpetas 
+- [ ] TODO Crear ruta para enviar los datos de todas las horas de mediciones 

@@ -1,0 +1,115 @@
+---
+const urlenv = import.meta.env.PUBLIC_LOGIN_URL;
+---
+
+<!--Formulario login -->
+<div
+    class="h-[90vh] flex items-center justify-center dark:text-white"
+>
+    <form
+        id="login-form"
+        class="w-full max-w-xl space-y-20 bg-gray-100 dark:bg-[#0f1011] p-4 rounded-lg shadow-lg dark:shadow-lg/100"
+    >
+        <h2
+            class="text-2xl font-bold text-center dark:text-white text-gray-700"
+        >
+            Iniciar sesión
+        </h2>
+
+        <div>
+            <label
+                for="email"
+                class="block text-sm font-medium text-gray-700 dark:text-white"
+                >Email</label
+            >
+            <input
+                type="email"
+                name="email"
+                id="email"
+                required
+                class="mt-1 block w-full px-4 py-2 border border-gray-300 rounded-md shadow-sm focus:ring-blue-500 focus:border-blue-500"
+            />
+        </div>
+
+        <div>
+            <label
+                for="password"
+                class="block text-sm font-medium text-gray-700 dark:text-white"
+                >Contraseña</label
+            >
+            <input
+                type="password"
+                name="password"
+                id="password"
+                required
+                class="mt-1 block w-full px-4 py-2 border border-gray-300 rounded-md shadow-sm focus:ring-blue-500 focus:border-blue-500"
+            />
+        </div>
+
+        <button
+            type="submit"
+            class="w-full bg-blue-600 text-white py-2 px-4 rounded hover:bg-blue-700 transition-colors font-semibold"
+        >
+            Iniciar sesión
+        </button>
+
+        <p class="text-center text-sm text-gray-700 dark:text-gray-300 mt-4">
+            No tienes cuenta?
+            <a
+                href="/register"
+                class="text-[#0348DD] hover:text-[#729EFD] dark:text-[#78A2FC] dark:hover:text-[#AFC8FD] transition-colors"
+                >Registrate aquí</a
+            >
+        </p>
+    </form>
+</div>
+<!-- TODO TOAST DE INFORMACION DE ERRORES -->
+<script>
+    //import { date } from "astro:schema";
+
+    //console.log(import.meta.env.PUBLIC_LOGIN_URL)
+    const form = document.getElementById("login-form");
+    form?.addEventListener("submit", async (event) => {
+        event.preventDefault();
+        const formData = new FormData(form);
+        const data = Object.fromEntries(formData.entries());
+        try {
+            const response = await fetch(import.meta.env.PUBLIC_LOGIN_URL, {
+                method: "post",
+                headers: {
+                    "Content-Type": "application/json",
+                },
+                body: JSON.stringify(data),
+            });
+
+            const mg = await response.json();
+
+            if (!response.ok) {
+                const status = response.status;
+
+                switch (status) {
+                    case 400:
+                        console.log("Solicitud malformada (400)");
+
+                        break;
+                    case 404:
+                        console.log(mg);
+                        break;
+
+                    case 401:
+                        console.log(mg);
+
+                        break;
+                }
+                return;
+            }
+
+            console.log("Usuario autenticado" + " " + mg);
+            localStorage.setItem("isAuth", "true");
+            window.location.href = "/";
+        } catch (error) {
+            console.error("Error de red:", error);
+            alert("No se pudo conectar con el servidor.");
+        }
+    });
+</script>

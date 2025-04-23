@@ -1,0 +1,18 @@
+---
+import "../styles/global.css";
+import Layout from "../layouts/Layout.astro";
+import Heather from "../components/Cabecera.astro";
+import IndexData from "../components/IndexData.astro";
+---
+
+<script>
+  if (!localStorage.getItem("isAuth")) {
+    // Si no tiene token, redirige al login
+    window.location.href = "/login";
+  }
+</script>
+
+<Layout>
+  <Heather texto="Principal" />
+  <IndexData />
+</Layout>
