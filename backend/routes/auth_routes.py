@@ -22,6 +22,7 @@ auth_routes = Blueprint("routes", __name__)
 
 @auth_routes.route("/")
 def inicio():
+    queries.insertar_datos()
     return jsonify({"message": "The app is on"})
 
 

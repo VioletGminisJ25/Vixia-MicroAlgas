@@ -9,6 +9,7 @@ from database.db_instance import db_instance
 
 import random
 from datetime import datetime, timedelta
+from backend.utils.datos_fic_db import generar_dato
 
 
 class DataQueries:
@@ -21,41 +22,6 @@ class DataQueries:
         """
         print(self.session.query(SensorData).all())
         return self.session.query(SensorData).all()
-
-    def get_periodo_dia(self, timestamp):
-        """
-        Determina el periodo del día basado en la hora del timestamp.
-        """
-        hora = datetime.strptime(timestamp, "%Y-%m-%d %H:%M:%S").hour
-        if 0 <= hora < 6:
-            return "noche"
-        elif 6 <= hora < 14:
-            return "mañana"
-        elif 14 <= hora < 20:
-            return "tarde"
-        else:
-            return "noche"
-
-    def generar_dato(self, timestamp):
-        return {
-            "timestamp": timestamp,
-            "rgb": {
-                "r": random.randint(0, 255),
-                "g": random.randint(0, 255),
-                "b": random.randint(0, 255),
-            },
-            "colors": {
-                "blue": random.choice([True, False]),
-                "red": random.choice([True, False]),
-                "white": random.choice([True, False]),
-            },
-            "data": {
-                "temperature": round(random.uniform(15, 30), 1),
-                "ph": round(random.uniform(6.5, 8.5), 1),
-            },
-            "wave_length": [round(random.uniform(280, 800), 1) for _ in range(288)],
-            "periodo_dia": self.get_periodo_dia(timestamp),
-        }
 
     def insertar_datos(self):
         # Fecha de inicio y fin
@@ -74,7 +40,7 @@ class DataQueries:
                 timestamp = (base_time + timedelta(minutes=i * 15)).strftime(
                     "%Y-%m-%d %H:%M:%S"
                 )
-                dato = self.generar_dato(timestamp)
+                dato = generar_dato(timestamp)
 
                 # Insertar en la tabla MainDatetime
                 main_datetime = MainDatetime(
