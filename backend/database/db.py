@@ -21,12 +21,16 @@ class Database:
         """
         Inicializa la base de datos y crea las tablas necesarias.
         """
-        app.config["SQLALCHEMY_DATABASE_URI"] = (
-            f"mysql+mysqlconnector://{self.db_user}:{self.db_password}@{self.db_host}/{self.db_name}"
-        )
-        app.config["SQLALCHEMY_TRACK_MODIFICATIONS"] = False
-        self.db.init_app(app)
-        with app.app_context():
-            self.db.create_all()
+        try:
 
-        print("Connected to the database!")
+            app.config["SQLALCHEMY_DATABASE_URI"] = (
+                f"mysql+mysqlconnector://{self.db_user}:{self.db_password}@{self.db_host}/{self.db_name}"
+            )
+            app.config["SQLALCHEMY_TRACK_MODIFICATIONS"] = False
+            self.db.init_app(app)
+            with app.app_context():
+                self.db.create_all()
+
+            print("Connected to the database!")
+        except Exception as e:
+            print(f"Error connecting to the database: {e}")
