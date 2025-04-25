@@ -13,18 +13,23 @@ from utils.lib import (
 from utils.auth import register_handler, login_handler
 from flask import jsonify, request
 from markupsafe import escape
+from database.queries import DataQueries
+
+queries = DataQueries()
 
 auth_routes = Blueprint("routes", __name__)
 
 
 @auth_routes.route("/")
 def inicio():
+    queries.insertar_datos()
     return jsonify({"message": "The app is on"})
 
 
 @auth_routes.route("/data", methods=["GET"])
 def data_route():
     """Ruta para obtener los datos mas actuales del arduino cada 15 minutos."""
+    print(queries.get_sensor_data())
     return jsonify(data_handler()), 200
 
 
