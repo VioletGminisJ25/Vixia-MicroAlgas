@@ -65,9 +65,8 @@ const urlenv = import.meta.env.PUBLIC_LOGIN_URL;
 </div>
 <!-- TODO TOAST DE INFORMACION DE ERRORES -->
 <script>
-    //import { date } from "astro:schema";
-
-    //console.log(import.meta.env.PUBLIC_LOGIN_URL)
+    // Verifica si el usuario ya está autenticado
+    // Si el usuario ya está autenticado, redirige a la página de inicio
     const form = document.getElementById("login-form");
     form?.addEventListener("submit", async (event) => {
         event.preventDefault();

@@ -2,9 +2,11 @@
 import "../styles/global.css";
 import Heather from "../components/Cabecera.astro";
 import Layout from "../layouts/Layout.astro";
+import PhData from "../components/PhData.astro";
 ---
 
 <!-- Pagina de de sensores --><!-- TODO Por hacer -->
-<Layout testTitle="Sensores">
-        <Heather texto="Sensores" showSensores={false} />
+<Layout testTitle="Evolucion pH">
+        <Heather texto="Registros pH" showPh={false} />
+        <PhData />
 </Layout>

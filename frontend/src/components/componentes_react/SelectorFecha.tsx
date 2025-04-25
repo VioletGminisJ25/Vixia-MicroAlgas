@@ -4,30 +4,35 @@ import 'react-datepicker/dist/react-datepicker.css';
 import { format } from 'date-fns';
 import type { CompareData } from '../../scripts/data_interface';
 
-//env de conexiones
 const urlGetHours: string = import.meta.env.PUBLIC_GET_HOURS;
 const urlGetComparasion: string = import.meta.env.PUBLIC_GET_COMPARASION;
+
 interface CalendarProps {
   setDatos: React.Dispatch<React.SetStateAction<CompareData | null>>;
 }
-//metodo react
+
+/// Componente que contiene un selector de fecha y un selector de horas
+/// El selector de fecha permite seleccionar fechas hasta la fecha actual
+/// El selector de horas permite seleccionar horas enviando una peticion a la API
+//Se crearon estados para manejar el estado de carga y error
 export default function Calendar({ setDatos }: CalendarProps) {
   const [startDate, setStartDate] = useState<Date | null>(new Date());
   const [hoursOptions, setHoursOptions] = useState<string[]>([]);
   const [selectedHour, setSelectedHour] = useState<string>('');
-
-  //state del componente para la gestion de errores y conexion
   const [loadingHours, setLoadingHours] = useState(false);
   const [errorHours, setErrorHours] = useState<string | null>(null);
 
-  //este evento manda la fecha selecionada al servidor y espera una respuesta
+  //Evento que se ejecuta al cambiar la fecha
+  //Se envia una peticion a la API para obtener las horas disponibles
+  //Rellena el selector de horas con las horas disponibles
+  //Se maneja el estado de carga y error
   const handleDateChange = async (date: Date | null) => {
     setStartDate(date);
-    //Se limpian los datos para evitar desincronizaciones
+
     setHoursOptions([]);
     setSelectedHour('');
     if (!date) return;
-    //Se cargan los states de load a true y error a null
+
     setLoadingHours(true);
     setErrorHours(null);
 
@@ -62,25 +67,26 @@ export default function Calendar({ setDatos }: CalendarProps) {
     }
   };
 
-  //evento que manda la hora (y fecha) al servidor y esprea una respuesta
+  //Evento que se ejecuta al cambiar la hora
+  //Se envia una peticion a la API para obtener los datos de la fecha y hora seleccionada
   const handleHour = (e: React.ChangeEvent<HTMLSelectElement>) => {
     const selectedTime = e.target.value;
     setSelectedHour(selectedTime);
 
     if (!startDate || !selectedTime) return;
 
-    // Combinar fecha y hora
+
     const [hours, minutes, seconds] = selectedTime.split(':');
     const combinedDateTime = new Date(startDate);
     combinedDateTime.setHours(parseInt(hours, 10));
     combinedDateTime.setMinutes(parseInt(minutes, 10));
     combinedDateTime.setSeconds(parseInt(seconds, 10));
 
-    // Formatear según requerimiento
+
     const formattedDateTime = format(combinedDateTime, 'yyyy-MM-dd HH:mm:ss');
 
     console.log(formattedDateTime)
-    // // Enviar al servidor
+
     fetch(urlGetComparasion, {
       method: 'POST',
       headers: {
@@ -98,10 +104,10 @@ export default function Calendar({ setDatos }: CalendarProps) {
       });
 
   }
-  //Estructura y diseño de los componentes
-  //atach de los eventos a los componentes
+
+  ///Renderiza el componente del selector de fecha y hora
   return (
-    <div className="flex flex-row  justify-center items-center space-x-4">
+    <div className="flex flex-row justify-center items-center space-x-4">
       <p className='text-black dark:text-white font-bold'>SELECIONAR UNA FECHA</p>
       <DatePicker
         selected={startDate}

@@ -3,16 +3,13 @@ import "../styles/global.css";
 import Layout from "../layouts/Layout.astro";
 import Heather from "../components/Cabecera.astro";
 import IndexData from "../components/IndexData.astro";
+import { isAuth } from "../scripts/isAuth";
+import PhData from "../components/PhData.astro";
 ---
 
-<script>
-  if (!localStorage.getItem("isAuth")) {
-    // Si no tiene token, redirige al login
-    window.location.href = "/login";
-  }
-</script>
-
-<Layout>
-  <Heather texto="Principal" />
+<!-- Pagina principal --><!-- Esta página se encarga de mostrar los datos mas recientes en una gráfica y un selector de fechas para comparar -->
+<Layout testTitle="Principal">
+  <Heather texto="Principal" showBack={false} />
+  
   <IndexData />
 </Layout>

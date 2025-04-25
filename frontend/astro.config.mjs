@@ -2,11 +2,13 @@
 import { defineConfig } from "astro/config";
 import tailwindcss from "@tailwindcss/vite";
 import react from '@astrojs/react';
+import compress from 'astro-compress';
+import critters from "astro-critters";
 
 // https://astro.build/config
 export default defineConfig({
   vite: {
-    plugins: [tailwindcss()],
+    plugins: [tailwindcss(),],
   },
   server: {
     host: '0.0.0.0',
@@ -14,5 +16,15 @@ export default defineConfig({
   devToolbar: {
     enabled: false
   },
-  integrations: [react()],
+  integrations: [react()
+    , compress({
+      HTML: true,
+      CSS: true,
+      JavaScript: true,    // para .js / .mjs
+      JSON: true,          // para .json
+      SVG: true,           // opcional si manejas SVG aparte
+    }),
+    critters()
+  ],
+
 });
