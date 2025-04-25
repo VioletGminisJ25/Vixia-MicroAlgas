@@ -1,17 +1,21 @@
-import React from 'react';
 import type { SampleData } from '../../scripts/data_interface';
-import NivoLine from './LongitudDeOnda';
+import NivoLine from './Nivo_LongitudDeOnda';
 interface Componente1Props {
     datos: SampleData | null;
     titulo: string;
 }
-
-export default function GraficaPrueba({ datos, titulo }: Componente1Props) {
-    // extraemos el objeto colors (o colocamos un fallback para null)
+/// Componente que recibe datos y un titulo y renderiza una grafica con los datos
+export default function ComponenteGrafico_Nivo_LongitudDeOnda({ datos, titulo }: Componente1Props) {
+    // Si no hay datos, establecemos un objeto de datos por defecto
+    // Esto es útil para evitar errores al intentar acceder a propiedades de datos nulos
     const colors = datos?.colors ?? { red: false, white: false, blue: false };
-
+    
+    //Estructura del componente, que contiene un div
+    //Dentro del div hay un título, botones de colores y una tabla con la gráfica
+    //Los botones de colores están habilitados o deshabilitados según los datos
+    //La tabla contiene la gráfica y dos botones que muestran el pH y la temperatura
     return (
-        <div className="flex flex-col items-center w-[45%] h-[90%] bg-gray-100 dark:bg-[#0f1011] p-4 rounded-lg shadow-lg dark:shadow-lg/100">
+        <div className="flex flex-col items-center w-full h-[100%] bg-slate-100 dark:bg-[#0f1011] p-4 rounded-lg shadow-lg dark:shadow-lg/100">
             <div className='flex flex-col items-center text-black dark:text-white font-bold'>{titulo}</div>
             {/* Botones de colores: deshabilitamos según datos.colors */}
             <div className="flex flex-row space-x-4 mb-4 w-full">

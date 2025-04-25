@@ -1,30 +1,35 @@
-import React from 'react'
-import { ResponsiveLine } from '@nivo/line'
+import { ResponsiveLine } from '@nivo/line' // Importamos el componente ResponsiveLine de Nivo
 import type { SampleData } from '../../scripts/data_interface'
 
 interface NivoLineProps {
     datos: SampleData | null
 }
 
-export default function NivoLine({ datos }: NivoLineProps) {
+/**
+ * Componente que renderiza un gráfico de líneas utilizando Nivo
+ * @param {SampleData | null} datos - Datos a graficar
+ * @returns {JSX.Element} - Componente de gráfico de líneas
+ */
+
+//Datos de la grafica
+//El componente recibe un objeto de datos que contiene la longitud de onda
+export default function Nivo_LongitudDeOnda({ datos }: NivoLineProps) {
     const isDark = document.documentElement.classList.contains("dark");
     if (!datos) return <div className="p-4">Sin datos</div>
 
-    // 1. Extraemos el array
-    const { wave_lenght } = datos
+    const { wave_length } = datos
 
-    // 2. Creamos la serie
     const series = [
         {
             id: 'Longitud de onda',
-            data: wave_lenght.map((value, index) => ({
-                // Usa idx o la propia longitud como x
+            data: wave_length.map((value, index) => ({
                 x: index,
                 y: value,
             })),
         },
     ]
-    
+    //Estructura del componente de Nivo
+    //https://nivo.rocks/line/
     return (
         <div className="w-full h-full max-w-full overflow-hidden px-[3%] pb-[5%]">
             <ResponsiveLine
@@ -40,7 +45,7 @@ export default function NivoLine({ datos }: NivoLineProps) {
                     tickSize: 5,
                     tickPadding: 5,
                     tickRotation: 0,
-                    legend: 'transportation',
+                    legend: 'Indice de medicion',
                     legendOffset: 36,
                     legendPosition: 'middle',
                     truncateTickAt: 0

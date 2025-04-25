@@ -1,0 +1,18 @@
+---
+import "../styles/global.css";
+import Calendar from "../components/componentes_react/SelectorFecha";
+import Layout from "../layouts/Layout.astro";
+import Heather from "../components/Cabecera.astro";
+import CompareComponet from "../components/CompararData.astro";
+---
+
+<!-- Pagina de comparación de datos --><!-- Esta página se encarga de comparar los datos de dos fechas (selecionada y ultima) y mostrar las gráficas correspondientes -->
+
+<Layout testTitle="Comparar">
+    <Heather
+        texto="Comparar"
+        showCompare={false}
+    />
+
+    <CompareComponet/>
+</Layout>

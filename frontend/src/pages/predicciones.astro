@@ -1,0 +1,15 @@
+---
+import "../styles/global.css";
+import Heather from "../components/Cabecera.astro";
+import LoginForm from "../components/forms/LoginForm.astro";
+import Layout from "../layouts/Layout.astro";
+const a = import.meta.env.JAVI_URL;
+---
+
+<!-- Pagina con los registros --><!-- TODO Por hacer registros -->
+<Layout testTitle="Prediciones">
+        <Heather
+                texto="Prediciones"
+                showPrediciones={false}
+        />
+</Layout>
