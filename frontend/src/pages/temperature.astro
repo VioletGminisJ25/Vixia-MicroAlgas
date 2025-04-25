@@ -2,9 +2,11 @@
 import "../styles/global.css";
 import Heather from "../components/Cabecera.astro";
 import Layout from "../layouts/Layout.astro";
+import TempData from "../components/TempData.astro";
 ---
 
 <!-- Pagina de de sensores --><!-- TODO Por hacer -->
-<Layout testTitle="Sensores">
-        <Heather texto="Sensores" showSensores={false} />
+<Layout testTitle="Evolucion temperatura">
+    <Heather texto="Evolucion Temperatura" showTemp={false} />
+    <TempData />
 </Layout>

@@ -1,12 +1,21 @@
 ---
 import "../styles/global.css";
-import Heather from "../components/Heather.astro";
+import Heather from "../components/Cabecera.astro";
 import LoginForm from "../components/forms/LoginForm.astro";
 import Layout from "../layouts/Layout.astro";
 const a = import.meta.env.JAVI_URL;
 ---
 
-<Layout>
-        <Heather></Heather>
-        <LoginForm/>
+<!-- Pagina de inicio de sesion --><!-- pagina para logearse -->
+<Layout testTitle="Login">
+        <Heather
+                showCompare={false}
+                showMediciones={false}
+                showSensores={false}
+                showPrediciones={false}
+                showPh={false}
+                showTemp={false}
+                showBack={false}
+        />
+        <LoginForm />
 </Layout>

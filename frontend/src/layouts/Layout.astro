@@ -2,7 +2,7 @@
 const { testTitle } = Astro.props;
 ---
 
-<!doctype html>
+<!-- Layout de la aplicación --><!doctype html>
 <html lang="en">
 	<head>
 		<meta charset="UTF-8" />
@@ -10,8 +10,21 @@ const { testTitle } = Astro.props;
 		<link rel="icon" type="image/svg+xml" href="/favicon.svg" />
 		<meta name="generator" content={Astro.generator} />
 		<title>{testTitle}</title>
+		<script>
+			
+		</script>
 	</head>
 	<body class="flex flex-col h-screen bg-[#ffffff] dark:bg-[#1d1f21]">
+		<script>
+			if (
+				!localStorage.getItem("isAuth") &&
+				!["/login", "/register", "/404"].includes(
+					window.location.pathname,
+				)
+			) {
+				window.location.href = "/login";
+			}
+		</script>
 		<slot />
 	</body>
 </html>

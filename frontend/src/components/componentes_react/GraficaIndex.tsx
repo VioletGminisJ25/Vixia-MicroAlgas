@@ -1,11 +1,27 @@
 import { useEffect, useState } from 'react';
-import LastCurrentData from './Grafico';
+import LastCurrentData from './ComponenteGrafico_Nivo_LongitudDeOnda';
 import type { SampleData } from "../../scripts/data_interface";
+import { motion } from 'framer-motion';
 
+const appearVariants = {
+    hidden: { opacity: 0, y: 50, scale: 0.8 },
+    visible: {
+        opacity: 1,
+        y: 0,
+        scale: 1,
+        transition: { duration: 0.7, ease: [0.25, 0.8, 0.25, 1] }
+    }
+};
 
-export default function ParentComponent() {
+/**
+ * Componente padre que contiene el componente de la gráfica
+ * @returns 
+ */
+export default function GraficaIndex() {
     const [datos, setDatos] = useState<SampleData | null>(null);
-
+    /**
+     * Efecto que se ejecuta al montar el componente y cada 15 minutos
+     */
     useEffect(() => {
         const fetchData = async () => {
             try {
@@ -23,20 +39,31 @@ export default function ParentComponent() {
 
         fetchData();
 
-        // Creamos intervalo que llama cada X milisegundos
+
         const interval = setInterval(fetchData, 15 * 60 * 1000); // cada 15 minutos
 
-        // Limpiamos el intervalo cuando el componente se desmonte
+        // Limpiar el intervalo al desmontar el componente
+        // Esto es importante para evitar fugas de memoria y llamadas innecesarias a la API
         return () => clearInterval(interval);
-    }, []); // Solo se ejecuta al montar el componente
+    }, []);
 
+    // Renderizar el componente de la gráfica y pasarle los datos
+    // Si los datos son nulos, no se renderiza nada
     return (
         <div className="flex flex-col h-full">
             <div className="
                 flex flex-1 justify-around
-                items-center 
+                items-center  w-[80%] mx-[10%] mt-[1%] mb-[1%]
             ">
-                <LastCurrentData titulo='FECHA MAS RECIENTE' datos={datos ?? null} />
+                <motion.div
+                    id="graficaAnimacion"
+                    className="flex-1 h-[90%] mx-2"
+                    variants={appearVariants}
+                    initial="hidden"
+                    animate="visible"
+                >
+                    <LastCurrentData titulo='FECHA MAS RECIENTE' datos={datos ?? null} />
+                </motion.div>
             </div>
         </div>
     );
