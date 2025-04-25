@@ -25,14 +25,23 @@ export interface CompareData {
 }
 
 //Interfaz para Calendario
-export interface YearData {
+export interface CalendarData {
   year: number;
   values: { day: string; value: number }[];
 }
 
-export interface SwarmplotData {
+export interface SwarmPlotData {
   id: string;
   group: string;
   price: number;
   volume: number;
+}
+
+export interface NivoLineData {
+
+  year: number;
+  weeks: {
+    week : { min: number; max: number }
+  }
+
 }
