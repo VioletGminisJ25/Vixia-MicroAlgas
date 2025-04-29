@@ -9,12 +9,14 @@ const { testTitle } = Astro.props;
 		<meta name="viewport" content="width=device-width" />
 		<link rel="icon" type="image/svg+xml" href="/favicon.svg" />
 		<meta name="generator" content={Astro.generator} />
+		<meta name="description" content="Aplicación de gestión de datos" />
+		<meta name="keywords" content="graficar, datos, gestión,ph,temp" />
 		<title>{testTitle}</title>
 		<script>
 			
 		</script>
 	</head>
-	<body class="flex flex-col h-screen bg-[#ffffff] dark:bg-[#1d1f21]">
+	<body class="flex flex-col h-full bg-[#ffffff] dark:bg-[#1d1f21]">
 		<script>
 			if (
 				!localStorage.getItem("isAuth") &&

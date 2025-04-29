@@ -1,5 +1,7 @@
 ---
 import ThemeSwitch from "./componentes_react/BotonTema";
+import { useEffect, useState } from 'react';
+
 const { texto } = Astro.props;
 const {
   showCompare = true,
@@ -14,7 +16,7 @@ const {
 
 <!-- Cabecera de la aplicación --><!-- título de la aplicación y un nav con diferentes opciones, incluye un switch de modo oscuro/claro -->
 <header
-  class="h-[10vh] bg-white shadow-lg px-6 flex justify-between items-center dark:bg-[#0f1011] dark:shadow-lg/100"
+  class="h-[10%] bg-white shadow-lg px-6 flex justify-between items-center dark:bg-[#0f1011] dark:shadow-lg/100"
 >
   <div class="text-2xl font-bold text-blue-600">{texto}</div>
 
