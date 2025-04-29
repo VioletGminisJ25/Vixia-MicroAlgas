@@ -371,7 +371,8 @@ class DataQueries:
         # Ordenar los grupos para una salida consistente
         sorted_groups = sorted(value_counts.keys(), key=lambda g: time_day.index(g))
 
-        item_volumes = []
+        item_prices = []
+        items_volume = []
         for group in sorted_groups:
             group_index = time_day.index(group) + 1
             item_counter_in_group = 0  # Contador para ID dentro del grupo
@@ -382,7 +383,8 @@ class DataQueries:
                 count = value_counts[group][value]
                 # Generar un nuevo ID basado en el grupo y el índice del valor único dentro de ese grupo
                 item_id = f"{group_index}:{item_counter_in_group:02d}"
-                item_volumes.append(count)
+                item_prices.append(value)
+                items_volume.append(count)
                 output_aggregated.append(
                     {
                         "id": item_id,  # Nuevo ID basado en la agregación
@@ -395,19 +397,25 @@ class DataQueries:
 
         output = {
             "datos": output_aggregated,
-            "values": {"min": min(item_volumes), "max": max(item_volumes)},
+            "values": {
+                "volume": [min(items_volume), max(items_volume)],
+                "price": [min(item_prices) * 0.95, max(item_prices) * 1.05],
+            },
         }
 
         return output  # Devolver la lista agregada
 
-    def get_ph(self):
+    def get_data(self, datatype):
         """
         Obtiene los datos de pH de la base de datos.
         """
+
+        if datatype not in ["ph", "temperature"]:
+            return jsonify({"error": "Tipo de dato no valido"}), 400
         futures = {
-            "ResponsiveLine": executor_instance.submit(self.responsive_line, "ph"),
-            "Calendar": executor_instance.submit(self.calendar, "ph"),
-            "SwarmPlot": executor_instance.submit(self.swarm_plot, "ph"),
+            "ResponsiveLine": executor_instance.submit(self.responsive_line, datatype),
+            "Calendar": executor_instance.submit(self.calendar, datatype),
+            "SwarmPlot": executor_instance.submit(self.swarm_plot, datatype),
         }
         ph_data = {}
         for key, future in futures.items():
