@@ -22,14 +22,12 @@ auth_routes = Blueprint("routes", __name__)
 
 @auth_routes.route("/")
 def inicio():
-    queries.insertar_datos()
     return jsonify({"message": "The app is on"})
 
 
 @auth_routes.route("/data", methods=["GET"])
 def data_route():
     """Ruta para obtener los datos mas actuales del arduino cada 15 minutos."""
-    print(queries.get_sensor_data())
     return jsonify(data_handler()), 200
 
 
@@ -76,7 +74,7 @@ def get_hours_route():
     """Endpoint para obtener las horas de los datos de un archivo JSON."""
     data = request.json
     print(data)
-    return get_hours(data)
+    return queries.get_hours_bd(data)
 
 
 @auth_routes.route("/get_comparation", methods=["POST"])
@@ -84,7 +82,9 @@ def get_comparation_route():
     """Endpoint para obtener la comparacion de los datos de un archivo JSON."""
     data = request.json
     print(data)
-    return get_comparation(data)
+    result = queries.get_comparation(data)
+    print(result)
+    return result
 
 
 @auth_routes.route("/ph_temp", methods=["POST"])
@@ -93,3 +93,16 @@ def get_ph_temp_route():
     data = request.json
     print(data)
     return get_ph_temp_average(data)
+
+
+@auth_routes.route("/ph", methods=["POST"])
+def get_ph_route():
+    """Endpoint para obtener el pH promedio diario de los datos de un archivo JSON."""
+    return queries.get_ph()
+
+
+@auth_routes.route("/insert", methods=["POST"])
+def insert_data_route():
+    """Endpoint para obtener el pH promedio diario de los datos de un archivo JSON."""
+    # return queries.insertar_datos_ficticios()
+    pass

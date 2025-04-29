@@ -78,7 +78,7 @@ def data_handler():
         "colors": get_colors(),
         "rgb": get_rgb(),
         "data": get_ph_temp(),
-        "wave_lenght": WAVELENGTHS,
+        "wave_length": WAVELENGTHS,
     }
 
 
