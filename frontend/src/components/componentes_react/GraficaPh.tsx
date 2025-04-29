@@ -1,157 +1,85 @@
+import React, { useState, useEffect } from 'react';
 import CalendarByYear from "../componentes_react/ComponenteGrafico_Nivo_Calendar";
 import Swarmplot from "../componentes_react/ComponenteGrafico_Nivo_SwarmPlot";
-// Ejemplo de cómo podrías recibir los datos del backend
-const exampleDataPh = {
-    calendar: [
-        {
-            year: 2019,
-            values: [
-                { day: "2019-01-01", value: 30 },
-                { day: "2019-01-02", value: 35 },
-                { day: "2019-01-03", value: 25 },
-                { day: "2019-01-04", value: 42 },
-                { day: "2019-01-05", value: 48 },
-                { day: "2019-01-06", value: 32 },
-                { day: "2019-01-07", value: 38 },
-                { day: "2019-01-08", value: 28 },
-                { day: "2019-01-09", value: 45 },
-                { day: "2019-01-10", value: 51 },
-                
-            ],
-        },
-        {
-            year: 2020,
-            values: [
-                { day: "2020-01-01", value: 30 }, 
-                { day: "2020-01-02", value: 35 },
-                { day: "2020-01-03", value: 25 },
-                { day: "2020-01-04", value: 42 },
-                { day: "2020-01-05", value: 48 },
-                { day: "2019-01-06", value: 32 },
-                { day: "2019-01-07", value: 38 },
-                { day: "2019-01-08", value: 28 },
-                { day: "2019-01-09", value: 45 },
-                { day: "2019-01-10", value: 51 },
-            ],
-        },
-        
-    ],
-    nivoLine: [
-        {
-            year: 2019,
-            weeks: [
-                { week: 1, min: 10, max: 50 },
-                { week: 2, min: 20, max: 40 },
-                { week: 3, min: 25, max: 45 },
-            ],
-        },
-        {
-            year: 2020,
-            weeks: [
-            ],
-        },
-    ],
-    swarmplot:
-        [
-            {
-              "id": "0.0",
-              "group": "group A",
-              "price": 455,
-              "volume": 11
-            },
-            {
-              "id": "0.1",
-              "group": "group A",
-              "price": 339,
-              "volume": 17
-            },
-            {
-              "id": "0.2",
-              "group": "group A",
-              "price": 189,
-              "volume": 8
-            },
-            {
-              "id": "0.3",
-              "group": "group A",
-              "price": 445,
-              "volume": 13
-            },
-            {
-              "id": "0.4",
-              "group": "group A",
-              "price": 222,
-              "volume": 18
-            },
-            {
-              "id": "0.5",
-              "group": "group A",
-              "price": 218,
-              "volume": 8
-            },
-            {
-              "id": "0.6",
-              "group": "group A",
-              "price": 197,
-              "volume": 18
-            },
-            {
-              "id": "0.7",
-              "group": "group A",
-              "price": 242,
-              "volume": 14
-            },
-            {
-              "id": "0.8",
-              "group": "group A",
-              "price": 183,
-              "volume": 5
-            },
-            {
-              "id": "0.9",
-              "group": "group A",
-              "price": 167,
-              "volume": 20
-            },
-            {
-              "id": "0.10",
-              "group": "group A",
-              "price": 146,
-              "volume": 12
-            },
-        ]
-};
+import NivoLineChart from "./ComponenteGrafico_Responsive_Line"; // Importa el componente correcto
+import type { PhInterface } from '../../scripts/data_interface';
+import Loader from "../componentes_react/Loader";
 
+// Ejemplo de cómo podrías recibir los datos del backend
 
 export default function GraficaPh() {
-    return (
-        <div className="w-full h-full bg-gray-100 p-6 grid grid-cols-1 md:grid-cols-2 gap-6">
-            {/* Calendario */}
-            <div className="shadow-md rounded-lg bg-white p-4 h-fit">
-                <h2 className="text-xl font-semibold mb-4">Media Diaria</h2>
-                <CalendarByYear calendar_data={exampleDataPh.calendar} />
+  const [jsonData, setJsonData] = useState<PhInterface | null>(null);
+  const [loading, setLoading] = useState(true);
+  const [error, setError] = useState<string | null>(null);
 
-            </div>
+  useEffect(() => {
+    const fetchData = async () => {
+      try {
+        const response = await fetch('http://193.146.35.170:5000/ph', {
+          method: 'POST',
+          headers: {
+            'Content-Type': 'application/json',
+          },
 
-            {/* BulletChart (o su reemplazo) */}
-            <div className="shadow-md rounded-lg bg-white p-4 h-fit">
-                <h2 className="text-xl font-semibold mb-4">Gráfico de Valores</h2>
-                {/* {phData && <BulletChart data={phData} />} */}
-                <p className="text-gray-500">Componente del gráfico por desarrollar...</p>
-                <Swarmplot swarmPlot_data={exampleDataPh.swarmplot} />
-            </div>
+        });
 
-            {/* Swarmplot */}
-            <div className="shadow-md rounded-lg bg-white p-4 h-fit">
-                <h2 className="text-xl font-semibold mb-4">Distribución de Datos</h2>
-                {/* {phDistribution && <Swarmplot data={phDistribution} />} */}
-            </div>
+        if (!response.ok) {
+          throw new Error(`HTTP error! status: ${response.status}`);
+        }
+        const data: PhInterface = await response.json();
+        console.log("JSON recibido del backend (POST):", data);
 
-            {/* Espacio adicional si es necesario */}
-            {/* <div className="shadow-md rounded-lg bg-white p-4 h-fit">
-                <h2 className="text-xl font-semibold mb-4">Otro Componente</h2>
-                <p className="text-gray-500">Información adicional o controles...</p>
-            </div> */}
+        setJsonData(data);
+      } catch (e: any) {
+        setError(e.message);
+        console.error("Error fetching data (POST):", e);
+      } finally {
+        setLoading(false);
+      }
+    };
+
+    fetchData();
+  }, []);
+
+  return (
+    <div className="w-full h-[90%] p-6 grid grid-cols-5 grid-rows-5 gap-4">
+
+      <div id='padre_grafica' className="min-h-[100%] shadow-md h-fit rounded-lg  p-4 col-span-3 row-span-3 bg-slate-100">
+        <h2 className="text-xl font-semibold mb-4">Grafica</h2>
+        <div id='grafica' className='min-h-[80%] w-full h-full flex items-center justify-center bg-white rounded-lg'>
+          {loading ? (
+            <Loader />
+          ) : (
+            <NivoLineChart lineData={jsonData?.ResponsiveLine || []} />
+          )}
         </div>
-    );
+      </div>
+
+      <div id='padre_swarmPlot' className="min-h-[100%] shadow-md rounded-lg p-4 h-fit col-span-2 row-span-5 col-start-4 row-start-1 bg-slate-100">
+        <h2 className="text-xl font-semibold mb-4">SwarmPlot</h2>
+        <div id='swarmplot' className='w-full flex items-center justify-center bg-white rounded-lg'>
+          {loading ? (
+            <Loader />
+          ) : (
+            <Swarmplot swarmPlot_data={jsonData?.SwarmPlot} />
+          )}
+        </div>
+      </div>
+
+      <div id='padre_Calendar' className="min-h-[100%] shadow-md rounded-lg  p-4 h-fit col-span-3 row-span-2 col-start-1 row-start-4 bg-slate-100">
+        <h2 className="text-xl font-semibold mb-4">Calendario</h2>
+          {loading ? (
+            <Loader />
+          ) : (
+            <CalendarByYear calendar_data={jsonData?.Calendar || []} />
+          )}
+            <div id='calendar' className='w-full h-full flex items-center justify-center bg-white rounded-lg'>
+        </div>
+      </div>
+
+      {/* <div className="shadow-md rounded-lg bg-white p-4 h-fit">
+        <h2 className="text-xl font-semibold mb-4">nosé</h2>
+      </div> */}
+    </div>
+  );
 }

@@ -2,7 +2,7 @@ import { useEffect, useState } from 'react';
 import LastCurrentData from './ComponenteGrafico_Nivo_LongitudDeOnda';
 import type { SampleData } from "../../scripts/data_interface";
 import { motion } from 'framer-motion';
-
+const urlenv = import.meta.env.PUBLIC_DATA;
 const appearVariants = {
     hidden: { opacity: 0, y: 50, scale: 0.8 },
     visible: {
@@ -25,7 +25,7 @@ export default function GraficaIndex() {
     useEffect(() => {
         const fetchData = async () => {
             try {
-                const response = await fetch('http://193.146.35.170:5000/data');
+                const response = await fetch(import.meta.env.PUBLIC_DATA);
                 if (!response.ok) {
                     throw new Error('Error al obtener los datos');
                 }

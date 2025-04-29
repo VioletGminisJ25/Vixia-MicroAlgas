@@ -1,5 +1,5 @@
 import type { SampleData } from '../../scripts/data_interface';
-import NivoLine from './Nivo_LongitudDeOnda';
+import NivoLine from './Nivo_ResponsiveLine';
 interface Componente1Props {
     datos: SampleData | null;
     titulo: string;

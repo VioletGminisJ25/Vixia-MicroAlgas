@@ -24,24 +24,29 @@ export interface CompareData {
   selected_data: SampleData;
 }
 
-//Interfaz para Calendario
+//Interfaz para Calendario-ResponsiveLine-SwarmPlot
 export interface CalendarData {
   year: number;
   values: { day: string; value: number }[];
 }
 
-export interface SwarmPlotData {
-  id: string;
-  group: string;
-  price: number;
-  volume: number;
+export interface NivoLineData {
+  id: string,
+  data: { x: number; y: number }[];
 }
 
-export interface NivoLineData {
+export interface SwarmPlotData {
+  datos: {
+    id: string;
+    group: string;
+    price: number;
+    volume: number;
+  }[],
+  values: { min: number, max: number };
+}
 
-  year: number;
-  weeks: {
-    week : { min: number; max: number }
-  }
-
+export interface PhInterface {
+  Calendar: CalendarData[];
+  ResponsiveLine: NivoLineData[];
+  SwarmPlot: SwarmPlotData;
 }
