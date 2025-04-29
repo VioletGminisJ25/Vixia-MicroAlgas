@@ -1,16 +1,20 @@
 import React from 'react';
 import { ResponsiveCalendar } from '@nivo/calendar';
-import type { YearData } from "../../scripts/data_interface"; // Importa la interfaz
+import type { CalendarData } from "../../scripts/data_interface"; // Importa la interfaz
 
 
 interface Props {
-    nivo_data: YearData[];
+    nivo_data: CalendarData[];
 }
 
 const Nivo_Calendar: React.FC<Props> = ({ nivo_data }) => {
+    console.log("Nivo_Calendar", nivo_data); // Log para depuración
+
+    const yearsToRender = nivo_data.length > 0 ? nivo_data : [{ year: new Date().getFullYear(), values: [] }];
+
     return (
         <div className="grid grid-cols-1 gap-4"> {/* Force one column */}
-            {nivo_data.map((yearData) => (
+             {yearsToRender.map((yearData) => (
                 <div key={yearData.year} className="h-[300px]">
                     <ResponsiveCalendar
                         data={yearData.values}

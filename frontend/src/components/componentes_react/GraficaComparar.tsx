@@ -19,7 +19,7 @@ export default function ParentComponent() {
   const [datos, setDatos] = useState<CompareData | null>(null);
 
   return (
-    <div className="flex flex-col h-full">
+    <div className="flex flex-col h-[90%]">
       {/* Selector de fecha */}
       <div className="
       flex justify-center items-center
