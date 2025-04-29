@@ -4,7 +4,7 @@ import Swarmplot from "../componentes_react/ComponenteGrafico_Nivo_SwarmPlot";
 import NivoLineChart from "./ComponenteGrafico_Responsive_Line"; // Importa el componente correcto
 import type { PhInterface } from '../../scripts/data_interface';
 import Loader from "../componentes_react/Loader";
-
+import ErrorC from "../componentes_react/ServerError"; // Asegúrate de que este componente esté definido y exportado correctamente
 // Ejemplo de cómo podrías recibir los datos del backend
 
 export default function GraficaPh() {
@@ -40,13 +40,14 @@ export default function GraficaPh() {
 
     fetchData();
   }, []);
-
+  
   return (
+    
     <div className="w-full h-[90%] p-6 grid grid-cols-5 grid-rows-5 gap-4">
 
       <div id='padre_grafica' className="min-h-[100%] shadow-md h-fit rounded-lg  p-4 col-span-3 row-span-3 bg-slate-100">
         <h2 className="text-xl font-semibold mb-4">Grafica</h2>
-        <div id='grafica' className='min-h-[80%] w-full h-full flex items-center justify-center bg-white rounded-lg'>
+        <div id='grafica' className='min-h-[380px] w-full h-full flex items-center justify-center bg-white rounded-lg'>
           {loading ? (
             <Loader />
           ) : (
@@ -57,7 +58,7 @@ export default function GraficaPh() {
 
       <div id='padre_swarmPlot' className="min-h-[100%] shadow-md rounded-lg p-4 h-fit col-span-2 row-span-5 col-start-4 row-start-1 bg-slate-100">
         <h2 className="text-xl font-semibold mb-4">SwarmPlot</h2>
-        <div id='swarmplot' className='w-full flex items-center justify-center bg-white rounded-lg'>
+        <div id='swarmplot' className='min-h-[710px] w-full flex items-center justify-center bg-white rounded-lg'>
           {loading ? (
             <Loader />
           ) : (
@@ -66,15 +67,15 @@ export default function GraficaPh() {
         </div>
       </div>
 
-      <div id='padre_Calendar' className="min-h-[100%] shadow-md rounded-lg  p-4 h-fit col-span-3 row-span-2 col-start-1 row-start-4 bg-slate-100">
+      <div id='padre_Calendar' className="min-h-[100%] shadow-md rounded-lg  p-4 h-fit col-span-3 row-span-2 col-start-1 row-start-4 bg-slate-100 ">
         <h2 className="text-xl font-semibold mb-4">Calendario</h2>
+        <div id='calendar' className='w-full h-[100%] flex items-center justify-center bg-white rounded-lg'>
+          </div>
           {loading ? (
             <Loader />
           ) : (
             <CalendarByYear calendar_data={jsonData?.Calendar || []} />
           )}
-            <div id='calendar' className='w-full h-full flex items-center justify-center bg-white rounded-lg'>
-        </div>
       </div>
 
       {/* <div className="shadow-md rounded-lg bg-white p-4 h-fit">
