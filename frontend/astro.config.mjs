@@ -14,7 +14,7 @@ export default defineConfig({
     host: '0.0.0.0',
   },
   devToolbar: {
-    enabled: false
+    enabled: true
   },
   integrations: [react()
     , compress({
@@ -22,7 +22,8 @@ export default defineConfig({
       CSS: true,
       JavaScript: true,    // para .js / .mjs
       JSON: true,          // para .json
-      SVG: true,           // opcional si manejas SVG aparte
+      SVG: true, 
+      Path:["/src/pages"], 
     }),
     critters()
   ],
