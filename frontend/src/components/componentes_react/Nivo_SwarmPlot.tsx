@@ -8,19 +8,22 @@ interface Props {
 }
 
 const Nivo_SwarmPlot: React.FC<Props> = ({ nivo_data, nivo_data_values }) => {
+    console.log("Nivo_SwarmPlot", nivo_data); // Log para depuración
+    console.log("Nivo_SwarmPlot_values", nivo_data_values); // Log para depuración
+    console.log(window.location.pathname); // Log para depuración
     return (
         <div id='swarmplot' className="h-full w-full">
             <ResponsiveSwarmPlot
                 data={nivo_data || []}
-                groups={[...new Set(nivo_data?.map(d => d.group))]} // Extrae los grupos únicos
+                groups={[...new Set(nivo_data?.map(d => d.group))]}
                 value="price"
                 valueFormat="$.2f"
-                valueScale={{ type: 'linear', min: 1, max: 14, reverse: false }}
+                valueScale={{ type: 'linear', min: nivo_data_values?.price[0], max: nivo_data_values?.price[1], reverse: false }}
                 size={{
                     key: 'volume',
                     values: [
-                        nivo_data_values?.min || 0,
-                        nivo_data_values?.max || 200 // Cambia estos valores según tus datos
+                        nivo_data_values?.volume[0] || 0,
+                        nivo_data_values?.volume[1] || 200
                     ],
                     sizes: [
                         6,

@@ -42,7 +42,10 @@ export interface SwarmPlotData {
     price: number;
     volume: number;
   }[],
-  values: { min: number, max: number };
+  values: {
+    price: number[]
+    volume: number[]
+  };
 }
 
 export interface PhInterface {
