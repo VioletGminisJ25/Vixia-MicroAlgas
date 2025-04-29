@@ -98,7 +98,7 @@ def get_ph_temp_route():
 @auth_routes.route("/ph", methods=["POST"])
 def get_ph_route():
     """Endpoint para obtener el pH promedio diario de los datos de un archivo JSON."""
-    return queries.get_ph()
+    return queries.get_data("ph")
 
 
 @auth_routes.route("/insert", methods=["POST"])
@@ -106,3 +106,9 @@ def insert_data_route():
     """Endpoint para obtener el pH promedio diario de los datos de un archivo JSON."""
     # return queries.insertar_datos_ficticios()
     pass
+
+
+@auth_routes.route("/temp", methods=["POST"])
+def get_temp_route():
+    """Endpoint para obtener el pH promedio diario de los datos de un archivo JSON."""
+    return queries.get_data("temperature")
