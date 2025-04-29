@@ -14,7 +14,7 @@ export default defineConfig({
     host: '0.0.0.0',
   },
   devToolbar: {
-    enabled: true
+    enabled: false
   },
   integrations: [react()
     , compress({
