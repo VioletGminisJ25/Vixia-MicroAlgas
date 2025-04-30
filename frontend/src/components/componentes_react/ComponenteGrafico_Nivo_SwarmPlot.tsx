@@ -9,7 +9,7 @@ interface Props {
 const ComponenteGrafico_Nivo_SwarmPlot: React.FC<Props> = ({ swarmPlot_data }) => {
     return (
         <div className="h-[800px] w-full">
-            {swarmPlot_data && <Nivo_SwarmPlot nivo_data={swarmPlot_data.datos} nivo_data_values={swarmPlot_data.values} />} 
+            {swarmPlot_data && <Nivo_SwarmPlot nivo_data={swarmPlot_data.datos} nivo_data_values={swarmPlot_data.values} nivo_data_names={swarmPlot_data.ID} />} 
         </div>
     )
 }

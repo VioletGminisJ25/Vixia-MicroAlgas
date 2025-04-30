@@ -2,13 +2,13 @@ import React, { useState, useEffect } from 'react';
 import CalendarByYear from "../componentes_react/ComponenteGrafico_Nivo_Calendar";
 import Swarmplot from "../componentes_react/ComponenteGrafico_Nivo_SwarmPlot";
 import NivoLineChart from "./ComponenteGrafico_Responsive_Line"; // Importa el componente correcto
-import type { PhInterface } from '../../scripts/data_interface';
+import type { Interface_Ph_Temp } from '../../scripts/data_interface';
 import Loader from "../componentes_react/Loader";
 import ErrorC from "../componentes_react/ServerError"; // Asegúrate de que este componente esté definido y exportado correctamente
 // Ejemplo de cómo podrías recibir los datos del backend
 
-export default function GraficaPh() {
-    const [jsonData, setJsonData] = useState<PhInterface | null>(null);
+export default function GraficaTemp() {
+    const [jsonData, setJsonData] = useState<Interface_Ph_Temp | null>(null);
     const [loading, setLoading] = useState(true);
     const [error, setError] = useState<string | null>(null);
 
@@ -26,7 +26,7 @@ export default function GraficaPh() {
                 if (!response.ok) {
                     throw new Error(`HTTP error! status: ${response.status}`);
                 }
-                const data: PhInterface = await response.json();
+                const data: Interface_Ph_Temp = await response.json();
                 console.log("JSON recibido del backend (POST):", data);
 
                 setJsonData(data);
