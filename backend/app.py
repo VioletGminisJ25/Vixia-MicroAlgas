@@ -13,7 +13,9 @@ from flask_compress import Compress
 
 app = Flask(__name__)
 CORS(app)
-compress = Compress()
+compress = (
+    Compress()
+)  # Inicializa la compresión de respuestas para comprimir json y html
 compress.init_app(app)
 app.config["COMPRESS_ALGORITHM"] = "gzip"
 app.config["COMPRESS_LEVEL"] = 6
