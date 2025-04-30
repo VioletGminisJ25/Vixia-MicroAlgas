@@ -10,7 +10,7 @@ from utils.lib import (
     get_comparation,
     get_ph_temp_average,
 )
-from utils.auth import register_handler, login_handler
+from auth.auth import register_handler, login_handler
 from flask import jsonify, request
 from markupsafe import escape
 from database.queries import DataQueries

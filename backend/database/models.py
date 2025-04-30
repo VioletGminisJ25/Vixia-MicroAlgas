@@ -90,3 +90,17 @@ class WaveLength(db.Model):
         "MainDatetime", backref=db.backref("wave_length", uselist=False)
     )
     __table_args__ = (UniqueConstraint("datetime", "position", name="pk_wave_length"),)
+
+
+class Users(db.Model):
+    """
+    Modelo para la tabla Users.
+    """
+
+    __tablename__ = "users"
+    name = Column(String(100), nullable=False)
+    password = Column(String(100), nullable=False)
+    email = Column(String(100), primary_key=True, nullable=False)
+
+    def __repr__(self):
+        return f"<User(id={self.id}, name='{self.name}', email='{self.email}')>"
