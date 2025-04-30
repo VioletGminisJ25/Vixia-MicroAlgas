@@ -1,6 +1,6 @@
 import React from 'react';
 import { ResponsiveSwarmPlot } from '@nivo/swarmplot'
-import type { SwarmPlotData } from "../../scripts/data_interface";
+import type { SwarmPlotData } from "../../../scripts/Global_Interface";
 
 interface Props {
     nivo_data: SwarmPlotData["datos"] | undefined;
@@ -9,9 +9,6 @@ interface Props {
 }
 
 const Nivo_SwarmPlot: React.FC<Props> = ({ nivo_data, nivo_data_values, nivo_data_names }) => {
-    console.log("Nivo_SwarmPlot", nivo_data);
-    console.log("Nivo_SwarmPlot_values", nivo_data_values);
-    console.log(window.location.pathname);
     return (
         <div id='swarmplot' className="h-full w-full">
             <ResponsiveSwarmPlot

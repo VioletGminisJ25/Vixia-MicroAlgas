@@ -1,6 +1,6 @@
 import React from 'react';
 import { ResponsiveCalendar } from '@nivo/calendar';
-import type { CalendarData } from "../../scripts/data_interface"; // Importa la interfaz
+import type { CalendarData } from "../../../scripts/Global_Interface"; // Importa la interfaz
 
 
 interface Props {

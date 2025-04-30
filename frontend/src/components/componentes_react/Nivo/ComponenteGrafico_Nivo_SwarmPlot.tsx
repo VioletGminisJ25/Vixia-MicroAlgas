@@ -1,6 +1,6 @@
 import React from 'react';
-import Nivo_SwarmPlot from "../componentes_react/Nivo_SwarmPlot";
-import type { SwarmPlotData } from "../../scripts/data_interface"; 
+import Nivo_SwarmPlot from "./Nivo_SwarmPlot";
+import type { SwarmPlotData } from "../../../scripts/Global_Interface"; 
 
 interface Props {
     swarmPlot_data: SwarmPlotData | undefined; 

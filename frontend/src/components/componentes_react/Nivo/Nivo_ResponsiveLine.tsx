@@ -1,6 +1,6 @@
 import React, { useMemo } from 'react';
 import { ResponsiveLine } from '@nivo/line';
-import type { NivoLineData, SampleData } from '../../scripts/data_interface';
+import type { NivoLineData, SampleData } from '../../../scripts/Global_Interface';
 
 interface NivoLineProps {
   datos?: SampleData | null;
@@ -31,7 +31,7 @@ export default function Nivo_ResponsiveLine({ datos, nivo_datos }: NivoLineProps
       <ResponsiveLine
         data={series}
         margin={{ top: 30, right: 25, bottom: showLegend ? 50 : 25, left: 35 }}
-        xScale={{ type: 'linear', min: 0, max: 'auto' }}
+        xScale={{ type: 'linear', min: 'auto', max: 'auto' }}
         yScale={{ type: 'linear', min: 'auto', max: 'auto' }}
         curve="monotoneX"
         axisTop={null}

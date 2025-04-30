@@ -1,13 +1,13 @@
 import React, { useState, useEffect } from 'react';
-import CalendarByYear from "../componentes_react/ComponenteGrafico_Nivo_Calendar";
-import Swarmplot from "../componentes_react/ComponenteGrafico_Nivo_SwarmPlot";
-import NivoLineChart from "./ComponenteGrafico_Responsive_Line"; // Importa el componente correcto
-import type { Interface_Ph_Temp } from '../../scripts/data_interface';
-import Loader from "../componentes_react/Loader";
-import ErrorC from "../componentes_react/ServerError"; // Asegúrate de que este componente esté definido y exportado correctamente
+import CalendarByYear from "../Nivo/ComponenteGrafico_Nivo_Calendar";
+import Swarmplot from "../Nivo/ComponenteGrafico_Nivo_SwarmPlot";
+import NivoLineChart from "../Nivo/ComponenteGrafico_Responsive_Line"; // Importa el componente correcto
+import type { Interface_Ph_Temp } from '../../../scripts/Global_Interface';
+import Loader from "../Ui/Loader";
+import ErrorC from "../Ui/ServerError"; // Asegúrate de que este componente esté definido y exportado correctamente
 // Ejemplo de cómo podrías recibir los datos del backend
 
-export default function GraficaTemp() {
+export default function Grafica() {
     const [jsonData, setJsonData] = useState<Interface_Ph_Temp | null>(null);
     const [loading, setLoading] = useState(true);
     const [error, setError] = useState<string | null>(null);

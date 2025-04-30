@@ -1,6 +1,6 @@
 import { useEffect, useState } from 'react';
-import LastCurrentData from './ComponenteGrafico_Nivo_LongitudDeOnda';
-import type { SampleData } from "../../scripts/data_interface";
+import LastCurrentData from '../Nivo/ComponenteGrafico_Nivo_LongitudDeOnda';
+import type { SampleData } from "../../../scripts/Global_Interface";
 import { motion } from 'framer-motion';
 const urlenv = import.meta.env.PUBLIC_DATA;
 const appearVariants = {

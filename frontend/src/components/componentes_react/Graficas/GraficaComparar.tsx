@@ -1,8 +1,8 @@
 import { useState } from 'react';
-import DatePickerWithData from './SelectorFecha';
-import LastCurrentData from './ComponenteGrafico_Nivo_LongitudDeOnda';
-import SelectedData from './ComponenteGrafico_Nivo_LongitudDeOnda';
-import type { CompareData } from "../../scripts/data_interface";
+import DatePickerWithData from '../Ui/SelectorFecha';
+import LastCurrentData from '../Nivo/ComponenteGrafico_Nivo_LongitudDeOnda';
+import SelectedData from '../Nivo/ComponenteGrafico_Nivo_LongitudDeOnda';
+import type { CompareData } from "../../../scripts/Global_Interface";
 import { motion } from 'framer-motion';
 
 const appearVariants = {

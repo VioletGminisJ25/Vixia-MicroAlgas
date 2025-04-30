@@ -1,4 +1,4 @@
-import type { SampleData } from '../../scripts/data_interface';
+import type { SampleData } from '../../../scripts/Global_Interface';
 import NivoLine from './Nivo_ResponsiveLine';
 interface Componente1Props {
     datos: SampleData | null;
