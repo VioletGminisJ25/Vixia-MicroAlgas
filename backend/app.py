@@ -7,7 +7,7 @@ from flask import Flask
 from routes.auth_routes import auth_routes
 from flask_cors import CORS
 from database.db_instance import db_instance
-from database.executor_instance import executor_instance, init_executor
+from database.executor_instance import init_executor
 from flask_compress import Compress
 
 

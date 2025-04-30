@@ -18,7 +18,16 @@ from database.executor_instance import executor_instance
 
 
 class DataQueries:
+    """
+    Clase para manejar las consultas a la base de datos.
+    Esta clase contiene métodos para obtener datos de las tablas SensorData, Rgb, Colors y MainDatetime.
+    También incluye métodos para insertar datos ficticios y realizar comparaciones de datos.
+    """
+
     def __init__(self):
+        """
+        Inicializa la clase DataQueries y establece la sesión de la base de datos.
+        """
         self.session = db_instance.db.session
 
     def get_sensor_data(self):
@@ -29,6 +38,10 @@ class DataQueries:
         return self.session.query(SensorData).all()
 
     def insertar_datos_ficticios(self):
+        """
+        Inserta datos ficticios en la base de datos para las tablas MainDatetime, SensorData, Rgb, Colors y WaveLength.
+        Genera datos aleatorios para cada tabla y los inserta en la base de datos.
+        """
         # Fecha de inicio y fin
         inicio = datetime(2025, 1, 1)
         hoy = datetime.now()
@@ -235,6 +248,9 @@ class DataQueries:
             )
 
     def calendar(self, datatype):
+        """
+        Obtiene los datos de pH o temperatura promedio diario de la base de datos.
+        """
         if datatype not in ["ph", "temperature"]:
             return jsonify({"error": "Tipo de dato no valido"}), 400
         colum_to_avg = getattr(SensorData, datatype)
@@ -271,6 +287,9 @@ class DataQueries:
         return formatted_output
 
     def responsive_line(self, datatype):
+        """
+        Obtiene los datos de pH o temperatura promedio semanal de la base de datos.
+        """
         if datatype not in ["ph", "temperature"]:
             return jsonify({"error": "Tipo de dato no valido"}), 400
         colum_obj = getattr(SensorData, datatype)
@@ -311,6 +330,7 @@ class DataQueries:
         return formatted_output
 
     def bullet_chart(self, datatype):
+
         if datatype not in ["ph", "temperature"]:
             return jsonify({"error": "Tipo de dato no valido"}), 400
         colum_obj = getattr(SensorData, datatype)
@@ -326,22 +346,24 @@ class DataQueries:
         )
 
     def swarm_plot(self, datatype):
+        """
+        Obtiene los datos de pH o temperatura agrupados por hora y cuenta la cantidad de ocurrencias de cada valor.
+        """
         if datatype not in ["ph", "temperature"]:
             return jsonify({"error": "Tipo de dato no valido"}), 400
 
+        # --- Query ---
         colum_obj = getattr(SensorData, datatype)
         results = self.session.query(
-            # No necesitamos el datetime completo aquí, solo la hora y el valor
             db_instance.db.func.hour(SensorData.datetime).label("hour"),
             colum_obj.label("value"),
         ).all()
 
-        # --- Agregación ---
-        value_counts = {}  # Diccionario para contar {grupo: {valor: contador}}
+        value_counts = {}
         time_day = ["Manana", "Tarde", "Noche"]
 
         for hour, value in results:
-            if value is None:  # Opcional: Saltar valores nulos si pueden ocurrir
+            if value is None:
                 continue
 
             # Determinar el grupo (Mañana, Tarde, Noche)
@@ -353,7 +375,6 @@ class DataQueries:
             else:
                 day_out = time_day[2]
 
-            # Inicializar contadores si es necesario
             if day_out not in value_counts:
                 value_counts[day_out] = {}
             if value not in value_counts[day_out]:
@@ -365,8 +386,6 @@ class DataQueries:
         # --- Generación de la Salida Agregada ---
         output = {}
         output_aggregated = []
-        # Un contador para generar IDs únicos para los puntos *agregados*
-        # Podríamos hacerlo global o por grupo, aquí lo haremos por grupo.
 
         # Ordenar los grupos para una salida consistente
         sorted_groups = sorted(value_counts.keys(), key=lambda g: time_day.index(g))
@@ -396,6 +415,7 @@ class DataQueries:
                 item_counter_in_group += 1
 
         output = {
+            "ID": str(datatype).title(),
             "datos": output_aggregated,
             "values": {
                 "volume": [min(items_volume), max(items_volume)],
@@ -408,6 +428,7 @@ class DataQueries:
     def get_data(self, datatype):
         """
         Obtiene los datos de pH de la base de datos.
+        Utiliza un executor para ejecutar las consultas en segundo plano y mejorar el rendimiento.
         """
 
         if datatype not in ["ph", "temperature"]:
