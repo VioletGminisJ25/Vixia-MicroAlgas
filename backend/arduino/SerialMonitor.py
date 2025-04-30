@@ -6,8 +6,9 @@ import os
 import pandas as pd
 import serial.tools.list_ports
 import serial
-from arduino.util import obtener_puertos_usb
+from arduino.util import obtener_puertos_usb, measurement_config_send
 from dotenv import load_dotenv
+import asyncio
 
 load_dotenv()
 
@@ -337,6 +338,7 @@ class SerialMonitor:
             self.monitor_thread.start()
         except serial.SerialException as e:
             print(f"Error al abrir el puerto {self.port}: {e}")
+        asyncio.run(measurement_config_send(self))
 
     def stop(self):
         self.running = False

@@ -10,9 +10,8 @@ from database.db_instance import db_instance
 from database.executor_instance import init_executor
 from flask_compress import Compress
 from config import Config
-from arduino.SerialMonitor import SerialMonitor
 from dotenv import load_dotenv
-import os
+from arduino.serial_intance import monitor
 
 load_dotenv()
 
@@ -33,7 +32,6 @@ def main():
     init_executor(app, executor_type="thread", max_workers=4)
     app.register_blueprint(auth_routes)
 
-    monitor = SerialMonitor(os.getenv("BAUD_RATE"))
     monitor.start()
     # IMPORTANTE: Use reloader a false porque crea dos veces y hace dos starts de serial monitor y salta error de que el puerto COM ya está en uso
     app.run(debug=True, host="0.0.0.0", use_reloader=False)
