@@ -9,6 +9,7 @@ import serial
 from arduino.util import obtener_puertos_usb, measurement_config_send
 from dotenv import load_dotenv
 import asyncio
+from database.queries import DataQueries
 
 load_dotenv()
 
@@ -307,7 +308,7 @@ WAVELENGTHS = [
 
 
 class SerialMonitor:
-    def __init__(self, baud_rate):
+    def __init__(self, baud_rate, app, socketio):
         self.baud_rate = baud_rate
         self.serial_port = None
         self.running = False
@@ -322,6 +323,8 @@ class SerialMonitor:
         self.manual_name = None
         self.port = obtener_puertos_usb(os.getenv("VID"), os.getenv("PID"))
         self.timeout = int(os.getenv("TIMEOUT"))
+        self.app = app
+        self.socketio = socketio
 
     def start(self):
         try:
@@ -349,15 +352,17 @@ class SerialMonitor:
             print("Puerto cerrado.")
 
     def monitor_serial(self):
-        while self.running:
-            if self.serial_port.in_waiting > 0:
-                data = self.serial_port.read(self.serial_port.in_waiting).decode(
-                    "utf-8", errors="ignore"
-                )
-                print(data, end="")
-                self.buffer += data
-                self.process_buffer()
-            time.sleep(0.01)
+        with self.app.app_context():
+            self.queries = DataQueries()
+            while self.running:
+                if self.serial_port.in_waiting > 0:
+                    data = self.serial_port.read(self.serial_port.in_waiting).decode(
+                        "utf-8", errors="ignore"
+                    )
+                    print(data, end="")
+                    self.buffer += data
+                    self.process_buffer()
+                time.sleep(0.01)
 
     def process_buffer(self):
         while True:
@@ -419,14 +424,39 @@ class SerialMonitor:
         for espectrometro, _, _ in self.current_batch:
             espectro_data.append(espectrometro)
         espectro_df = pd.DataFrame(espectro_data)
+        espectro_avg = espectro_df.mean(axis=0).values
+        print(espectro_avg)
 
         # Crear DataFrame para la temperatura
         temp_data = [temp for _, temp, _ in self.current_batch]
         temp_df = pd.DataFrame(temp_data, columns=["Temperatura"])
+        temp_avg = temp_df.mean().values[0]
+        print(temp_avg)
 
         # Crear DataFrame para el pH
         ph_data = [ph for _, _, ph in self.current_batch]
         ph_df = pd.DataFrame(ph_data, columns=["pH"])
+        ph_avg = ph_df.mean().values[0]
+        print(ph_avg)
+
+        datetime_med = datetime.now().strftime("%Y-%m-%d %H:%M:%S")
+        data = {
+            "datetime": datetime_med,
+            "value": espectro_avg,
+            "temperature": temp_avg,
+            "ph": ph_avg,
+        }
+        self.socketio.emit(
+            "arduino_data",
+            {
+                "colors": None,
+                "rgb": None,
+                "data": {"ph": ph_avg, "temperature": temp_avg},
+                "wave_length": espectro_avg,
+            },
+        )
+        self.queries.insert_data(data)
+        print("Datos guardados en la base de datos.")
 
         # TODO Subir datos a la base de datos
 

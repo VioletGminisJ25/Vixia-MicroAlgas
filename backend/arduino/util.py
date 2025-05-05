@@ -21,6 +21,12 @@ def obtener_puertos_usb(vid, pid):
     return None
 
 
+from colorama import init, Fore
+
+# Hace que despues de cada cadena vuelva a estar en el color por defecto
+init(autoreset=True)
+
+
 async def measurement_config_send(
     monitor,
     time=os.getenv("TIME_BETWEEN_MEASURAMENTS"),
@@ -31,10 +37,13 @@ async def measurement_config_send(
     blue=os.getenv("LIGHT_BLUE"),
 ):
     values = [time, light, dark, white, red, blue]
-    monitor.send_command(" ")
+    await asyncio.sleep(5)
 
-    await asyncio.sleep(8)
+    monitor.send_command("aa")
+    print(f"\n{Fore.RED}Enviando: aa\n")
+
+    await asyncio.sleep(30)
     for data in values:
         monitor.send_command(data)
-        print(f"Enviando: {data}")
+        print(f"\n{Fore.RED} Enviando: {data}\n")
         await asyncio.sleep(1)

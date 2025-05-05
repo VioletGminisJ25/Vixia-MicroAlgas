@@ -14,3 +14,4 @@ class Config:
     COMPRESS_MIN_SIZE = 200
     SQLALCHEMY_DATABASE_URI = f"mysql+mysqlconnector://{os.getenv("DB_USER")}:{os.getenv("DB_PASSWORD")}@{os.getenv("DB_HOST")}/{os.getenv("DB_NAME")}"
     SQLALCHEMY_TRACK_MODIFICATIONS = False
+    SECRET_KEY = "vixiasystem"

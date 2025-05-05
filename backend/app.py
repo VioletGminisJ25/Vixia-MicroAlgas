@@ -11,7 +11,11 @@ from database.executor_instance import init_executor
 from flask_compress import Compress
 from config import Config
 from dotenv import load_dotenv
-from arduino.serial_intance import monitor
+from arduino.SerialMonitor import SerialMonitor
+import os
+
+from websockets.socketio_intance import socketio_init
+
 
 load_dotenv()
 
@@ -31,10 +35,11 @@ def main():
     db_instance.init_db(app)
     init_executor(app, executor_type="thread", max_workers=4)
     app.register_blueprint(auth_routes)
-
+    socketio = socketio_init(app)
+    monitor = SerialMonitor(os.getenv("BAUD_RATE"), app, socketio)
     monitor.start()
     # IMPORTANTE: Use reloader a false porque crea dos veces y hace dos starts de serial monitor y salta error de que el puerto COM ya está en uso
-    app.run(debug=True, host="0.0.0.0", use_reloader=False)
+    socketio.run(app, debug=True, host="0.0.0.0", use_reloader=False)
     # app.run(debug=False, host="0.0.0.0")
 
 

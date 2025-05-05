@@ -18,8 +18,8 @@ class Database:
         Inicializa la base de datos y crea las tablas necesarias.
         """
         try:
-            self.db.init_app(app)
             with app.app_context():
+                self.db.init_app(app)
                 self.db.create_all()
 
             print("Connected to the database!")

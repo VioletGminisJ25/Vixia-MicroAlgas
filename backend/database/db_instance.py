@@ -1,5 +1,6 @@
 from database.db import Database
 from flask_executor import Executor
+from flask import current_app
 
 db_instance = Database()
 
