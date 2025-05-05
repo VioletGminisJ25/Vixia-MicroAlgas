@@ -2,6 +2,10 @@ import { useEffect, useState } from 'react';
 import LastCurrentData from '../Nivo/ComponenteGrafico_Nivo_LongitudDeOnda';
 import type { SampleData } from "../../../scripts/Global_Interface";
 import { motion } from 'framer-motion';
+import { ToastContainer, toast } from 'react-toastify'
+import { io } from 'socket.io-client';
+
+
 const urlenv = import.meta.env.PUBLIC_DATA;
 const appearVariants = {
     hidden: { opacity: 0, y: 50, scale: 0.8 },
@@ -18,34 +22,74 @@ const appearVariants = {
  * @returns 
  */
 export default function GraficaIndex() {
+
     const [datos, setDatos] = useState<SampleData | null>(null);
     /**
      * Efecto que se ejecuta al montar el componente y cada 15 minutos
      */
     useEffect(() => {
-        const fetchData = async () => {
-            try {
-                const response = await fetch(import.meta.env.PUBLIC_DATA);
-                if (!response.ok) {
-                    throw new Error('Error al obtener los datos');
-                }
-                const jsonData: SampleData = await response.json();
-                setDatos(jsonData);
-            } catch (error) {
-                console.error('Error al cargar datos:', error);
-                setDatos(null);
-            }
+
+        const socket = io(import.meta.env.PUBLIC_DATA);
+
+        socket.on('arduino_data', (data) => {
+
+            console.log('Conectado al servidor de WebSocket' + data);
+        });
+
+        return () => {
+            socket.disconnect();
         };
-
-        fetchData();
-
-
-        const interval = setInterval(fetchData, 15 * 60 * 1000); // cada 15 minutos
-
-        // Limpiar el intervalo al desmontar el componente
-        // Esto es importante para evitar fugas de memoria y llamadas innecesarias a la API
-        return () => clearInterval(interval);
     }, []);
+    // const fetchData = async () => {
+    //     try {
+    //         const response = await fetch(import.meta.env.PUBLIC_DATA);
+    //         if (!response.ok) {
+    //             throw new Error('Error al obtener los datos');
+    //         }
+    //         const jsonData: SampleData = await response.json();
+    //         setDatos(jsonData);
+    //         console.log('Datos obtenidos:', jsonData);
+    //         toast.success('Datos obtenidos', {
+    //             position: "bottom-right",
+    //             autoClose: 5000,
+    //             hideProgressBar: false,
+    //             closeOnClick: false,
+    //             pauseOnHover: true,
+    //             draggable: true,
+    //             progress: undefined,
+    //             theme: "colored",
+    //         });
+    //     } catch (error) {
+    //         console.error('Error al cargar datos:', error);
+    //         toast.error("Eror de conexion", {
+    //             position: "bottom-right",
+    //             autoClose: 5000,
+    //             hideProgressBar: false,
+    //             closeOnClick: true,
+    //             pauseOnHover: true,
+    //             draggable: true,
+    //             progress: undefined,
+    //             theme: "colored",
+    //         });
+
+    //         setDatos(null);
+    //     }
+
+
+
+
+    //fetchData();
+
+
+    //const interval = setInterval(fetchData, 15 * 60 * 1000); // cada 15 minutos
+
+    // Limpiar el intervalo al desmontar el componente
+    // Esto es importante para evitar fugas de memoria y llamadas innecesarias a la API
+
+
+
+    //return () => clearInterval(interval);
+
 
     // Renderizar el componente de la gráfica y pasarle los datos
     // Si los datos son nulos, no se renderiza nada

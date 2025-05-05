@@ -1,9 +1,10 @@
 import React, { useState, useEffect } from 'react';
 import DatePicker from 'react-datepicker';
 import 'react-datepicker/dist/react-datepicker.css';
-import { format } from 'date-fns';
-import type { CompareData } from '../../scripts/data_interface';
-
+import { format, formatDate } from 'date-fns';
+import type { CompareData } from '../../../scripts/Global_Interface';
+import { ToastContainer, toast } from 'react-toastify'
+import Loader from './Loader';
 const urlGetHours: string = import.meta.env.PUBLIC_GET_HOURS;
 const urlGetComparasion: string = import.meta.env.PUBLIC_GET_COMPARASION;
 
@@ -50,18 +51,48 @@ export default function Calendar({ setDatos }: CalendarProps) {
       const data = await response.json();
       if (!response.ok) {
         if (response.status === 404) {
+          toast.error(`No hay mediciones para esta fecha\n` + format(date, 'yyyy-MM-dd'), {
+            position: "bottom-right",
+            autoClose: 5000,
+            hideProgressBar: false,
+            closeOnClick: false,
+            pauseOnHover: true,
+            draggable: true,
+            progress: undefined,
+            theme: "colored",
+          });
           setErrorHours(data.error);
         } else {
           setErrorHours(data.error);
         }
         return;
       }
+      toast.success('Horas recibidas', {
+        position: "bottom-right",
+        autoClose: 5000,
+        hideProgressBar: false,
+        closeOnClick: false,
+        pauseOnHover: true,
+        draggable: true,
+        progress: undefined,
+        theme: "colored",
+      });
       console.log(data)
       setHoursOptions(data);
 
     } catch (error) {
       console.error('Error al conectar con el servidor:', error);
       setErrorHours('No se pudo conectar con el servidor. Por favor, verifica tu conexión a internet.');
+      toast.error('Error de conexion con el servidor', {
+        position: "bottom-right",
+        autoClose: 5000,
+        hideProgressBar: false,
+        closeOnClick: false,
+        pauseOnHover: true,
+        draggable: true,
+        progress: undefined,
+        theme: "colored",
+      });
     } finally {
       setLoadingHours(false);
     }
@@ -98,9 +129,29 @@ export default function Calendar({ setDatos }: CalendarProps) {
       .then(data => {
         console.log('Comparación recibida:', data);
         setDatos(data)
+        toast.success('Datos obtenidos', {
+          position: "bottom-right",
+          autoClose: 5000,
+          hideProgressBar: false,
+          closeOnClick: false,
+          pauseOnHover: true,
+          draggable: true,
+          progress: undefined,
+          theme: "colored",
+        });
       })
       .catch(error => {
         console.error('Error al enviar hora:', error);
+        toast.error('Error de conexion con el servidor', {
+          position: "bottom-right",
+          autoClose: 5000,
+          hideProgressBar: false,
+          closeOnClick: false,
+          pauseOnHover: true,
+          draggable: true,
+          progress: undefined,
+          theme: "light",
+        });
       });
 
   }
@@ -120,7 +171,7 @@ export default function Calendar({ setDatos }: CalendarProps) {
       />
 
       {loadingHours ? (
-        <span className="text-black dark:text-white font-bold"> Cargando datos...</span>
+        <Loader />
       ) : errorHours ? (
         <span className="text-red-600">{errorHours}</span>
       ) : (

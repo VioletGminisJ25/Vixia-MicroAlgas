@@ -3,10 +3,12 @@ import "../styles/global.css";
 import Heather from "../components/Cabecera.astro";
 import Layout from "../layouts/Layout.astro";
 import TempData from "../components/TempData.astro";
+import Toastify from "../components/componentes_react/Ui/Toastify";
 ---
 
 <!-- Pagina de de sensores --><!-- TODO Por hacer -->
 <Layout testTitle="Evolucion temperatura">
     <Heather texto="Evolucion Temperatura" showTemp={false} />
     <TempData />
+    <Toastify client:load />
 </Layout>

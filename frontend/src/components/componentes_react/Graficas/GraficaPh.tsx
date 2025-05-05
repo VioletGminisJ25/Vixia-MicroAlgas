@@ -5,6 +5,8 @@ import NivoLineChart from "../Nivo/ComponenteGrafico_Responsive_Line"; // Import
 import type { Interface_Ph_Temp } from '../../../scripts/Global_Interface';
 import Loader from "../Ui/Loader";
 import ErrorC from "../Ui/ServerError"; // Asegúrate de que este componente esté definido y exportado correctamente
+import { ToastContainer, toast } from 'react-toastify'
+
 // Ejemplo de cómo podrías recibir los datos del backend
 
 export default function GraficaPh() {
@@ -30,9 +32,30 @@ export default function GraficaPh() {
         console.log("JSON recibido del backend (POST):", data);
 
         setJsonData(data);
+        toast.success('Datos obtenidos', {
+          position: "bottom-right",
+          autoClose: 5000,
+          hideProgressBar: false,
+          closeOnClick: false,
+          pauseOnHover: true,
+          draggable: true,
+          progress: undefined,
+          theme: "colored",
+      });
       } catch (e: any) {
         setError(e.message);
         console.error("Error fetching data (POST):", e);
+        toast.error("Error de conexión", {
+          position: "bottom-right",
+          autoClose: 5000,
+          hideProgressBar: false,
+          closeOnClick: true,
+          pauseOnHover: true,
+          draggable: true,
+          progress: undefined,
+          theme: "colored",
+        });
+
       } finally {
         setLoading(false);
       }
@@ -61,8 +84,6 @@ export default function GraficaPh() {
         <div id='swarmplot' className='min-h-[710px] w-full flex items-center justify-center bg-white rounded-lg'>
           {loading ? (
             <Loader />
-          ) : error ? (
-            <ErrorC/> // Muestra el mensaje de error si hay uno
           ) : (
             <Swarmplot swarmPlot_data={jsonData?.SwarmPlot} />
           )}

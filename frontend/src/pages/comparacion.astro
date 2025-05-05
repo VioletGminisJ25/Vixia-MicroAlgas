@@ -4,6 +4,7 @@ import Calendar from "../components/componentes_react/Ui/SelectorFecha";
 import Layout from "../layouts/Layout.astro";
 import Heather from "../components/Cabecera.astro";
 import CompareComponet from "../components/CompararData.astro";
+import Toastify from "../components/componentes_react/Ui/Toastify";
 ---
 
 <!-- Pagina de comparación de datos --><!-- Esta página se encarga de comparar los datos de dos fechas (selecionada y ultima) y mostrar las gráficas correspondientes -->
@@ -13,6 +14,6 @@ import CompareComponet from "../components/CompararData.astro";
         texto="Comparar"
         showCompare={false}
     />
-
     <CompareComponet/>
+    <Toastify client:load/>
 </Layout>
