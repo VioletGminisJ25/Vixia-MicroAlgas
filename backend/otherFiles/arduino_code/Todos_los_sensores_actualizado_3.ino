@@ -87,6 +87,9 @@ void sendData(float temp, float ph, unsigned long timestamp) {
   Serial.println(timestamp / 1000.0, 2);
 }
 
+
+
+
 // Medición con luz blanca (10 medidas consecutivas)
 void medirConBlanca() {
   digitalWrite(relayPin1, HIGH); delay(delayBombilla);

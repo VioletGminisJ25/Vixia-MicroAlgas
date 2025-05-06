@@ -359,7 +359,10 @@ class SerialMonitor:
                     data = self.serial_port.read(self.serial_port.in_waiting).decode(
                         "utf-8", errors="ignore"
                     )
+
                     print(data, end="")
+
+                    # print(data)
                     self.buffer += data
                     self.process_buffer()
                 time.sleep(0.01)
@@ -451,8 +454,8 @@ class SerialMonitor:
             {
                 "colors": None,
                 "rgb": None,
-                "data": {"ph": ph_avg, "temperature": temp_avg},
-                "wave_length": espectro_avg,
+                "data": {"ph": float(ph_avg), "temperature": float(temp_avg)},
+                "wave_length": espectro_avg.tolist(),
             },
         )
         self.queries.insert_data(data)

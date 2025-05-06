@@ -234,7 +234,7 @@ class DataQueries:
 
             # --- Devolver Respuesta ---
             return (
-                jsonify({"last_data": last_data, "selected_data": selected_data}),
+                jsonify({"selected_data": selected_data}),
                 200,
             )
 
@@ -276,15 +276,26 @@ class DataQueries:
         )
 
         output = defaultdict(lambda: {"values": []})
-
+        avgs = []
         for year, datetime, avg in results:
+            avgs.append(avg)
             output[year]["values"].append(
-                {"day": str(datetime).split(" ")[0], "value": round(avg, 2)}
+                {
+                    "day": str(datetime).split(" ")[0],
+                    "value": round(avg, 2),
+                }
             )
 
         formatted_output = []
         for year, data in output.items():
-            formatted_output.append({"year": year, "values": data["values"]})
+            formatted_output.append(
+                {
+                    "year": year,
+                    "values": data["values"],
+                    "min": min(avgs),
+                    "max": max(avgs),
+                }
+            )
 
         return formatted_output
 
@@ -367,6 +378,7 @@ class DataQueries:
         for hour, value in results:
             if value is None:
                 continue
+            value = round(value, 1)
 
             # Determinar el grupo (Mañana, Tarde, Noche)
             hour_int = int(hour)  # Asegurarse de que la hora es un entero
@@ -485,3 +497,37 @@ class DataQueries:
         except Exception as e:
             print(f"Error al insertar datos: {e}")
             self.session.rollback()
+
+    def get_latest_data(self):
+        result = (
+            self.session.query(
+                SensorData.datetime,
+                SensorData.ph,
+                SensorData.temperature,
+                Rgb.r,
+                Rgb.g,
+                Rgb.b,
+            )
+            .select_from(SensorData)
+            .outerjoin(Rgb, SensorData.datetime == Rgb.datetime)
+            .outerjoin(Colors, SensorData.datetime == Colors.datetime)
+            .order_by(SensorData.datetime.desc())
+            .first()
+        )
+        result_wavelength = (
+            self.session.query(WaveLength.value)
+            .select_from(WaveLength)
+            .filter(WaveLength.datetime == result.datetime)
+            .order_by(WaveLength.position)
+            .all()
+        )
+        if not result:
+            return 404
+
+        last_data = {
+            "colors": None,
+            "rgb": None,
+            "data": {"temperature": result.temperature, "ph": result.ph},
+            "wave_length": [item[0] for item in result_wavelength],
+        }
+        return last_data
