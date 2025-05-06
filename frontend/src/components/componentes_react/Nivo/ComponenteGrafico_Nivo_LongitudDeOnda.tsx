@@ -1,4 +1,4 @@
-import type { SampleData } from '../../scripts/data_interface';
+import type { SampleData } from '../../../scripts/Global_Interface';
 import NivoLine from './Nivo_ResponsiveLine';
 interface Componente1Props {
     datos: SampleData | null;
@@ -9,7 +9,7 @@ export default function ComponenteGrafico_Nivo_LongitudDeOnda({ datos, titulo }:
     // Si no hay datos, establecemos un objeto de datos por defecto
     // Esto es útil para evitar errores al intentar acceder a propiedades de datos nulos
     const colors = datos?.colors ?? { red: false, white: false, blue: false };
-    
+    const rgb = datos?.rgb ?? { r: 0, g: 0, b: 0 };
     //Estructura del componente, que contiene un div
     //Dentro del div hay un título, botones de colores y una tabla con la gráfica
     //Los botones de colores están habilitados o deshabilitados según los datos
@@ -24,7 +24,7 @@ export default function ComponenteGrafico_Nivo_LongitudDeOnda({ datos, titulo }:
                     disabled={!colors.red}
                     className={`w-[10%] h-12 rounded 
             ${colors.red ? 'bg-red-500 text-white' : 'bg-gray-400 text-gray-600 cursor-not-allowed'}`}
-                    title={colors.red ? 'Se uso' : 'No se uso'}>
+                    title={rgb.r ? 'Se uso' : 'No se uso'}>
                     Rojo
                 </button>
 
@@ -33,7 +33,7 @@ export default function ComponenteGrafico_Nivo_LongitudDeOnda({ datos, titulo }:
                     disabled={!colors.white}
                     className={`w-[10%] h-12 rounded 
             ${colors.white ? 'bg-white text-black' : 'bg-gray-400 text-gray-600 cursor-not-allowed'}`}
-                    title={colors.white ? 'Se uso' : 'No se uso'}>
+                    title={rgb.g ? 'Se uso' : 'No se uso'}>
                     Blanco
                 </button>
 
@@ -42,7 +42,7 @@ export default function ComponenteGrafico_Nivo_LongitudDeOnda({ datos, titulo }:
                     disabled={!colors.blue}
                     className={`w-[10%] h-12 rounded 
             ${colors.blue ? 'bg-blue-500 text-white' : 'bg-gray-400 text-gray-600 cursor-not-allowed'}`}
-                    title={colors.blue ? 'Se uso' : 'No se uso'}
+                    title={rgb.b ? 'Se uso' : 'No se uso'}
                 >
                     Azul
                 </button>
@@ -53,12 +53,12 @@ export default function ComponenteGrafico_Nivo_LongitudDeOnda({ datos, titulo }:
                     <div
                         className="w-21 h-12 rounded"
                         style={{
-                            backgroundColor: datos
-                                ? `rgb(${datos.rgb.r}, ${datos.rgb.g}, ${datos.rgb.b})`
+                            backgroundColor: rgb
+                                ? `rgb(${rgb.r}, ${rgb.g}, ${rgb.b})`
                                 : '#000000',
                         }}
                         title={datos
-                            ? `rgb(${datos.rgb.r}, ${datos.rgb.g}, ${datos.rgb.b})`
+                            ? `rgb(${rgb.r}, ${rgb.g}, ${rgb.b})`
                             : 'rgb(NaN,NaN,NaN)'}
                     />
                 </div>
@@ -72,10 +72,10 @@ export default function ComponenteGrafico_Nivo_LongitudDeOnda({ datos, titulo }:
             {/* Botones de PH y Temp */}
             <div className="flex space-x-4 mt-4 w-full">
                 <button className="w-1/2 h-12 bg-[#ffffff] dark:bg-[#1d1f21] text-black dark:text-white font-bold rounded">
-                    <p>PH: {datos?.data.ph ?? 'sin datos'}</p>
+                    <p> pH: {datos?.data.ph ? Math.round(datos.data.ph * 10) / 10 : 'sin datos'}</p>
                 </button>
                 <button className="w-1/2 h-12 bg-[#ffffff] dark:bg-[#1d1f21] text-black dark:text-white font-bold rounded">
-                    <p>{datos?.data.temperature ?? 'sin datos'} °C</p>
+                    <p>{datos?.data.temperature ? Math.round(datos.data.temperature * 10) / 10 : 'sin datos'} °C</p>
                 </button>
             </div>
         </div>

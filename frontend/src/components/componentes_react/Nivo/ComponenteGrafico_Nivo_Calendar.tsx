@@ -1,6 +1,6 @@
 import React from 'react';
-import Nivo_Calendar from "../componentes_react/Nivo_Calendar";
-import type { CalendarData } from "../../scripts/data_interface"; // Importa la interfaz
+import Nivo_Calendar from "./Nivo_Calendar";
+import type { CalendarData } from "../../../scripts/Global_Interface"; // Importa la interfaz
 
 interface Props {
     calendar_data: CalendarData[];

@@ -36,6 +36,7 @@ export interface NivoLineData {
 }
 
 export interface SwarmPlotData {
+  ID: string;
   datos: {
     id: string;
     group: string;
@@ -48,7 +49,7 @@ export interface SwarmPlotData {
   };
 }
 
-export interface PhInterface {
+export interface Interface_Ph_Temp {
   Calendar: CalendarData[];
   ResponsiveLine: NivoLineData[];
   SwarmPlot: SwarmPlotData;

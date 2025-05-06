@@ -13,11 +13,6 @@ const { testTitle } = Astro.props;
 		<meta name="keywords" content="graficar, datos, gestión,ph,temp" />
 		<title>{testTitle}</title>
 		<script>
-			
-		</script>
-	</head>
-	<body class="flex flex-col h-full bg-[#ffffff] dark:bg-[#1d1f21]">
-		<script>
 			if (
 				!localStorage.getItem("isAuth") &&
 				!["/login", "/register", "/404"].includes(
@@ -26,6 +21,11 @@ const { testTitle } = Astro.props;
 			) {
 				window.location.href = "/login";
 			}
+		</script>
+	</head>
+	<body class="flex flex-col h-full bg-[#ffffff] dark:bg-[#1d1f21]">
+		<script>
+			
 		</script>
 		<slot />
 	</body>

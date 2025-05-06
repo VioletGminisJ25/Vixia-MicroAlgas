@@ -1,5 +1,5 @@
 import React, { useEffect, useState } from 'react';
-import '../../styles/ThemeSwitch.css';
+import '../../../styles/ThemeSwitch.css';
 
 /**
  * MIT License
