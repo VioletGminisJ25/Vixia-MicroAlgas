@@ -12,13 +12,22 @@ from database.db_instance import db_instance
 import random
 from datetime import datetime, timedelta
 from utils.datos_fic_db import generar_dato
-from utils.lib import data_handler
+from utils.lib import data_handler, get_periodo_dia
 from sqlalchemy import extract
 from database.executor_instance import executor_instance
 
 
 class DataQueries:
+    """
+    Clase para manejar las consultas a la base de datos.
+    Esta clase contiene métodos para obtener datos de las tablas SensorData, Rgb, Colors y MainDatetime.
+    También incluye métodos para insertar datos ficticios y realizar comparaciones de datos.
+    """
+
     def __init__(self):
+        """
+        Inicializa la clase DataQueries y establece la sesión de la base de datos.
+        """
         self.session = db_instance.db.session
 
     def get_sensor_data(self):
@@ -29,6 +38,10 @@ class DataQueries:
         return self.session.query(SensorData).all()
 
     def insertar_datos_ficticios(self):
+        """
+        Inserta datos ficticios en la base de datos para las tablas MainDatetime, SensorData, Rgb, Colors y WaveLength.
+        Genera datos aleatorios para cada tabla y los inserta en la base de datos.
+        """
         # Fecha de inicio y fin
         inicio = datetime(2025, 1, 1)
         hoy = datetime.now()
@@ -169,11 +182,13 @@ class DataQueries:
                     Colors.blue,
                 )
                 .select_from(SensorData)
-                .join(Rgb, SensorData.datetime == Rgb.datetime)
-                .join(Colors, SensorData.datetime == Colors.datetime)
+                .outerjoin(Rgb, SensorData.datetime == Rgb.datetime)
+                .outerjoin(Colors, SensorData.datetime == Colors.datetime)
                 .filter(SensorData.datetime == fecha_dt)
                 .first()
             )  # Usamos first() porque esperamos un único resultado para un timestamp exacto
+
+            print(main_result)
 
             if not main_result:
                 # No se encontraron datos para ese timestamp exacto
@@ -219,7 +234,7 @@ class DataQueries:
 
             # --- Devolver Respuesta ---
             return (
-                jsonify({"last_data": last_data, "selected_data": selected_data}),
+                jsonify({"selected_data": selected_data}),
                 200,
             )
 
@@ -235,6 +250,9 @@ class DataQueries:
             )
 
     def calendar(self, datatype):
+        """
+        Obtiene los datos de pH o temperatura promedio diario de la base de datos.
+        """
         if datatype not in ["ph", "temperature"]:
             return jsonify({"error": "Tipo de dato no valido"}), 400
         colum_to_avg = getattr(SensorData, datatype)
@@ -258,19 +276,33 @@ class DataQueries:
         )
 
         output = defaultdict(lambda: {"values": []})
-
+        avgs = []
         for year, datetime, avg in results:
+            avgs.append(avg)
             output[year]["values"].append(
-                {"day": str(datetime).split(" ")[0], "value": round(avg, 2)}
+                {
+                    "day": str(datetime).split(" ")[0],
+                    "value": round(avg, 2),
+                }
             )
 
         formatted_output = []
         for year, data in output.items():
-            formatted_output.append({"year": year, "values": data["values"]})
+            formatted_output.append(
+                {
+                    "year": year,
+                    "values": data["values"],
+                    "min": min(avgs),
+                    "max": max(avgs),
+                }
+            )
 
         return formatted_output
 
     def responsive_line(self, datatype):
+        """
+        Obtiene los datos de pH o temperatura promedio semanal de la base de datos.
+        """
         if datatype not in ["ph", "temperature"]:
             return jsonify({"error": "Tipo de dato no valido"}), 400
         colum_obj = getattr(SensorData, datatype)
@@ -311,6 +343,7 @@ class DataQueries:
         return formatted_output
 
     def bullet_chart(self, datatype):
+
         if datatype not in ["ph", "temperature"]:
             return jsonify({"error": "Tipo de dato no valido"}), 400
         colum_obj = getattr(SensorData, datatype)
@@ -326,23 +359,26 @@ class DataQueries:
         )
 
     def swarm_plot(self, datatype):
+        """
+        Obtiene los datos de pH o temperatura agrupados por hora y cuenta la cantidad de ocurrencias de cada valor.
+        """
         if datatype not in ["ph", "temperature"]:
             return jsonify({"error": "Tipo de dato no valido"}), 400
 
+        # --- Query ---
         colum_obj = getattr(SensorData, datatype)
         results = self.session.query(
-            # No necesitamos el datetime completo aquí, solo la hora y el valor
             db_instance.db.func.hour(SensorData.datetime).label("hour"),
             colum_obj.label("value"),
         ).all()
 
-        # --- Agregación ---
-        value_counts = {}  # Diccionario para contar {grupo: {valor: contador}}
+        value_counts = {}
         time_day = ["Manana", "Tarde", "Noche"]
 
         for hour, value in results:
-            if value is None:  # Opcional: Saltar valores nulos si pueden ocurrir
+            if value is None:
                 continue
+            value = round(value, 1)
 
             # Determinar el grupo (Mañana, Tarde, Noche)
             hour_int = int(hour)  # Asegurarse de que la hora es un entero
@@ -353,7 +389,6 @@ class DataQueries:
             else:
                 day_out = time_day[2]
 
-            # Inicializar contadores si es necesario
             if day_out not in value_counts:
                 value_counts[day_out] = {}
             if value not in value_counts[day_out]:
@@ -365,8 +400,6 @@ class DataQueries:
         # --- Generación de la Salida Agregada ---
         output = {}
         output_aggregated = []
-        # Un contador para generar IDs únicos para los puntos *agregados*
-        # Podríamos hacerlo global o por grupo, aquí lo haremos por grupo.
 
         # Ordenar los grupos para una salida consistente
         sorted_groups = sorted(value_counts.keys(), key=lambda g: time_day.index(g))
@@ -396,6 +429,7 @@ class DataQueries:
                 item_counter_in_group += 1
 
         output = {
+            "ID": str(datatype).title(),
             "datos": output_aggregated,
             "values": {
                 "volume": [min(items_volume), max(items_volume)],
@@ -408,6 +442,7 @@ class DataQueries:
     def get_data(self, datatype):
         """
         Obtiene los datos de pH de la base de datos.
+        Utiliza un executor para ejecutar las consultas en segundo plano y mejorar el rendimiento.
         """
 
         if datatype not in ["ph", "temperature"]:
@@ -427,3 +462,72 @@ class DataQueries:
         if ph_data == {}:
             return jsonify({"error": "No hay datos para la medicion"}), 404
         return jsonify(ph_data), 200
+
+    def insert_data(self, data):
+        """
+        Inserta datos en la base de datos.
+        """
+        try:
+            # Crear una nueva instancia de SensorData
+            new_data_main = MainDatetime(
+                datetime=data["datetime"],
+                period_day=get_periodo_dia(data["datetime"]),
+            )
+            new_data_sensor = SensorData(
+                datetime=data["datetime"],
+                ph=data["ph"],
+                temperature=data["temperature"],
+            )
+
+            # Agregar la nueva instancia a la sesión
+
+            self.session.add(new_data_main)
+            self.session.add(new_data_sensor)
+            for position, value in enumerate(data["value"]):
+                new_data_wave = WaveLength(
+                    datetime=data["datetime"],
+                    position=position,
+                    value=value,
+                )
+                # Agregar la nueva instancia a la sesión
+                self.session.add(new_data_wave)
+            # Confirmar los cambios en la base de datos
+            self.session.commit()
+            print("✔ Datos insertados en la base de datos.")
+        except Exception as e:
+            print(f"Error al insertar datos: {e}")
+            self.session.rollback()
+
+    def get_latest_data(self):
+        result = (
+            self.session.query(
+                SensorData.datetime,
+                SensorData.ph,
+                SensorData.temperature,
+                Rgb.r,
+                Rgb.g,
+                Rgb.b,
+            )
+            .select_from(SensorData)
+            .outerjoin(Rgb, SensorData.datetime == Rgb.datetime)
+            .outerjoin(Colors, SensorData.datetime == Colors.datetime)
+            .order_by(SensorData.datetime.desc())
+            .first()
+        )
+        result_wavelength = (
+            self.session.query(WaveLength.value)
+            .select_from(WaveLength)
+            .filter(WaveLength.datetime == result.datetime)
+            .order_by(WaveLength.position)
+            .all()
+        )
+        if not result:
+            return 404
+
+        last_data = {
+            "colors": None,
+            "rgb": None,
+            "data": {"temperature": result.temperature, "ph": result.ph},
+            "wave_length": [item[0] for item in result_wavelength],
+        }
+        return last_data

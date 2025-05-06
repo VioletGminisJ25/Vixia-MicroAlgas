@@ -213,3 +213,18 @@ def get_ph_temp_average(data):
         return jsonify({"error": "No hay datos para la medicion"}), 404
     else:
         return jsonify(daily_averages), 200
+
+
+def get_periodo_dia(timestamp):
+    """
+    Determina el periodo del día basado en la hora del timestamp.
+    """
+    hora = datetime.strptime(timestamp, "%Y-%m-%d %H:%M:%S").hour
+    if 0 <= hora < 6:
+        return "noche"
+    elif 6 <= hora < 14:
+        return "mañana"
+    elif 14 <= hora < 20:
+        return "tarde"
+    else:
+        return "noche"
