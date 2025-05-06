@@ -27,7 +27,7 @@ export default function Nivo_ResponsiveLine({ datos, nivo_datos }: NivoLineProps
   const showLegend = nivo_datos && nivo_datos.length > 1;
 
   return (
-    <div className="w-[90%] h-[400px]"> {/* altura fija */}
+    <div className="w-[100%] h-[400px] "> {/* altura fija */}
       <ResponsiveLine
         data={series}
         margin={{ top: 30, right: 25, bottom: showLegend ? 50 : 25, left: 35 }}

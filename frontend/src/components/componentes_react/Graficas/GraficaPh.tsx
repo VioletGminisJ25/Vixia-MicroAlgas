@@ -4,12 +4,12 @@ import Swarmplot from "../Nivo/ComponenteGrafico_Nivo_SwarmPlot";
 import NivoLineChart from "../Nivo/ComponenteGrafico_Responsive_Line"; // Importa el componente correcto
 import type { Interface_Ph_Temp } from '../../../scripts/Global_Interface';
 import Loader from "../Ui/Loader";
-import ErrorC from "../Ui/ServerError"; // Asegúrate de que este componente esté definido y exportado correctamente
+import ErrorC from "../Ui/ServerError";
 import { ToastContainer, toast } from 'react-toastify'
-
+// Asegúrate de que este componente esté definido y exportado correctamente
 // Ejemplo de cómo podrías recibir los datos del backend
 
-export default function GraficaPh() {
+export default function Grafica() {
   const [jsonData, setJsonData] = useState<Interface_Ph_Temp | null>(null);
   const [loading, setLoading] = useState(true);
   const [error, setError] = useState<string | null>(null);
@@ -17,7 +17,7 @@ export default function GraficaPh() {
   useEffect(() => {
     const fetchData = async () => {
       try {
-        const response = await fetch('http://193.146.35.170:5000/ph', {
+        const response = await fetch(import.meta.env.PUBLIC_GET_HP, {
           method: 'POST',
           headers: {
             'Content-Type': 'application/json',
@@ -40,8 +40,8 @@ export default function GraficaPh() {
           pauseOnHover: true,
           draggable: true,
           progress: undefined,
-          theme: "colored",
-      });
+          theme: localStorage.getItem('theme') === 'dark' ? 'dark' : 'light'
+        });
       } catch (e: any) {
         setError(e.message);
         console.error("Error fetching data (POST):", e);
@@ -53,9 +53,8 @@ export default function GraficaPh() {
           pauseOnHover: true,
           draggable: true,
           progress: undefined,
-          theme: "colored",
+          theme: localStorage.getItem('theme') === 'dark' ? 'dark' : 'light'
         });
-
       } finally {
         setLoading(false);
       }
@@ -65,7 +64,6 @@ export default function GraficaPh() {
   }, []);
 
   return (
-
     <div className="w-full h-[90%] p-6 grid grid-cols-5 grid-rows-5 gap-4">
 
       <div id='padre_grafica' className="min-h-[100%] shadow-md h-fit rounded-lg  p-4 col-span-3 row-span-3 bg-slate-100">

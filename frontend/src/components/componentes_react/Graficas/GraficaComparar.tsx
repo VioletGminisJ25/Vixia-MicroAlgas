@@ -4,7 +4,10 @@ import LastCurrentData from '../Nivo/ComponenteGrafico_Nivo_LongitudDeOnda';
 import SelectedData from '../Nivo/ComponenteGrafico_Nivo_LongitudDeOnda';
 import type { CompareData } from "../../../scripts/Global_Interface";
 import { motion } from 'framer-motion';
+import { ToastContainer } from 'react-toastify';
+import useWebSocket_lastData from '../../../hooks/WebSockect';
 
+// Propiedades de las animaciones de carga de los componentes.
 const appearVariants = {
   hidden: { opacity: 0, y: 50, scale: 0.8 },
   visible: {
@@ -15,8 +18,14 @@ const appearVariants = {
   }
 };
 
-export default function ParentComponent() {
+/// Componente principal que contiene el selector de fecha
+/// la fecha se selecciona en el componente DatePickerWithData y se pasa al componente SelectedData mediante props
+/// 'lastCurrentData' es el componente que muestra la fecha más reciente de los datos obtenidos por el WebSocket, en tiempo real
+/// Se utiliza el hook useWebSocket_lastData para obtener los datos del WebSocket.
+export default function GraficaComparar() {
+  // Estado para almacenar los datos seleccionados por el usuario
   const [datos, setDatos] = useState<CompareData | null>(null);
+  const { data: datosWebSocket, isConnected, error } = useWebSocket_lastData(import.meta.env.PUBLIC_API_URL);
 
   return (
     <div className="flex flex-col h-[90%]">
@@ -32,7 +41,8 @@ export default function ParentComponent() {
 
       {/* Contenedor de gráficas */}
       <div className="flex flex-1 justify-between items-center gap-x-4 px-4 py-2">
-        {/* Bloque 1 */}
+
+        {/* Bloque 'selected_data' */}
         <motion.div
           id="graficaAnimacion"
           className="flex-1 h-[90%] mx-2"
@@ -46,7 +56,7 @@ export default function ParentComponent() {
           />
         </motion.div>
 
-        {/* Bloque 2 */}
+        {/* Bloque 'lastcurrentdata' */}
         <motion.div
           id="graficaAnimacion2"
           className="flex-1 h-[90%] mx-2"
@@ -57,12 +67,25 @@ export default function ParentComponent() {
         >
           <LastCurrentData
             titulo="FECHA MAS RECIENTE"
-            datos={datos?.last_data ?? null}
+            datos={datosWebSocket ?? null}
           />
         </motion.div>
       </div>
+
+      {/* Contenedor de notificaciones, con estilos unicos, las 'Toastify' son enviadas mediante el websocket */}
+      <ToastContainer
+        position="bottom-right"
+        autoClose={2000}
+        limit={3}
+        hideProgressBar={false}
+        newestOnTop={true}
+        closeOnClick={false}
+        rtl={false}
+        pauseOnFocusLoss
+        draggable
+        pauseOnHover
+        theme={localStorage.getItem('theme') === 'dark' ? 'dark' : 'light'}
+      />
     </div>
-
-
   );
 }

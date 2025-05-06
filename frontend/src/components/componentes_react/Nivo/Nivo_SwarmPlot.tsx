@@ -10,7 +10,7 @@ interface Props {
 
 const Nivo_SwarmPlot: React.FC<Props> = ({ nivo_data, nivo_data_values, nivo_data_names }) => {
     return (
-        <div id='swarmplot' className="h-full w-full">
+        <div id='swarmplot' className="h-[800px] w-full">
             <ResponsiveSwarmPlot
                 animate={false}
                 data={nivo_data || []} // Si nivo_data es undefined o null, usa un array vacío

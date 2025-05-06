@@ -8,7 +8,7 @@ interface Props {
 
 const ComponenteGrafico_Nivo_Line: React.FC<Props> = ({ lineData }) => {
     return (
-        <div className="h-full w-full"> {/* El div contenedor ocupa todo el espacio disponible */}
+        <div className="h-full w-full "> {/* El div contenedor ocupa todo el espacio disponible */}
             <Nivo_NivoLine nivo_datos={lineData} />
 
         </div>
