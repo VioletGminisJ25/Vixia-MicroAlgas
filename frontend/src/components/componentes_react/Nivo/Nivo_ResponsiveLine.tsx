@@ -1,13 +1,17 @@
-import React, { useMemo } from 'react';
+//Componente de Nivo: https://nivo.rocks/line/
+import { useMemo } from 'react';
 import { ResponsiveLine } from '@nivo/line';
 import type { NivoLineData, SampleData } from '../../../scripts/Global_Interface';
 
+//Tiene una interfaz para los datos
+//Se usan dos datos por que el componente puede usarse para mostar dos datos diferentes
+//Longitud de onda y el valor de max/min de ph y temp
 interface NivoLineProps {
-  datos?: SampleData | null;
-  nivo_datos?: NivoLineData[] | null;
+  wave_length?: SampleData | null;
+  maxMin?: NivoLineData[] | null;
 }
 
-export default function Nivo_ResponsiveLine({ datos, nivo_datos }: NivoLineProps) {
+export default function Nivo_ResponsiveLine({ wave_length: datos, maxMin: nivo_datos }: NivoLineProps) {
   // Si pasan explicitamente nivo_datos (min/max por semana), lo usamos.
   // Si no, y hay 'datos', construimos la serie wave_length.
   const series: NivoLineData[] = useMemo(() => {
@@ -24,6 +28,7 @@ export default function Nivo_ResponsiveLine({ datos, nivo_datos }: NivoLineProps
     return <div className="p-4">Sin datos para graficar</div>;
   }
 
+  //Leyenda personalizada para cada caso
   const showLegend = nivo_datos && nivo_datos.length > 1;
 
   return (

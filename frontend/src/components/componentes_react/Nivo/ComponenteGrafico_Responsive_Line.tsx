@@ -1,15 +1,16 @@
+//Contenedor del componente Nivo_ResponsiveLine
 import React from 'react';
 import Nivo_NivoLine from "./Nivo_ResponsiveLine";
-import type { NivoLineData } from "../../../scripts/Global_Interface"; // Importa la interfaz
+import type { NivoLineData } from "../../../scripts/Global_Interface";
 
 interface Props {
-    lineData: NivoLineData[]; // Cambia el nombre de la prop para mayor claridad
+    lineData: NivoLineData[];
 }
 
 const ComponenteGrafico_Nivo_Line: React.FC<Props> = ({ lineData }) => {
     return (
-        <div className="h-full w-full "> {/* El div contenedor ocupa todo el espacio disponible */}
-            <Nivo_NivoLine nivo_datos={lineData} />
+        <div className="h-full w-full ">
+            <Nivo_NivoLine maxMin={lineData} />
 
         </div>
     );

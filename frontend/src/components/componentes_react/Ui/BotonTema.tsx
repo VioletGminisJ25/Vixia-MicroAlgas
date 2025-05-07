@@ -6,11 +6,11 @@ import '../../../styles/ThemeSwitch.css';
  * Copyright (c) 2025 JustCode14
  * See https://uiverse.io/JustCode14/red-dingo-61
  */
+
+//Boton para cambiar el tema de la pagina
 export default function ThemeSwitch() {
   const [isDark, setIsDark] = useState(false);
 
-  // Al cargar el componente, se comprueba si hay un tema guardado en localStorage
-  // y se aplica el tema correspondiente
   useEffect(() => {
     const storedTheme = localStorage.getItem('theme');
     if (storedTheme === 'dark') {
@@ -22,8 +22,6 @@ export default function ThemeSwitch() {
     }
   }, []);
 
-  // Función para alternar entre el tema claro y oscuro
-  // Cambia la clase del elemento html y guarda el tema en localStorage
   const toggleTheme = () => {
     const html = document.documentElement;
     if (isDark) {
@@ -37,8 +35,6 @@ export default function ThemeSwitch() {
     }
   };
 
-  // Renderiza un botón que alterna entre el tema claro y oscuro
-  // El botón tiene un icono de sol y una nube que cambian según el tema
   return (
     <label className="switch" title={isDark ? 'Modo oscuro' : 'Modo claro'}>
       <input type="checkbox" checked={isDark} onChange={toggleTheme} />

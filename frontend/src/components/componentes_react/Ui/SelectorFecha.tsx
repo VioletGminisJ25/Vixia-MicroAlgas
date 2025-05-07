@@ -6,6 +6,8 @@ import type { CompareData } from '../../../scripts/Global_Interface';
 import { toast } from 'react-toastify';
 import Loader from './Loader';
 
+//fuente https://www.npmjs.com/package/react-datepicker
+
 const urlGetHours: string = import.meta.env.PUBLIC_GET_HOURS;
 const urlGetComparasion: string = import.meta.env.PUBLIC_GET_COMPARASION;
 
@@ -60,11 +62,11 @@ export default function Calendar({ setDatos }: CalendarProps) {
   };
 
   useEffect(() => {
-    // Se ejecuta una vez al montarse el componente, usando la fecha inicial
+
     if (startDate) {
       fetchHours(startDate);
     }
-  }, []); // Array de dependencias vacío, se ejecuta solo una vez
+  }, []);
 
   const handleDateChange = async (date: Date | null) => {
     setStartDate(date);

@@ -5,7 +5,7 @@ import SelectedData from '../Nivo/ComponenteGrafico_Nivo_LongitudDeOnda';
 import type { CompareData } from "../../../scripts/Global_Interface";
 import { motion } from 'framer-motion';
 import { ToastContainer } from 'react-toastify';
-import useWebSocket_lastData from '../../../hooks/WebSockect';
+import useWebSocket_lastData from '../../../hooks/WebSockect_lasData';
 
 // Propiedades de las animaciones de carga de los componentes.
 const appearVariants = {
@@ -22,6 +22,7 @@ const appearVariants = {
 /// la fecha se selecciona en el componente DatePickerWithData y se pasa al componente SelectedData mediante props
 /// 'lastCurrentData' es el componente que muestra la fecha más reciente de los datos obtenidos por el WebSocket, en tiempo real
 /// Se utiliza el hook useWebSocket_lastData para obtener los datos del WebSocket.
+
 export default function GraficaComparar() {
   // Estado para almacenar los datos seleccionados por el usuario
   const [datos, setDatos] = useState<CompareData | null>(null);

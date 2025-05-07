@@ -66,7 +66,7 @@ export default function ComponenteGrafico_Nivo_LongitudDeOnda({ datos, titulo }:
 
             {/* Tabla principal */}
             <div className="flex items-center justify-center h-full w-full bg-white p-4 rounded-lg shadow-md overflow-auto">
-                <NivoLine datos={datos}></NivoLine>
+                <NivoLine wave_length={datos}></NivoLine>
             </div>
 
             {/* Botones de PH y Temp */}

@@ -1,8 +1,9 @@
-// hooks/useWebSocket.js
+//WebSocket usado para comunicacion en tiempo real
 import { useState, useEffect, useCallback, useRef } from 'react';
 import { io } from 'socket.io-client';
 import { toast } from 'react-toastify';
 
+//Hace la conexion y mediante los estados de la conexion informa con toastify
 const useWebSocket_lastData = (url) => {
     const [socket, setSocket] = useState(null);
     const [data, setData] = useState(null);
@@ -75,8 +76,3 @@ const useWebSocket_lastData = (url) => {
 export default useWebSocket_lastData;
 
 
-const prueba = (url) => {
-
-};
-
-export { prueba };
