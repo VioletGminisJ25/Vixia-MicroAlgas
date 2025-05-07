@@ -6,6 +6,7 @@ from database.models import (
     Colors,
     SensorData,
     WaveLength,
+    WaveLength_White,
 )
 from database.db_instance import db_instance
 
@@ -177,13 +178,9 @@ class DataQueries:
                     Rgb.r,
                     Rgb.g,
                     Rgb.b,
-                    Colors.red,
-                    Colors.white,
-                    Colors.blue,
                 )
                 .select_from(SensorData)
                 .outerjoin(Rgb, SensorData.datetime == Rgb.datetime)
-                .outerjoin(Colors, SensorData.datetime == Colors.datetime)
                 .filter(SensorData.datetime == fecha_dt)
                 .first()
             )  # Usamos first() porque esperamos un único resultado para un timestamp exacto
@@ -211,11 +208,6 @@ class DataQueries:
                 "g": main_result.g,
                 "b": main_result.b,
             }
-            selected_data["colors"] = {
-                "red": main_result.red,
-                "white": main_result.white,
-                "blue": main_result.blue,
-            }
 
             # --- Consulta Optimizada para WaveLength (Query 2) ---
             wavelength_results = (
@@ -228,9 +220,11 @@ class DataQueries:
             # Extraer solo los valores de la lista de tuplas [(valor,), (valor,), ...]
             selected_data["wave_length"] = [item[0] for item in wavelength_results]
 
+            if selected_data == []:
+                return jsonify({"Datos corruptos"}), 400
+
             # --- Obtener Últimos Datos ---
             # Asumiendo que data_handler() es razonablemente rápido. Si no, también necesita optimización.
-            last_data = data_handler()
 
             # --- Devolver Respuesta ---
             return (
@@ -243,9 +237,7 @@ class DataQueries:
             self.session.rollback()  # Revertir la transacción si algo falla
             print(f"Error during database query or processing: {e}")  # Loguear el error
             return (
-                jsonify(
-                    {"error": "Error interno del servidor al procesar la solicitud"}
-                ),
+                jsonify({"error": "Internal Server Error"}),
                 500,
             )
 
@@ -285,6 +277,16 @@ class DataQueries:
                     "value": round(avg, 2),
                 }
             )
+        years_to_add = [2026, 2027, 2028]  # Cambia este valor al año que quieras añadir
+        for year_to_add in years_to_add:
+            if year_to_add not in output:
+                output[year_to_add] = {
+                    "values": [
+                        {f"day": "{year_to_add}-01-01", "value": 7.2},
+                        {f"day": "{year_to_add}-01-02", "value": 7.4},
+                        {f"day": "{year_to_add}-01-03", "value": 7.1},
+                    ]
+                }
 
         formatted_output = []
         for year, data in output.items():
@@ -463,7 +465,7 @@ class DataQueries:
             return jsonify({"error": "No hay datos para la medicion"}), 404
         return jsonify(ph_data), 200
 
-    def insert_data(self, data):
+    def insert_data(self, data, is_first_measurement):
         """
         Inserta datos en la base de datos.
         """
@@ -481,15 +483,22 @@ class DataQueries:
 
             # Agregar la nueva instancia a la sesión
 
-            self.session.add(new_data_main)
-            self.session.add(new_data_sensor)
             for position, value in enumerate(data["value"]):
-                new_data_wave = WaveLength(
-                    datetime=data["datetime"],
-                    position=position,
-                    value=value,
-                )
-                # Agregar la nueva instancia a la sesión
+                if not is_first_measurement:
+                    new_data_wave = WaveLength(
+                        datetime=data["datetime"],
+                        position=position,
+                        value=value,
+                    )
+                    self.session.add(new_data_main)
+                    self.session.add(new_data_sensor)
+                else:
+                    new_data_wave = WaveLength_White(
+                        datetime=data["datetime"],
+                        position=position,
+                        value=value,
+                    )
+                    # Agregar la nueva instancia a la sesión
                 self.session.add(new_data_wave)
             # Confirmar los cambios en la base de datos
             self.session.commit()
@@ -510,7 +519,6 @@ class DataQueries:
             )
             .select_from(SensorData)
             .outerjoin(Rgb, SensorData.datetime == Rgb.datetime)
-            .outerjoin(Colors, SensorData.datetime == Colors.datetime)
             .order_by(SensorData.datetime.desc())
             .first()
         )
@@ -530,4 +538,38 @@ class DataQueries:
             "data": {"temperature": result.temperature, "ph": result.ph},
             "wave_length": [item[0] for item in result_wavelength],
         }
+        print(last_data)
         return last_data
+
+    def insert_lights_state_sync(self, lights_state):
+        """
+        Inserta el estado de los luces en la base de datos.
+        """
+        try:
+            new_LightsState = Colors(
+                datetime=datetime.now(),
+                roja=lights_state["roja"],
+                azul=lights_state["azul"],
+                blanca=lights_state["blanca"],
+            )
+            self.session.add(new_LightsState)
+            self.session.commit()
+            print("✔ Lights state inserted in the database.")
+        except Exception as e:
+            print(f"Error al insertar datos: {e}")
+            self.session.rollback()
+
+    def get_latest_color(self):
+        """Devuelve el último valor de los colores de la tabla Colors."""
+        try:
+            latest_color = (
+                self.session.query(Colors).order_by(Colors.datetime.desc()).first()
+            )
+            return {
+                "roja": latest_color.roja,
+                "azul": latest_color.azul,
+                "blanca": latest_color.blanca,
+            }
+        except Exception as e:
+            print(f"Error al obtener los colores: {e}")
+            self.session.rollback()

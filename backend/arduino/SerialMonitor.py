@@ -362,10 +362,49 @@ class SerialMonitor:
 
                     print(data, end="")
 
-                    # print(data)
                     self.buffer += data
                     self.process_buffer()
+
+                    self.lights_handler()
+
                 time.sleep(0.01)
+
+    def lights_handler(self):
+        while "\n" in self.buffer:  # Procesar cualquier línea completa en el buffer
+            try:
+                # Buscar el final de línea
+                end_of_line = self.buffer.find("\n")
+                if end_of_line != -1:  # Si hay un mensaje completo
+                    # Extraer el mensaje completo hasta el final de línea
+                    line = self.buffer[:end_of_line].strip().lower()
+                    # Eliminar el mensaje procesado del buffer
+                    self.buffer = self.buffer[end_of_line + 1 :]
+
+                    lights_state = {"roja": 0, "azul": 0, "blanca": 0}
+
+                    # Procesar el mensaje
+                    if line == "luces apagadas (oscuridad)":
+                        # Guardar inmediatamente el estado de luces apagadas
+                        self.queries.insert_lights_state_sync(lights_state)
+                        self.socketio.emit("lights_state", lights_state)
+                    elif "luz" in line and "encendida" in line:
+                        parts = line.split(" ")
+                        if (
+                            len(parts) == 3
+                            and parts[0] == "luz"
+                            and parts[2] == "encendida"
+                        ):
+                            color = parts[1]
+                            if color in lights_state:
+                                lights_state[color] = 1
+                                self.queries.insert_lights_state_sync(lights_state)
+                                self.socketio.emit("lights_state", lights_state)
+                            else:
+                                print(f"Color de luz desconocido: {color}")
+                else:
+                    break  # Salir del bucle si no hay un mensaje completo
+            except Exception as e:
+                print(f"Error al procesar el mensaje de luces: {e}")
 
     def process_buffer(self):
         while True:
@@ -458,7 +497,7 @@ class SerialMonitor:
                 "wave_length": espectro_avg.tolist(),
             },
         )
-        self.queries.insert_data(data)
+        self.queries.insert_data(data, self.is_first_measurement)
         print("Datos guardados en la base de datos.")
 
         # TODO Subir datos a la base de datos
