@@ -2,7 +2,7 @@
 import { useMemo } from 'react';
 import { ResponsiveLine } from '@nivo/line';
 import type { NivoLineData, SampleData } from '../../../scripts/Global_Interface';
-
+import "../../../styles/global.css"
 //Tiene una interfaz para los datos
 //Se usan dos datos por que el componente puede usarse para mostar dos datos diferentes
 //Longitud de onda y el valor de max/min de ph y temp
@@ -24,7 +24,7 @@ export default function Nivo_ResponsiveLine({ wave_length: datos, maxMin: nivo_d
     return [];
   }, [datos, nivo_datos]);
 
-  if (series.length === 0) {
+  if (series.length === 0 || series === null) {
     return <div className="p-4">Sin datos para graficar</div>;
   }
 

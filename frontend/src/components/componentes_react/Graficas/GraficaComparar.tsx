@@ -26,7 +26,7 @@ const appearVariants = {
 export default function GraficaComparar() {
   // Estado para almacenar los datos seleccionados por el usuario
   const [datos, setDatos] = useState<CompareData | null>(null);
-  const { data: datosWebSocket, isConnected, error } = useWebSocket_lastData(import.meta.env.PUBLIC_API_URL);
+  const { data: datosWebSocket, isConnected, error, lights_state } = useWebSocket_lastData(import.meta.env.PUBLIC_API_URL);
 
   return (
     <div className="flex flex-col h-[90%]">
@@ -53,7 +53,7 @@ export default function GraficaComparar() {
         >
           <SelectedData
             titulo="FECHA SELECIONADA"
-            datos={datos?.selected_data ?? null}
+            datos={datos?.selected_data ?? null} lights={null}
           />
         </motion.div>
 
@@ -68,7 +68,8 @@ export default function GraficaComparar() {
         >
           <LastCurrentData
             titulo="FECHA MAS RECIENTE"
-            datos={datosWebSocket ?? null}
+            datos={datosWebSocket ?? null} 
+            lights={lights_state ?? null}
           />
         </motion.div>
       </div>

@@ -10,16 +10,15 @@ interface Props {
 
 //Se le pasa los datos mediantes props, los datos se recibin del servidor
 const Nivo_Calendar: React.FC<Props> = ({ nivo_data }) => {
-    console.log("Nivo_Calendar", nivo_data);
 
     const yearsToRender = nivo_data.length > 0 ? nivo_data : [{ year: new Date().getFullYear(), values: [] }];
 
     return (
-        <div id='carrusel' className="grid grid-cols-1 gap-4"> 
+        <div id='carrusel' className="grid grid-cols-1 gap-4">
             {yearsToRender.map((yearData) => (
                 <div key={yearData.year} className="h-[300px]">
                     <ResponsiveCalendar
-                        data={yearData.values} 
+                        data={yearData.values}
                         from={`${yearData.year}-01-01`}
                         to={`${yearData.year}-12-31`}
                         emptyColor="#eeeeee"

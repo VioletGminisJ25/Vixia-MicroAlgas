@@ -7,6 +7,7 @@ import { toast } from 'react-toastify';
 const useWebSocket_lastData = (url) => {
     const [socket, setSocket] = useState(null);
     const [data, setData] = useState(null);
+    const [lights_state, setLightsState] = useState(null);
     const [isConnected, setIsConnected] = useState(false);
     const [error, setError] = useState(null);
     const socketRef = useRef(null);
@@ -48,6 +49,10 @@ const useWebSocket_lastData = (url) => {
                 setData(newData);
                 toast.success('Ultimos datos recibidos', {});
             });
+            currentSocket.on("lights_state", (data) => {
+                console.log("isActive", data)
+                setLightsState(data);
+            });
 
             setSocket(currentSocket);
         }
@@ -70,7 +75,7 @@ const useWebSocket_lastData = (url) => {
         };
     }, [url, connect, disconnect]);
 
-    return { socket, data, isConnected, error, connect, disconnect };
+    return { socket, lights_state, data, isConnected, error, connect, disconnect };
 };
 
 export default useWebSocket_lastData;

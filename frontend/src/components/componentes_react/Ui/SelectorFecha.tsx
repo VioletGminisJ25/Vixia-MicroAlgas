@@ -1,7 +1,7 @@
 import React, { useState, useEffect } from 'react';
 import DatePicker from 'react-datepicker';
 import 'react-datepicker/dist/react-datepicker.css';
-import { format } from 'date-fns';
+import { daysToWeeks, format } from 'date-fns';
 import type { CompareData } from '../../../scripts/Global_Interface';
 import { toast } from 'react-toastify';
 import Loader from './Loader';
@@ -21,13 +21,14 @@ export default function Calendar({ setDatos }: CalendarProps) {
   const [selectedHour, setSelectedHour] = useState<string>('');
   const [loadingHours, setLoadingHours] = useState(false);
   const [errorHours, setErrorHours] = useState<string | null>(null);
+  const [noDataForHour, setNoDataForHour] = useState(false);
 
   const fetchHours = async (date: Date) => {
     setHoursOptions([]);
     setSelectedHour('');
     setLoadingHours(true);
     setErrorHours(null);
-
+    setNoDataForHour(false);
     const payload = JSON.stringify({ date: format(date, 'yyyy-MM-dd') });
 
     try {
@@ -49,7 +50,6 @@ export default function Calendar({ setDatos }: CalendarProps) {
         }
         return;
       }
-      toast.success('Horas recibidas', {});
       console.log(data);
       setHoursOptions(data);
     } catch (error: any) {
@@ -78,6 +78,7 @@ export default function Calendar({ setDatos }: CalendarProps) {
   const handleHour = (e: React.ChangeEvent<HTMLSelectElement>) => {
     const selectedTime = e.target.value;
     setSelectedHour(selectedTime);
+    setNoDataForHour(false);
 
     if (!startDate || !selectedTime) return;
 
@@ -100,6 +101,12 @@ export default function Calendar({ setDatos }: CalendarProps) {
     })
       .then(response => response.json())
       .then(data => {
+        if (data.error) {
+          console.log('Error datos', data);
+          toast.warn(data.error, {});
+          setDatos(data)
+          return;
+        }
         console.log('Comparación recibida:', data);
         setDatos(data);
         toast.success('Datos obtenidos', {});

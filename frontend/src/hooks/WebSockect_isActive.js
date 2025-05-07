@@ -19,7 +19,7 @@ const useWebSocket_isActive = (url) => {
                 console.log('Conectado al servidor WebSocket');
                 setIsConnected(true);
                 setError(null);
-                toast.success('Conectado al servidor!', {});
+                toast.success('Conectado al servidor! luces', {});
             });
 
             currentSocket.on('connect_error', (err) => {
@@ -42,7 +42,7 @@ const useWebSocket_isActive = (url) => {
                 toast.warn(`Desconectado del servidor: ${reason}`, {});
             });
 
-            currentSocket.on("", (data) => {
+            currentSocket.on("lights_state", (data) => {
                 console.log("isActive", data)
             });
 
