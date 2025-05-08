@@ -325,6 +325,8 @@ class SerialMonitor:
         self.timeout = int(os.getenv("TIMEOUT"))
         self.app = app
         self.socketio = socketio
+        self.in_automatic_measurement = False
+        self.in_manual_mode = False
 
     def start(self):
         try:
@@ -359,12 +361,10 @@ class SerialMonitor:
                     data = self.serial_port.read(self.serial_port.in_waiting).decode(
                         "utf-8", errors="ignore"
                     )
-
                     print(data, end="")
 
                     self.buffer += data
                     self.process_buffer()
-
                     self.lights_handler()
 
                 time.sleep(0.01)
@@ -407,6 +407,12 @@ class SerialMonitor:
                 print(f"Error al procesar el mensaje de luces: {e}")
 
     def process_buffer(self):
+        start_idx = self.buffer.find("h")
+        end_idx = self.buffer.find("a", start_idx)
+        if start_idx != -1 and end_idx != -1 and end_idx > start_idx:
+            if not self.in_automatic_measurement:
+                self.socketio.emit("manual_mode", "False")
+            self.in_automatic_measurement = True
         while True:
             start_idx = self.buffer.find("h")
             end_idx = self.buffer.find("a", start_idx)
@@ -419,9 +425,10 @@ class SerialMonitor:
 
     def handle_arduino_message(self, message):
         datos = message.split(",")
-
         if len(datos) < 4 or datos[0] != "h" or datos[-1] != "a":
             print("Formato de datos inválido.")
+            self.in_automatic_measurement = False
+            self.socketio.emit("manual_mode", "True")
             return
 
         try:
@@ -488,17 +495,21 @@ class SerialMonitor:
             "temperature": temp_avg,
             "ph": ph_avg,
         }
-        self.socketio.emit(
-            "arduino_data",
-            {
-                "colors": None,
-                "rgb": None,
-                "data": {"ph": float(ph_avg), "temperature": float(temp_avg)},
-                "wave_length": espectro_avg.tolist(),
-            },
-        )
+
+        if not self.in_manual_mode:
+            self.socketio.emit(
+                "arduino_data",
+                {
+                    "colors": None,
+                    "rgb": None,
+                    "data": {"ph": float(ph_avg), "temperature": float(temp_avg)},
+                    "wave_length": espectro_avg.tolist(),
+                },
+            )
         self.queries.insert_data(data, self.is_first_measurement)
         print("Datos guardados en la base de datos.")
+        self.in_automatic_measurement = False
+        self.socketio.emit("manual_mode", "True")
 
         # TODO Subir datos a la base de datos
 
@@ -531,10 +542,10 @@ class SerialMonitor:
             if command.strip().upper() == "M":
                 self.waiting_for_manual = True
                 self.manual_batch = []
-                self.manual_name = input(
-                    "Introduce un nombre para esta muestra manual: "
-                ).strip()
-                print(f"Enviando 'M' al Arduino para '{self.manual_name}'...")
+                # self.manual_name = input(
+                #     "Introduce un nombre para esta muestra manual: "
+                # ).strip()
+                print(f"Enviando 'M' al Arduino")
                 self.serial_port.write("M\n".encode("utf-8"))
             else:
                 self.serial_port.write(f"{command}\n".encode("utf-8"))
