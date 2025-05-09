@@ -3,6 +3,7 @@ import serial.tools.list_ports
 from dotenv import load_dotenv
 import os
 import asyncio
+import websockets.socketio_intance
 
 load_dotenv()
 
@@ -29,6 +30,7 @@ init(autoreset=True)
 
 async def measurement_config_send(
     monitor,
+    manual,
     time=os.getenv("TIME_BETWEEN_MEASURAMENTS"),
     light=os.getenv("TIME_LIGHT"),
     dark=os.getenv("TIME_DARK"),
@@ -37,13 +39,18 @@ async def measurement_config_send(
     blue=os.getenv("LIGHT_BLUE"),
 ):
     values = [time, light, dark, white, red, blue]
+    if manual:
+        await asyncio.sleep(30)
     await asyncio.sleep(5)
 
     monitor.send_command("aa")
     print(f"\n{Fore.RED}Enviando: aa\n")
 
-    await asyncio.sleep(30)
+    await asyncio.sleep(22)
+    monitor.white_measurement_started = False
+    # websockets.socketio_intance.socketio.emit("manual_mode", "False")
     for data in values:
         monitor.send_command(data)
         print(f"\n{Fore.RED} Enviando: {data}\n")
         await asyncio.sleep(1)
+    websockets.socketio_intance.socketio.emit("manual_mode", "True")

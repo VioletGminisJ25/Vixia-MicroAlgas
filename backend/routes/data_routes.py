@@ -1,5 +1,8 @@
 from flask import Blueprint, request, jsonify
 from database.queries import DataQueries
+import arduino.monitor_instance
+from arduino.util import measurement_config_send
+import asyncio
 
 queries = DataQueries()
 
@@ -36,7 +39,33 @@ def get_temp_route():
     return queries.get_data("temperature")
 
 
-@data_routes.route("/wake_up", methods=["POST"])
+@data_routes.route("/wake_up", methods=["GET"])
 def wake_up_route():
     """Endpoint para obtener el estado de las luces de los datos de un archivo JSON."""
-    pass
+    arduino.monitor_instance.monitor.active = (
+        not arduino.monitor_instance.monitor.active
+    )
+
+
+@data_routes.route("/get_manual", methods=["GET"])
+def manual_mode_route():
+    """Endpoint para hacer una medicion manual de arduino"""
+    try:
+        arduino.monitor_instance.monitor.send_command("M")
+        asyncio.run(
+            measurement_config_send(arduino.monitor_instance.monitor, manual=True)
+        )
+        # Add a return statement after the command is sent
+        return jsonify(
+            {"status": "success", "message": "Manual measurement command sent."}, 200
+        )
+    except Exception as e:
+        # Optional: Add basic error handling in case sending command fails
+        print(f"Error sending manual command: {e}")
+        return jsonify(
+            {
+                "status": "error",
+                "message": "Failed to send manual measurement command.",
+            },
+            500,
+        )
