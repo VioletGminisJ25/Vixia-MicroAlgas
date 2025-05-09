@@ -9,12 +9,14 @@ const useWebSocket_lastData = (url) => {
     const [data, setData] = useState(null);
     const [lights_state, setLightsState] = useState(null);
     const [isConnected, setIsConnected] = useState(false);
+    const [manula, setma] = useState(false);
     const [error, setError] = useState(null);
     const socketRef = useRef(null);
+    const [isManual, setManual] = useState(null);
 
     const connect = useCallback(() => {
         if (!socketRef.current) {
-            socketRef.current = io(url);
+            socketRef.current = io(url, { timeout: 10000 });
             const currentSocket = socketRef.current;
 
             currentSocket.on('connect', () => {
@@ -28,7 +30,7 @@ const useWebSocket_lastData = (url) => {
                 console.error('Error de conexión al WebSocket:', err);
                 setIsConnected(false);
                 setError(err);
-                toast.error(`Error de conexión: ${error.message || error}`, {});
+                toast.error(error, {});
             });
 
             currentSocket.on('connect_timeout', (timeout) => {
@@ -49,9 +51,15 @@ const useWebSocket_lastData = (url) => {
                 setData(newData);
                 toast.success('Ultimos datos recibidos', {});
             });
+
             currentSocket.on("lights_state", (data) => {
                 console.log("isActive", data)
                 setLightsState(data);
+            });
+
+            currentSocket.on("manual_mode", (isManual) => {
+                console.log("manual SOCKET", isManual)
+                setManual(isManual);
             });
 
             setSocket(currentSocket);
@@ -75,7 +83,7 @@ const useWebSocket_lastData = (url) => {
         };
     }, [url, connect, disconnect]);
 
-    return { socket, lights_state, data, isConnected, error, connect, disconnect };
+    return { lights_state, data, isManual ,socket, isConnected, error, connect, disconnect };
 };
 
 export default useWebSocket_lastData;

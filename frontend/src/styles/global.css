@@ -1,10 +1,2 @@
 @import "tailwindcss";
 @custom-variant dark (&:where(.dark, .dark *));
-
-.nivo-tooltip {
-    
-    z-index: 9999 !important;
-    /* Asegura que quede por encima */
-    pointer-events: none;
-    /* Mantén que no interfiera con hover */
-}

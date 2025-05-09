@@ -2,79 +2,9 @@
 import "../styles/global.css"; // Asegúrate que esta ruta es correcta
 import IndexDataComponent from "./componentes_react/Graficas/GraficaIndex"; // Asegúrate que esta ruta es correcta
 import Modal from "./componentes_react/Ui/Modal"; // Asegúrate que esta ruta es correcta
+import BotonesEstados from "./componentes_react/BotonesEstados";
+import useWebSocket_lastData from "../hooks/WebSockect_lasData";
+
 ---
 
-<div class="h-full w-full grid grid-cols-5 grid-rows-4 gap-4">
-    <div class="col-span-3 row-span-4 col-start-2">
-        <IndexDataComponent client:only="react" />
-    </div>
-    <div class="row-span-2 col-start-5 row-start-2">
-        <div
-            class="h-[90%] w-full
-                   bg-slate-100 dark:bg-[#0f1011] p-1 rounded-lg shadow-xl dark:shadow-xl/100
-                   flex flex-col justify-center items-center"
-        >
-            <div
-                class="flex flex-col justify-center items-center w-full h-full gap-4"
-            >
-                <div
-                    class="flex flex-row justify-center items-center w-full
-                           text-black dark:text-white"
-                >
-                    <button
-                        id="btModal"
-                        class="w-1/2 h-12 rounded
-                                    bg-white
-                                   dark:bg-[#1d1f21] dark:text-white
-                                   dark:hover:bg-neutral-700
-                                      hover:bg-neutral-200"
-                    >
-                        Encender/Apagar
-                    </button>
-                </div>
-                <div
-                    class="flex flex-row justify-center items-center w-full
-                           text-black dark:text-white"
-                >
-                    <button 
-                        class="w-1/2 h-12 rounded
-                        bg-white
-                                   dark:bg-[#1d1f21] dark:text-white
-                                   dark:hover:bg-neutral-700
-                                   hover:bg-neutral-200"
-                    >
-                        Tomar muestra manual
-                    </button>
-                </div>
-                <div
-                    class="flex flex-row justify-center items-center w-full
-                            text-black dark:text-white"
-                >
-                    <button
-                        class="w-1/2 h-12 rounded
-                        bg-white hover:
-                                    dark:bg-[#1d1f21] dark:text-white
-                                    dark:hover:bg-neutral-700
-                                    hover:bg-neutral-200"
-                    >
-                        Cambiar Parametros de medida
-                    </button>
-                </div>
-                <div
-                    class="flex flex-row justify-center items-center w-full
-                            text-black dark:text-white"
-                >
-                    <button
-                        class="w-1/2 h-12 rounded
-                        bg-white hover:
-                                    dark:bg-[#1d1f21] dark:text-white
-                                    dark:hover:bg-neutral-700
-                                    hover:bg-neutral-200"
-                    >
-                        Guardar en excel
-                    </button>
-                </div>
-            </div>
-        </div>
-    </div>
-</div>
+<IndexDataComponent client:only="react" />

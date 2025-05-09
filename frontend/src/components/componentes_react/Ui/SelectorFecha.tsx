@@ -1,13 +1,14 @@
 import React, { useState, useEffect } from 'react';
 import DatePicker from 'react-datepicker';
 import 'react-datepicker/dist/react-datepicker.css';
-import { daysToWeeks, format } from 'date-fns';
+import { format } from 'date-fns';
 import type { CompareData } from '../../../scripts/Global_Interface';
 import { toast } from 'react-toastify';
 import Loader from './Loader';
 
 //fuente https://www.npmjs.com/package/react-datepicker
 
+//env de conexion
 const urlGetHours: string = import.meta.env.PUBLIC_GET_HOURS;
 const urlGetComparasion: string = import.meta.env.PUBLIC_GET_COMPARASION;
 
@@ -24,45 +25,40 @@ export default function Calendar({ setDatos }: CalendarProps) {
   const [noDataForHour, setNoDataForHour] = useState(false);
 
   const fetchHours = async (date: Date) => {
+    //Al cargar restauramos valores, se reinican los valores de.
     setHoursOptions([]);
     setSelectedHour('');
     setLoadingHours(true);
     setErrorHours(null);
     setNoDataForHour(false);
-    const payload = JSON.stringify({ date: format(date, 'yyyy-MM-dd') });
 
-    try {
-      const response = await fetch(urlGetHours, {
-        method: 'POST',
-        headers: {
-          'Content-Type': 'application/json'
-        },
-        body: payload
-      });
+    const hour_send = JSON.stringify({ date: format(date, 'yyyy-MM-dd') });
 
+    fetch(urlGetHours, {
+      method: 'POST',
+      headers: {
+        'Content-Type': 'application/json'
+      },
+      body: hour_send
+    }).then(async response => {
       const data = await response.json();
       if (!response.ok) {
-        if (response.status === 404) {
-          toast.error(`No hay mediciones para esta fecha\n` + format(date, 'yyyy-MM-dd'), {});
-          setErrorHours(data.error);
-        } else {
-          setErrorHours(data.error);
-        }
+        console.log(response);
+        toast.warn(data.error + format(date, 'yyyy-MM-dd'), {});
+        setErrorHours(data.error);
         return;
       }
-      console.log(data);
       setHoursOptions(data);
-    } catch (error: any) {
+    }).catch(error => {
       console.error('Error al conectar con el servidor:', error);
       setErrorHours('No se pudo conectar con el servidor. Por favor, verifica tu conexión a internet.');
       toast.error('Error de conexion con el servidor', {});
-    } finally {
+    }).finally(() => {
       setLoadingHours(false);
-    }
+    });
   };
 
   useEffect(() => {
-
     if (startDate) {
       fetchHours(startDate);
     }
@@ -98,23 +94,27 @@ export default function Calendar({ setDatos }: CalendarProps) {
         'Content-Type': 'application/json'
       },
       body: JSON.stringify({ date: formattedDateTime })
-    })
-      .then(response => response.json())
-      .then(data => {
-        if (data.error) {
-          console.log('Error datos', data);
-          toast.warn(data.error, {});
-          setDatos(data)
-          return;
-        }
-        console.log('Comparación recibida:', data);
-        setDatos(data);
-        toast.success('Datos obtenidos', {});
-      })
-      .catch(error => {
-        console.error('Error al enviar hora:', error);
-        toast.error('Error de conexion con el servidor', {});
-      });
+    }).then(async response => {
+      const data = await response.json();
+      if (!response.ok) {
+        console.log('Error datos', data);
+        toast.warn(data.error, {});
+        setDatos(data)
+        return;
+      }
+      if (data.selected_data.wave_length.length == 0) {
+        toast.warn("datos corruptos", {});
+        setDatos(data)
+        return;
+      }
+
+      console.log('Comparación recibida:', data);
+      setDatos(data);
+      toast.success('Datos obtenidos', {});
+    }).catch(error => {
+      console.error('Error al enviar hora:', error);
+      toast.error('Error de conexion con el servidor', {});
+    });
   };
 
   return (

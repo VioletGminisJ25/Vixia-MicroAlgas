@@ -1,4 +1,4 @@
-import React, { useState, useEffect } from 'react';
+import { useState, useEffect } from 'react';
 import CalendarByYear from "../Nivo/ComponenteGrafico_Nivo_Calendar";
 import Swarmplot from "../Nivo/ComponenteGrafico_Nivo_SwarmPlot";
 import NivoLineChart from "../Nivo/ComponenteGrafico_Responsive_Line";
@@ -97,7 +97,7 @@ export default function Grafica() {
           {loading ? (
             <Loader />
           ) : (
-            <Swarmplot swarmPlot_data={jsonData?.SwarmPlot} />
+            <Swarmplot swarmPlot_data={jsonData?.SwarmPlot } />
           )}
         </div>
       </div>
