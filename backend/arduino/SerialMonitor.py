@@ -366,12 +366,12 @@ class SerialMonitor:
                     print(data, end="")
 
                     self.buffer += data
-                    self.lights_handler()
+                    self.messages_handler()
                     self.process_buffer()
 
                 time.sleep(0.01)
 
-    def lights_handler(self):
+    def messages_handler(self):
         buffer2 = self.buffer
         while "\n" in buffer2:  # Procesar cualquier línea completa en el buffer
             try:
@@ -510,7 +510,7 @@ class SerialMonitor:
             "ph": ph_avg,
         }
 
-        if self.active:
+        if self.active and not self.white_measurement_started:
             self.socketio.emit(
                 "arduino_data",
                 {
@@ -518,6 +518,7 @@ class SerialMonitor:
                     "rgb": None,
                     "data": {"ph": float(ph_avg), "temperature": float(temp_avg)},
                     "wave_length": espectro_avg.tolist(),
+                    "x": WAVELENGTHS,
                 },
             )
         self.queries.insert_data(data, self.is_first_measurement)
@@ -571,6 +572,7 @@ class SerialMonitor:
                     "rgb": None,
                     "data": {"ph": float(ph_avg), "temperature": float(temp_avg)},
                     "wave_length": espectro_avg.tolist(),
+                    "x": WAVELENGTHS,
                 },
             )
         self.queries.insert_data(data, self.is_first_measurement)
@@ -587,6 +589,7 @@ class SerialMonitor:
                 #     "Introduce un nombre para esta muestra manual: "
                 # ).strip()
                 print(f"Enviando 'M' al Arduino")
+                self.socketio.emit("wake_up_state", self.active)
                 self.serial_port.write("M\n".encode("utf-8"))
             else:
                 self.serial_port.write(f"{command}\n".encode("utf-8"))
