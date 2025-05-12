@@ -1,7 +1,10 @@
+//Componente de Nivo: https://nivo.rocks/swarmplot/
 import React from 'react';
 import { ResponsiveSwarmPlot } from '@nivo/swarmplot'
 import type { SwarmPlotData } from "../../../scripts/Global_Interface";
 
+//Aquí le pasamos varias interfaces, de este modo las props se separan segun los datos que queremos graficar y como
+//Así los tamaños de los puntos se hacen medias entre sus valores y esto hace que el grafico sea mas responsivo
 interface Props {
     nivo_data: SwarmPlotData["datos"] | undefined;
     nivo_data_values: SwarmPlotData["values"] | undefined;
@@ -13,13 +16,13 @@ const Nivo_SwarmPlot: React.FC<Props> = ({ nivo_data, nivo_data_values, nivo_dat
         <div id='swarmplot' className="h-[800px] w-full">
             <ResponsiveSwarmPlot
                 animate={false}
-                data={nivo_data || []} // Si nivo_data es undefined o null, usa un array vacío
-                groups={[...new Set(nivo_data?.map(d => d.group) || [])]} // Evita errores si nivo_data es undefined
+                data={nivo_data || []}
+                groups={[...new Set(nivo_data?.map(d => d.group) || [])]}
                 value="price"
                 valueFormat="$.2f"
                 valueScale={{
                     type: 'linear',
-                    min: nivo_data_values?.price?.[0], // Usa optional chaining para evitar errores
+                    min: nivo_data_values?.price?.[0],
                     max: nivo_data_values?.price?.[1],
                     reverse: false
                 }}

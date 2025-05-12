@@ -1,6 +1,13 @@
 import React from 'react';
 import styled from 'styled-components';
 
+/**
+ * MIT License
+ * Copyright (c) 2025 Kennyotsu
+ * See https://uiverse.io/kennyotsu/wise-rattlesnake-92
+ */
+
+
 const Card = () => {
   return (
     <StyledWrapper>

@@ -1,9 +1,9 @@
-// hooks/useWebSocket.js
+//WebSocket usado para comunicacion en tiempo real
 import { useState, useEffect, useCallback, useRef } from 'react';
 import { io } from 'socket.io-client';
 import { toast } from 'react-toastify';
 
-const useWebSocket_lastData = (url) => {
+const useWebSocket_isActive = (url) => {
     const [socket, setSocket] = useState(null);
     const [data, setData] = useState(null);
     const [isConnected, setIsConnected] = useState(false);
@@ -19,7 +19,7 @@ const useWebSocket_lastData = (url) => {
                 console.log('Conectado al servidor WebSocket');
                 setIsConnected(true);
                 setError(null);
-                toast.success('Conectado al servidor!', {});
+                toast.success('Conectado al servidor! luces', {});
             });
 
             currentSocket.on('connect_error', (err) => {
@@ -42,11 +42,10 @@ const useWebSocket_lastData = (url) => {
                 toast.warn(`Desconectado del servidor: ${reason}`, {});
             });
 
-            currentSocket.on('arduino_data', (newData) => {
-                console.log('Datos recibidos:', newData);
-                setData(newData);
-                toast.success('Ultimos datos recibidos', {});
+            currentSocket.on("lights_state", (data) => {
+                console.log("isActive", data)
             });
+
 
             setSocket(currentSocket);
         }
@@ -72,11 +71,4 @@ const useWebSocket_lastData = (url) => {
     return { socket, data, isConnected, error, connect, disconnect };
 };
 
-export default useWebSocket_lastData;
-
-
-const prueba = (url) => {
-
-};
-
-export { prueba };
+export { useWebSocket_isActive };

@@ -1,23 +1,33 @@
 import React, { useState, useEffect } from 'react';
 import CalendarByYear from "../Nivo/ComponenteGrafico_Nivo_Calendar";
 import Swarmplot from "../Nivo/ComponenteGrafico_Nivo_SwarmPlot";
-import NivoLineChart from "../Nivo/ComponenteGrafico_Responsive_Line"; // Importa el componente correcto
+import NivoLineChart from "../Nivo/ComponenteGrafico_Responsive_Line";
 import type { Interface_Ph_Temp } from '../../../scripts/Global_Interface';
 import Loader from "../Ui/Loader";
 import ErrorC from "../Ui/ServerError";
 import { ToastContainer, toast } from 'react-toastify'
 
-// Asegúrate de que este componente esté definido y exportado correctamente
-// Ejemplo de cómo podrías recibir los datos del backend
-
+// Aqui se podra visualizar los datos del ph
+// Hay 3 graficas, un calendario, un swarmplot y una grafica de lineas
+// El calendario es la media diaria de ph, ademas de poder selecionar el año que se quiere ver.
+// segun la intensidad del color, y el mismo color el dato sera mas alto o mas bajo
+//El grafico de lineas muestra el dato mas alto y el mas bajo de cada semana del año.
+// El swarmplot muestra los grupos de datos y las ocurrencias de cada uno de ellos
 export default function Grafica() {
-    const [jsonData, setJsonData] = useState<Interface_Ph_Temp | null>(null);
+    //Aqui se guardan los estados de los componentes, para el manejo de carga y errores
     const [loading, setLoading] = useState(true);
     const [error, setError] = useState<string | null>(null);
+    // Aqui se guardan los datos que se reciben del backend.
+    const [jsonData, setJsonData] = useState<Interface_Ph_Temp | null>(null);
 
+    //useEffect para la carga de datos, se ejecuta al iniciar el componente
+    // Se hace una peticion al backend para obtener los datos de las graficas
+    //Por defecto loading es true, y se cambia a false cuando se finaliza la conexion, sin importar si ha sido correcta o no.
+    // Si hay un error se guarda el estado, tal vez si se quiera mostrar un mensaje de error
     useEffect(() => {
         const fetchData = async () => {
             try {
+                //Aqui se hace la peticion al backend, se le pasa el metodo y el header de la peticion
                 const response = await fetch(import.meta.env.PUBLIC_GET_TEMP, {
                     method: 'POST',
                     headers: {
@@ -31,7 +41,7 @@ export default function Grafica() {
                 }
                 const data: Interface_Ph_Temp = await response.json();
                 console.log("JSON recibido del backend (POST):", data);
-
+                // Si la respuesta es correcta, se guardan los datos en el estado
                 setJsonData(data);
                 toast.success('Datos obtenidos', {
                     position: "bottom-right",
@@ -64,6 +74,8 @@ export default function Grafica() {
         fetchData();
     }, []);
 
+    //Bloque react con la carga de cada grafica, por ahora tiene encuenta que esta cargando, pero no si hay error. 
+    //Para la carga se usa UI de carga, al terminiar se muestra la grafica
     return (
         <div className="w-full h-[90%] p-6 grid grid-cols-5 grid-rows-5 gap-4">
 

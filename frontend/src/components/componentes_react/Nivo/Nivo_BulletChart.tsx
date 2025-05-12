@@ -10,7 +10,7 @@ const createSymmetricColorRange = (steps = 9) => {
     return [...left, ...center, ...right];
 };
 
-const colorRange = createSymmetricColorRange(9); // puedes cambiar a 7, 11, etc
+const colorRange = createSymmetricColorRange(9);
 
 const bulletDataFijo = [
     {
@@ -31,7 +31,7 @@ const Nivo_BulletChart: React.FC = () => {
                 titleAlign="start"
                 titleOffsetX={-70}
                 measureSize={0.2}
-                rangeColors={colorRange} // este sí es válido
+                rangeColors={colorRange}
             />
         </div>
     );

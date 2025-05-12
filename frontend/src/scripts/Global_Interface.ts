@@ -1,5 +1,6 @@
 //Interfaz base usada para datos de la API
-//Concretamente datos recibidos para tablas index y comparar
+
+//Aqui para los datos de las graficas
 export interface SampleData {
   colors: {
     blue: boolean;
@@ -16,6 +17,7 @@ export interface SampleData {
     r: number;
   };
   wave_length: number[];
+  x: number[]
 }
 
 //Exportar una interza para datos recientes y seleccionados
@@ -26,8 +28,8 @@ export interface CompareData {
 
 //Interfaz para Calendario-ResponsiveLine-SwarmPlot
 export interface CalendarData {
-  year: number;
   values: { day: string; value: number }[];
+  year: number;
 }
 
 export interface NivoLineData {

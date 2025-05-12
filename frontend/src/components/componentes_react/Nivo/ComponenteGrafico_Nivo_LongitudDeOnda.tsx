@@ -3,13 +3,14 @@ import NivoLine from './Nivo_ResponsiveLine';
 interface Componente1Props {
     datos: SampleData | null;
     titulo: string;
+    lights: { roja: number; blanca: number; azul: number } | null;
 }
 /// Componente que recibe datos y un titulo y renderiza una grafica con los datos
-export default function ComponenteGrafico_Nivo_LongitudDeOnda({ datos, titulo }: Componente1Props) {
+export default function ComponenteGrafico_Nivo_LongitudDeOnda({ datos, titulo, lights }: Componente1Props) {
     // Si no hay datos, establecemos un objeto de datos por defecto
     // Esto es útil para evitar errores al intentar acceder a propiedades de datos nulos
-    const colors = datos?.colors ?? { red: false, white: false, blue: false };
-    const rgb = datos?.rgb ?? { r: 0, g: 0, b: 0 };
+    const colors = lights ?? { roja: 0, blanca: 0, azul: 0 };
+    const rgb = datos?.rgb ?? { r: 1, g: 0, b: 0 };
     //Estructura del componente, que contiene un div
     //Dentro del div hay un título, botones de colores y una tabla con la gráfica
     //Los botones de colores están habilitados o deshabilitados según los datos
@@ -21,28 +22,28 @@ export default function ComponenteGrafico_Nivo_LongitudDeOnda({ datos, titulo }:
             <div className="flex flex-row space-x-4 mb-4 w-full">
                 <button
                     id="red"
-                    disabled={!colors.red}
+                    disabled={!colors.roja}
                     className={`w-[10%] h-12 rounded 
-            ${colors.red ? 'bg-red-500 text-white' : 'bg-gray-400 text-gray-600 cursor-not-allowed'}`}
-                    title={rgb.r ? 'Se uso' : 'No se uso'}>
+            ${colors.roja ? 'bg-red-500 text-white' : 'bg-gray-400 text-gray-600 cursor-not-allowed'}`}
+                    title={lights?.roja ? 'Se uso' : 'No se uso'}>
                     Rojo
                 </button>
 
                 <button
                     id="white"
-                    disabled={!colors.white}
+                    disabled={!colors.blanca}
                     className={`w-[10%] h-12 rounded 
-            ${colors.white ? 'bg-white text-black' : 'bg-gray-400 text-gray-600 cursor-not-allowed'}`}
-                    title={rgb.g ? 'Se uso' : 'No se uso'}>
+            ${colors.blanca ? 'bg-white text-black' : 'bg-gray-400 text-gray-600 cursor-not-allowed'}`}
+                    title={lights?.blanca ? 'Se uso' : 'No se uso'}>
                     Blanco
                 </button>
 
                 <button
                     id="blue"
-                    disabled={!colors.blue}
+                    disabled={!colors.azul}
                     className={`w-[10%] h-12 rounded 
-            ${colors.blue ? 'bg-blue-500 text-white' : 'bg-gray-400 text-gray-600 cursor-not-allowed'}`}
-                    title={rgb.b ? 'Se uso' : 'No se uso'}
+            ${colors.azul ? 'bg-blue-500 text-white' : 'bg-gray-400 text-gray-600 cursor-not-allowed'}`}
+                    title={lights?.azul ? 'Se uso' : 'No se uso'}
                 >
                     Azul
                 </button>
@@ -65,8 +66,8 @@ export default function ComponenteGrafico_Nivo_LongitudDeOnda({ datos, titulo }:
             </div>
 
             {/* Tabla principal */}
-            <div className="flex items-center justify-center h-full w-full bg-white p-4 rounded-lg shadow-md overflow-auto">
-                <NivoLine datos={datos}></NivoLine>
+            <div className="flex items-center justify-center h-full w-full bg-white p-4 rounded-lg shadow-md">
+                <NivoLine wave_length={datos ?? null}></NivoLine>
             </div>
 
             {/* Botones de PH y Temp */}

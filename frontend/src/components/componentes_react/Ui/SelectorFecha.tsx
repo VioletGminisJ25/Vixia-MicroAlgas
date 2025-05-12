@@ -6,6 +6,9 @@ import type { CompareData } from '../../../scripts/Global_Interface';
 import { toast } from 'react-toastify';
 import Loader from './Loader';
 
+//fuente https://www.npmjs.com/package/react-datepicker
+
+//env de conexion
 const urlGetHours: string = import.meta.env.PUBLIC_GET_HOURS;
 const urlGetComparasion: string = import.meta.env.PUBLIC_GET_COMPARASION;
 
@@ -19,52 +22,47 @@ export default function Calendar({ setDatos }: CalendarProps) {
   const [selectedHour, setSelectedHour] = useState<string>('');
   const [loadingHours, setLoadingHours] = useState(false);
   const [errorHours, setErrorHours] = useState<string | null>(null);
+  const [noDataForHour, setNoDataForHour] = useState(false);
 
   const fetchHours = async (date: Date) => {
+    //Al cargar restauramos valores, se reinican los valores de.
     setHoursOptions([]);
     setSelectedHour('');
     setLoadingHours(true);
     setErrorHours(null);
+    setNoDataForHour(false);
 
-    const payload = JSON.stringify({ date: format(date, 'yyyy-MM-dd') });
+    const hour_send = JSON.stringify({ date: format(date, 'yyyy-MM-dd') });
 
-    try {
-      const response = await fetch(urlGetHours, {
-        method: 'POST',
-        headers: {
-          'Content-Type': 'application/json'
-        },
-        body: payload
-      });
-
+    fetch(urlGetHours, {
+      method: 'POST',
+      headers: {
+        'Content-Type': 'application/json'
+      },
+      body: hour_send
+    }).then(async response => {
       const data = await response.json();
       if (!response.ok) {
-        if (response.status === 404) {
-          toast.error(`No hay mediciones para esta fecha\n` + format(date, 'yyyy-MM-dd'), {});
-          setErrorHours(data.error);
-        } else {
-          setErrorHours(data.error);
-        }
+        console.log(response);
+        toast.warn(data.error + format(date, 'yyyy-MM-dd'), {});
+        setErrorHours(data.error);
         return;
       }
-      toast.success('Horas recibidas', {});
-      console.log(data);
       setHoursOptions(data);
-    } catch (error: any) {
+    }).catch(error => {
       console.error('Error al conectar con el servidor:', error);
       setErrorHours('No se pudo conectar con el servidor. Por favor, verifica tu conexión a internet.');
       toast.error('Error de conexion con el servidor', {});
-    } finally {
+    }).finally(() => {
       setLoadingHours(false);
-    }
+    });
   };
 
   useEffect(() => {
-    // Se ejecuta una vez al montarse el componente, usando la fecha inicial
     if (startDate) {
       fetchHours(startDate);
     }
-  }, []); // Array de dependencias vacío, se ejecuta solo una vez
+  }, []);
 
   const handleDateChange = async (date: Date | null) => {
     setStartDate(date);
@@ -76,6 +74,7 @@ export default function Calendar({ setDatos }: CalendarProps) {
   const handleHour = (e: React.ChangeEvent<HTMLSelectElement>) => {
     const selectedTime = e.target.value;
     setSelectedHour(selectedTime);
+    setNoDataForHour(false);
 
     if (!startDate || !selectedTime) return;
 
@@ -95,17 +94,27 @@ export default function Calendar({ setDatos }: CalendarProps) {
         'Content-Type': 'application/json'
       },
       body: JSON.stringify({ date: formattedDateTime })
-    })
-      .then(response => response.json())
-      .then(data => {
-        console.log('Comparación recibida:', data);
-        setDatos(data);
-        toast.success('Datos obtenidos', {});
-      })
-      .catch(error => {
-        console.error('Error al enviar hora:', error);
-        toast.error('Error de conexion con el servidor', {});
-      });
+    }).then(async response => {
+      const data = await response.json();
+      if (!response.ok) {
+        console.log('Error datos', data);
+        toast.warn(data.error, {});
+        setDatos(data)
+        return;
+      }
+      if (data.selected_data.wave_length.length == 0) {
+        toast.warn("datos corruptos", {});
+        setDatos(data)
+        return;
+      }
+
+      console.log('Comparación recibida:', data);
+      setDatos(data);
+      toast.success('Datos obtenidos', {});
+    }).catch(error => {
+      console.error('Error al enviar hora:', error);
+      toast.error('Error de conexion con el servidor', {});
+    });
   };
 
   return (

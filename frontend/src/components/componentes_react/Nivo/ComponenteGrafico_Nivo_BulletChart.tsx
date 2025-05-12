@@ -1,5 +1,4 @@
-
-// ComponenteGrafico_Nivo_BuletChart.tsx
+//Contenedor del componente Nivo_BulletChart
 import React from 'react';
 import { ResponsiveBullet } from '@nivo/bullet';
 
@@ -13,7 +12,7 @@ const Nivo_BulletChart: React.FC = () => {
         },
     ];
 
-    console.log("Bullet Chart Data:", bulletDataFijo); // Agregamos un console.log para ver la estructura
+    console.log("Bullet Chart Data:", bulletDataFijo); 
 
     return (
         <div className="h-24">

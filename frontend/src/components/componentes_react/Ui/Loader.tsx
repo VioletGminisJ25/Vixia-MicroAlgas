@@ -1,18 +1,24 @@
 import React from 'react';
 import styled from 'styled-components';
+/**
+ * MIT License
+ * Copyright (c) 2025 adamiebl
+ * See https://uiverse.io/adamgiebl/thin-lionfish-5
+ */
 
+//Componente que se usa para la carga de datos
 const Loader = () => {
-    return (
-        <StyledWrapper>
-            <section className="dots-container">
-                <div className="dot" />
-                <div className="dot" />
-                <div className="dot" />
-                <div className="dot" />
-                <div className="dot" />
-            </section>
-        </StyledWrapper>
-    );
+  return (
+    <StyledWrapper>
+      <section className="dots-container">
+        <div className="dot" />
+        <div className="dot" />
+        <div className="dot" />
+        <div className="dot" />
+        <div className="dot" />
+      </section>
+    </StyledWrapper>
+  );
 }
 
 const StyledWrapper = styled.div`
