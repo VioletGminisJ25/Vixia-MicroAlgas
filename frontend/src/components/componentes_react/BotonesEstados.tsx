@@ -1,14 +1,13 @@
+
 import React, { useState } from 'react';
-
-
-
+import { toast } from 'react-toastify';
 
 interface BotonesEstadosProps {
     isManual: boolean | string;
+    isWake: boolean | string;
     // ... otras posibles props
 }
-
-const BotonesEstados: React.FC<BotonesEstadosProps> = ({ isManual }) => {
+const BotonesEstados: React.FC<BotonesEstadosProps> = ({ isManual, isWake }) => {
     const [showModal, setShowModal] = useState(false);
 
     const handleTomarMuestra = async () => {
@@ -19,44 +18,43 @@ const BotonesEstados: React.FC<BotonesEstadosProps> = ({ isManual }) => {
             boton.disabled = true;
         }
 
-        try {
-            const response = await fetch(import.meta.env.PUBLIC_GET_MANUAL, {
-                method: 'GET',
-                // Puedes añadir headers si es necesario, por ejemplo:
-                // headers: {
-                //   'Content-Type': 'application/json',
-                //   // 'Authorization': 'Bearer YOUR_TOKEN',
-                // },
-            });
+        toast.promise(
+            fetch(import.meta.env.PUBLIC_GET_MANUAL, { method: 'GET' })
+                .then(async response => {
+                    if (!response.ok) {
+                        console.error(`Error al solicitar la muestra manual: ${response.status}`);
+                        const boton = document.getElementById('muestraManual') as HTMLButtonElement | null;
+                        if (boton) {
+                            boton.disabled = true;
+                        }
+                        return;
+                    }
+                    const data = await response.json();
+                }).catch(error => {
+                    console.error("Error al realizar la petición GET:", error);
+                }), {
+            pending: 'Tomando medida...',
+            success: 'Datos procesados',
+            error: 'Algo salio mal...'
+        })
+    };
 
-            if (!response.ok) {
-                console.error(`Error al solicitar la muestra manual: ${response.status}`);
-                const boton = document.getElementById('muestraManual') as HTMLButtonElement | null;
-                if (boton) {
-                    boton.disabled = true;
-                }
-                // Aquí podrías mostrar un mensaje de error al usuario
-                return;
-            }
+    const handleRecibirMuestras = async () => {
+        console.log("¡Botón 'Recibir Muestras' clickeado!");
 
-
-
-            const data = await response.json();
-            console.log("Respuesta del servidor:", data);
-            // Aquí podrías manejar la respuesta del servidor,
-            // por ejemplo, actualizar el estado de la aplicación
-        } catch (error) {
-            console.error("Error al realizar la petición GET:", error);
-            // Aquí podrías mostrar un mensaje de error al usuario
+        const boton = document.getElementById('recibirDatos') as HTMLButtonElement | null;
+        if (boton) {
+            boton.textContent = isWake ? "Apagar" : "Encender";
         }
+        fetch(import.meta.env.PUBLIC_WAKE_UP, { method: 'GET' })
+            .then()
+            .catch()
 
     };
 
     const isManualBool = typeof isManual === "string"
         ? isManual.toLowerCase() === "true"
         : !!isManual;
-
-
 
     return (
         <div
@@ -72,15 +70,16 @@ const BotonesEstados: React.FC<BotonesEstadosProps> = ({ isManual }) => {
                            text-black dark:text-white"
                 >
                     <button
-
-                        id="btModal"
+                        itemID='recibirDatos'
+                        onClick={handleRecibirMuestras}
+                        id="recibirMuestras"
                         className="w-1/2 h-12 rounded
                                     bg-white
                                    dark:bg-[#1d1f21] dark:text-white
                                    dark:hover:bg-neutral-700
                                       hover:bg-neutral-200"
                     >
-                        Encender/Apagar
+                        {isWake ? "Apagar" : "Encender"}
                     </button>
                 </div>
 

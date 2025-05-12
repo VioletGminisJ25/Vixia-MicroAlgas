@@ -17,6 +17,7 @@ export interface SampleData {
     r: number;
   };
   wave_length: number[];
+  x: number[]
 }
 
 //Exportar una interza para datos recientes y seleccionados

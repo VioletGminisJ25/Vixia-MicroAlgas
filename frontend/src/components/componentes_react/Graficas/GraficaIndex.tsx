@@ -13,7 +13,7 @@ const appearVariants = { /* ... */ };
 // Podrá mostar si el medidión está conectado o no, así como apagarlo y encenderlo.
 // También se podra solicitar una medición manual al servidor, si el medidor está apagado.
 export default function GraficaIndex() {
-    const { data: datos, isManual, isConnected, error, lights_state } = useWebSocket_lastData("http://193.146.35.170:5000");
+    const { data: datos, isManual, isWake, isConnected, error, lights_state } = useWebSocket_lastData("http://193.146.35.170:5000");
 
     return (
         <div className="h-full w-full grid grid-cols-5 grid-rows-4 gap-4">
@@ -29,7 +29,7 @@ export default function GraficaIndex() {
                 </motion.div>
             </div>
             <div className='row-span-2 col-start-5 row-start-2'>
-                <BotonesEstados isManual={isManual ?? false} />
+                <BotonesEstados isManual={isManual ?? false} isWake={isWake ?? false} />
             </div>
             {/* Contenedor de notificaciones, con estilos unicos, las 'Toastify' son enviadas mediante el websocket */}
             <ToastContainer
@@ -40,7 +40,7 @@ export default function GraficaIndex() {
                 newestOnTop={true}
                 closeOnClick={false}
                 rtl={false}
-                pauseOnFocusLoss
+                pauseOnFocusLoss={false}
                 draggable
                 pauseOnHover
                 theme={localStorage.getItem('theme') === 'dark' ? 'dark' : 'light'}

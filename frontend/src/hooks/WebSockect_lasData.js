@@ -13,6 +13,7 @@ const useWebSocket_lastData = (url) => {
     const [error, setError] = useState(null);
     const socketRef = useRef(null);
     const [isManual, setManual] = useState(null);
+    const [isWake, setWake] = useState(null);
 
     const connect = useCallback(() => {
         if (!socketRef.current) {
@@ -62,6 +63,11 @@ const useWebSocket_lastData = (url) => {
                 setManual(isManual);
             });
 
+            currentSocket.on("wake_up_state", (isWake) => {
+                console.log("wake up SOCKET", isWake)
+                setWake(isWake);
+            });
+
             setSocket(currentSocket);
         }
     }, [url]);
@@ -83,7 +89,7 @@ const useWebSocket_lastData = (url) => {
         };
     }, [url, connect, disconnect]);
 
-    return { lights_state, data, isManual ,socket, isConnected, error, connect, disconnect };
+    return { lights_state, data, isManual, isWake, socket, isConnected, error, connect, disconnect };
 };
 
 export default useWebSocket_lastData;
