@@ -325,6 +325,10 @@ class SerialMonitor:
         self.timeout = int(os.getenv("TIMEOUT"))
         self.app = app
         self.socketio = socketio
+        self.automatic_mode = False
+        self.in_manual_mode = False
+        self.active = True
+        self.white_measurement_started = False
 
     def start(self):
         try:
@@ -341,7 +345,7 @@ class SerialMonitor:
             self.monitor_thread.start()
         except serial.SerialException as e:
             print(f"Error al abrir el puerto {self.port}: {e}")
-        asyncio.run(measurement_config_send(self))
+        asyncio.run(measurement_config_send(self, manual=False))
 
     def stop(self):
         self.running = False
@@ -359,15 +363,70 @@ class SerialMonitor:
                     data = self.serial_port.read(self.serial_port.in_waiting).decode(
                         "utf-8", errors="ignore"
                     )
-
                     print(data, end="")
 
-                    # print(data)
                     self.buffer += data
+                    self.messages_handler()
                     self.process_buffer()
+
                 time.sleep(0.01)
 
+    def messages_handler(self):
+        buffer2 = self.buffer
+        while "\n" in buffer2:  # Procesar cualquier línea completa en el buffer
+            try:
+                # Buscar el final de línea
+                end_of_line = buffer2.find("\n")
+                if end_of_line != -1:  # Si hay un mensaje completo
+                    # Extraer el mensaje completo hasta el final de línea
+                    line = buffer2[:end_of_line].strip().lower()
+                    # Eliminar el mensaje procesado del buffer
+                    buffer2 = buffer2[end_of_line + 1 :]
+
+                    lights_state = {"roja": 0, "azul": 0, "blanca": 0}
+
+                    # Procesar el mensaje
+                    if (
+                        line
+                        == "antes de empezar el programa es necesario medir el blanco..."
+                    ):
+                        self.white_measurement_started = True
+                        self.buffer = ""
+                    elif line == "luces apagadas (oscuridad)":
+                        # Guardar inmediatamente el estado de luces apagadas
+                        self.queries.insert_lights_state_sync(lights_state)
+                        self.socketio.emit("lights_state", lights_state)
+                        self.buffer = ""
+                    elif "luz" in line and "encendida" in line:
+                        parts = line.split(" ")
+                        if (
+                            len(parts) == 3
+                            and parts[0] == "luz"
+                            and parts[2] == "encendida"
+                        ):
+                            color = parts[1]
+                            if color in lights_state:
+                                lights_state[color] = 1
+                                self.queries.insert_lights_state_sync(lights_state)
+                                self.socketio.emit("lights_state", lights_state)
+                                self.buffer = ""
+                            else:
+                                print(f"Color de luz desconocido: {color}")
+                else:
+                    break  # Salir del bucle si no hay un mensaje completo
+            except Exception as e:
+                print(f"Error al procesar el mensaje de luces: {e}")
+
     def process_buffer(self):
+
+        # print(f"\nBuffer actual: {self.buffer}\n")  # Depuración
+
+        start_idx = self.buffer.find("h")
+        end_idx = self.buffer.find("a", start_idx)
+        if start_idx != -1 and end_idx != -1 and end_idx > start_idx:
+            if not self.automatic_mode:
+                self.socketio.emit("manual_mode", "False")
+            self.automatic_mode = True
         while True:
             start_idx = self.buffer.find("h")
             end_idx = self.buffer.find("a", start_idx)
@@ -380,9 +439,10 @@ class SerialMonitor:
 
     def handle_arduino_message(self, message):
         datos = message.split(",")
-
         if len(datos) < 4 or datos[0] != "h" or datos[-1] != "a":
             print("Formato de datos inválido.")
+            # self.in_automatic_measurement = False
+            # self.socketio.emit("manual_mode", "True")
             return
 
         try:
@@ -449,19 +509,23 @@ class SerialMonitor:
             "temperature": temp_avg,
             "ph": ph_avg,
         }
-        self.socketio.emit(
-            "arduino_data",
-            {
-                "colors": None,
-                "rgb": None,
-                "data": {"ph": float(ph_avg), "temperature": float(temp_avg)},
-                "wave_length": espectro_avg.tolist(),
-            },
-        )
-        self.queries.insert_data(data)
-        print("Datos guardados en la base de datos.")
 
-        # TODO Subir datos a la base de datos
+        if self.active and not self.white_measurement_started:
+            self.socketio.emit(
+                "arduino_data",
+                {
+                    "colors": None,
+                    "rgb": None,
+                    "data": {"ph": float(ph_avg), "temperature": float(temp_avg)},
+                    "wave_length": espectro_avg.tolist(),
+                    "x": WAVELENGTHS,
+                },
+            )
+        self.queries.insert_data(data, self.is_first_measurement)
+        print("Datos guardados en la base de datos.")
+        self.automatic_mode = False
+        if not self.white_measurement_started:
+            self.socketio.emit("manual_mode", "True")
 
         # Guardar en archivos Excel
         # espectro_file = os.path.join(self.save_dir, "valores_espectro.xlsx")
@@ -471,19 +535,48 @@ class SerialMonitor:
         # Función para agregar datos sin sobrescribir y preservar comentarios
 
     def save_manual_batch(self, timestamp):
+        print("✔ Manual measurement success")
+        self.active = False
+        self.socketio.emit("wake_up_state", self.active)
+
         # Crear DataFrame para el espectrómetro
         espectro_data = []
         for espectrometro, _, _ in self.manual_batch:
             espectro_data.append(espectrometro)
         espectro_df = pd.DataFrame(espectro_data)
+        espectro_avg = espectro_df.mean(axis=0).values
 
         # Crear DataFrame para la temperatura
         temp_data = [temp for _, temp, _ in self.manual_batch]
         temp_df = pd.DataFrame(temp_data, columns=["Temperatura"])
+        temp_avg = temp_df.mean().values[0]
 
         # Crear DataFrame para el pH
         ph_data = [ph for _, _, ph in self.manual_batch]
         ph_df = pd.DataFrame(ph_data, columns=["pH"])
+        ph_avg = ph_df.mean().values[0]
+
+        datetime_med = datetime.now().strftime("%Y-%m-%d %H:%M:%S")
+        data = {
+            "datetime": datetime_med,
+            "value": espectro_avg,
+            "temperature": temp_avg,
+            "ph": ph_avg,
+        }
+
+        if self.automatic_mode:
+            self.socketio.emit(
+                "arduino_data",
+                {
+                    "colors": None,
+                    "rgb": None,
+                    "data": {"ph": float(ph_avg), "temperature": float(temp_avg)},
+                    "wave_length": espectro_avg.tolist(),
+                    "x": WAVELENGTHS,
+                },
+            )
+        self.queries.insert_data(data, self.is_first_measurement)
+        print("Datos guardados en la base de datos.")
 
         # Guardar en base de datos
 
@@ -492,10 +585,11 @@ class SerialMonitor:
             if command.strip().upper() == "M":
                 self.waiting_for_manual = True
                 self.manual_batch = []
-                self.manual_name = input(
-                    "Introduce un nombre para esta muestra manual: "
-                ).strip()
-                print(f"Enviando 'M' al Arduino para '{self.manual_name}'...")
+                # self.manual_name = input(
+                #     "Introduce un nombre para esta muestra manual: "
+                # ).strip()
+                print(f"Enviando 'M' al Arduino")
+                self.socketio.emit("wake_up_state", self.active)
                 self.serial_port.write("M\n".encode("utf-8"))
             else:
                 self.serial_port.write(f"{command}\n".encode("utf-8"))

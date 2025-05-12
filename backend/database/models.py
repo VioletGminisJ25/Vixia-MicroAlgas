@@ -48,15 +48,12 @@ class Colors(db.Model):
     """
 
     __tablename__ = "colors"
-    datetime = Column(DateTime, ForeignKey("main_datetime.datetime"), primary_key=True)
+    id = Column(Integer, primary_key=True, autoincrement=True)
+    datetime = Column(DateTime)
 
-    red = Column(Boolean, nullable=False)
-    white = Column(Boolean, nullable=False)
-    blue = Column(Boolean, nullable=False)
-
-    main_datetime = db.relationship(
-        "MainDatetime", backref=db.backref("colors", uselist=False)
-    )
+    roja = Column(Boolean, nullable=False)
+    blanca = Column(Boolean, nullable=False)
+    azul = Column(Boolean, nullable=False)
 
 
 class SensorData(db.Model):
@@ -90,6 +87,19 @@ class WaveLength(db.Model):
         "MainDatetime", backref=db.backref("wave_length", uselist=False)
     )
     __table_args__ = (UniqueConstraint("datetime", "position", name="pk_wave_length"),)
+
+
+class WaveLength_White(db.Model):
+    """
+    Modelo para la tabla WaveLength_White.
+    """
+
+    __tablename__ = "wave_length_white"
+    id = Column(Integer, primary_key=True, autoincrement=True)
+    datetime = Column(DateTime)
+
+    position = Column(SmallInteger, nullable=False)
+    value = Column(Float, nullable=False)
 
 
 class Users(db.Model):

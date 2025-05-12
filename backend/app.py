@@ -5,6 +5,7 @@ Este archivo inicializa la aplicación Flask, configura CORS y registra las ruta
 
 from flask import Flask
 from routes.auth_routes import auth_routes
+from routes.data_routes import data_routes
 from websockets.socketio_intance import socketio_init
 from routes.socketio_routes import socket_routes, register_socketio_events
 from flask_cors import CORS
@@ -13,7 +14,9 @@ from database.executor_instance import init_executor
 from flask_compress import Compress
 from config import Config
 from dotenv import load_dotenv
-from arduino.SerialMonitor import SerialMonitor
+from arduino.monitor_instance import create_monitor
+
+
 import os
 
 
@@ -36,10 +39,11 @@ def main():
     init_executor(app, executor_type="thread", max_workers=4)
     socketio = socketio_init(app)
     register_socketio_events(socketio)
+    monitor = create_monitor(app, socketio)
+    monitor.start()
     app.register_blueprint(auth_routes)
     app.register_blueprint(socket_routes)
-    monitor = SerialMonitor(os.getenv("BAUD_RATE"), app, socketio)
-    monitor.start()
+    app.register_blueprint(data_routes)
     # IMPORTANTE: Use reloader a false porque crea dos veces y hace dos starts de serial monitor y salta error de que el puerto COM ya está en uso
     socketio.run(app, debug=True, host="0.0.0.0", use_reloader=False)
     # app.run(debug=False, host="0.0.0.0")

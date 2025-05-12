@@ -6,6 +6,7 @@ from database.models import (
     Colors,
     SensorData,
     WaveLength,
+    WaveLength_White,
 )
 from database.db_instance import db_instance
 
@@ -15,6 +16,297 @@ from utils.datos_fic_db import generar_dato
 from utils.lib import data_handler, get_periodo_dia
 from sqlalchemy import extract
 from database.executor_instance import executor_instance
+
+WAVELENGTHS = [
+    311.93,
+    314.64,
+    317.34,
+    320.05,
+    322.75,
+    325.45,
+    328.14,
+    330.84,
+    333.53,
+    336.21,
+    338.90,
+    341.58,
+    344.26,
+    346.94,
+    349.61,
+    352.28,
+    354.95,
+    357.62,
+    360.28,
+    362.94,
+    365.59,
+    368.24,
+    370.89,
+    373.54,
+    376.18,
+    378.82,
+    381.45,
+    384.08,
+    386.71,
+    389.34,
+    391.96,
+    394.57,
+    397.19,
+    399.80,
+    402.40,
+    405.00,
+    407.60,
+    410.20,
+    412.79,
+    415.37,
+    417.96,
+    420.53,
+    423.11,
+    425.68,
+    428.25,
+    430.81,
+    433.36,
+    435.92,
+    438.47,
+    441.01,
+    443.55,
+    446.09,
+    448.62,
+    451.15,
+    453.67,
+    456.19,
+    458.70,
+    461.21,
+    463.71,
+    466.21,
+    468.71,
+    471.20,
+    473.68,
+    476.16,
+    478.64,
+    481.11,
+    483.57,
+    486.04,
+    488.49,
+    490.94,
+    493.39,
+    495.83,
+    498.27,
+    500.70,
+    503.12,
+    505.54,
+    507.96,
+    510.37,
+    512.77,
+    515.17,
+    517.57,
+    519.96,
+    522.34,
+    524.72,
+    527.09,
+    529.46,
+    531.82,
+    534.18,
+    536.53,
+    538.88,
+    541.22,
+    543.55,
+    545.88,
+    548.20,
+    550.52,
+    552.83,
+    555.14,
+    557.44,
+    559.74,
+    562.03,
+    564.31,
+    566.59,
+    568.86,
+    571.13,
+    573.39,
+    575.64,
+    577.89,
+    580.13,
+    582.37,
+    584.60,
+    586.83,
+    589.05,
+    591.26,
+    593.47,
+    595.67,
+    597.87,
+    600.06,
+    602.24,
+    604.42,
+    606.59,
+    608.75,
+    610.91,
+    613.06,
+    615.21,
+    617.35,
+    619.49,
+    621.62,
+    623.74,
+    625.85,
+    627.96,
+    630.07,
+    632.16,
+    634.26,
+    636.34,
+    638.42,
+    640.49,
+    642.56,
+    644.62,
+    646.67,
+    648.72,
+    650.76,
+    652.79,
+    654.82,
+    656.84,
+    658.86,
+    660.87,
+    662.87,
+    664.87,
+    666.86,
+    668.84,
+    670.82,
+    672.79,
+    674.76,
+    676.71,
+    678.67,
+    680.61,
+    682.55,
+    684.48,
+    686.41,
+    688.33,
+    690.24,
+    692.15,
+    694.05,
+    695.94,
+    697.83,
+    699.71,
+    701.59,
+    703.46,
+    705.32,
+    707.18,
+    709.02,
+    710.87,
+    712.70,
+    714.53,
+    716.36,
+    718.18,
+    719.99,
+    721.79,
+    723.59,
+    725.38,
+    727.17,
+    728.94,
+    730.72,
+    732.48,
+    734.24,
+    736.00,
+    737.74,
+    739.48,
+    741.22,
+    742.95,
+    744.67,
+    746.38,
+    748.09,
+    749.79,
+    751.49,
+    753.18,
+    754.86,
+    756.54,
+    758.21,
+    759.88,
+    761.54,
+    763.19,
+    764.83,
+    766.47,
+    768.11,
+    769.73,
+    771.36,
+    772.97,
+    774.58,
+    776.18,
+    777.78,
+    779.37,
+    780.95,
+    782.53,
+    784.11,
+    785.67,
+    787.23,
+    788.79,
+    790.33,
+    791.88,
+    793.41,
+    794.94,
+    796.47,
+    797.98,
+    799.50,
+    801.00,
+    802.50,
+    804.00,
+    805.49,
+    806.97,
+    808.45,
+    809.92,
+    811.39,
+    812.85,
+    814.30,
+    815.75,
+    817.19,
+    818.63,
+    820.06,
+    821.49,
+    822.91,
+    824.32,
+    825.73,
+    827.13,
+    828.53,
+    829.92,
+    831.31,
+    832.69,
+    834.07,
+    835.44,
+    836.81,
+    838.17,
+    839.52,
+    840.87,
+    842.22,
+    843.55,
+    844.89,
+    846.22,
+    847.54,
+    848.86,
+    850.17,
+    851.48,
+    852.79,
+    854.08,
+    855.38,
+    856.67,
+    857.95,
+    859.23,
+    860.50,
+    861.77,
+    863.04,
+    864.30,
+    865.55,
+    866.80,
+    868.05,
+    869.29,
+    870.53,
+    871.76,
+    872.99,
+    874.21,
+    875.43,
+    876.64,
+    877.85,
+    879.06,
+    880.26,
+    881.46,
+    882.65,
+    883.84,
+]
 
 
 class DataQueries:
@@ -177,13 +469,9 @@ class DataQueries:
                     Rgb.r,
                     Rgb.g,
                     Rgb.b,
-                    Colors.red,
-                    Colors.white,
-                    Colors.blue,
                 )
                 .select_from(SensorData)
                 .outerjoin(Rgb, SensorData.datetime == Rgb.datetime)
-                .outerjoin(Colors, SensorData.datetime == Colors.datetime)
                 .filter(SensorData.datetime == fecha_dt)
                 .first()
             )  # Usamos first() porque esperamos un único resultado para un timestamp exacto
@@ -211,11 +499,6 @@ class DataQueries:
                 "g": main_result.g,
                 "b": main_result.b,
             }
-            selected_data["colors"] = {
-                "red": main_result.red,
-                "white": main_result.white,
-                "blue": main_result.blue,
-            }
 
             # --- Consulta Optimizada para WaveLength (Query 2) ---
             wavelength_results = (
@@ -228,13 +511,20 @@ class DataQueries:
             # Extraer solo los valores de la lista de tuplas [(valor,), (valor,), ...]
             selected_data["wave_length"] = [item[0] for item in wavelength_results]
 
+            if selected_data == []:
+                return jsonify({"Datos corruptos"}), 400
+
             # --- Obtener Últimos Datos ---
             # Asumiendo que data_handler() es razonablemente rápido. Si no, también necesita optimización.
-            last_data = data_handler()
 
             # --- Devolver Respuesta ---
             return (
-                jsonify({"selected_data": selected_data}),
+                jsonify(
+                    {
+                        "selected_data": selected_data,
+                        "x": WAVELENGTHS,
+                    }
+                ),
                 200,
             )
 
@@ -243,9 +533,7 @@ class DataQueries:
             self.session.rollback()  # Revertir la transacción si algo falla
             print(f"Error during database query or processing: {e}")  # Loguear el error
             return (
-                jsonify(
-                    {"error": "Error interno del servidor al procesar la solicitud"}
-                ),
+                jsonify({"error": "Internal Server Error"}),
                 500,
             )
 
@@ -285,6 +573,16 @@ class DataQueries:
                     "value": round(avg, 2),
                 }
             )
+        years_to_add = [2026, 2027, 2028]  # Cambia este valor al año que quieras añadir
+        for year_to_add in years_to_add:
+            if year_to_add not in output:
+                output[year_to_add] = {
+                    "values": [
+                        {f"day": "{year_to_add}-01-01", "value": 7.2},
+                        {f"day": "{year_to_add}-01-02", "value": 7.4},
+                        {f"day": "{year_to_add}-01-03", "value": 7.1},
+                    ]
+                }
 
         formatted_output = []
         for year, data in output.items():
@@ -463,7 +761,7 @@ class DataQueries:
             return jsonify({"error": "No hay datos para la medicion"}), 404
         return jsonify(ph_data), 200
 
-    def insert_data(self, data):
+    def insert_data(self, data, is_first_measurement):
         """
         Inserta datos en la base de datos.
         """
@@ -481,15 +779,22 @@ class DataQueries:
 
             # Agregar la nueva instancia a la sesión
 
-            self.session.add(new_data_main)
-            self.session.add(new_data_sensor)
             for position, value in enumerate(data["value"]):
-                new_data_wave = WaveLength(
-                    datetime=data["datetime"],
-                    position=position,
-                    value=value,
-                )
-                # Agregar la nueva instancia a la sesión
+                if not is_first_measurement:
+                    new_data_wave = WaveLength(
+                        datetime=data["datetime"],
+                        position=position,
+                        value=value,
+                    )
+                    self.session.add(new_data_main)
+                    self.session.add(new_data_sensor)
+                else:
+                    new_data_wave = WaveLength_White(
+                        datetime=data["datetime"],
+                        position=position,
+                        value=value,
+                    )
+                    # Agregar la nueva instancia a la sesión
                 self.session.add(new_data_wave)
             # Confirmar los cambios en la base de datos
             self.session.commit()
@@ -510,7 +815,6 @@ class DataQueries:
             )
             .select_from(SensorData)
             .outerjoin(Rgb, SensorData.datetime == Rgb.datetime)
-            .outerjoin(Colors, SensorData.datetime == Colors.datetime)
             .order_by(SensorData.datetime.desc())
             .first()
         )
@@ -529,5 +833,40 @@ class DataQueries:
             "rgb": None,
             "data": {"temperature": result.temperature, "ph": result.ph},
             "wave_length": [item[0] for item in result_wavelength],
+            "x": WAVELENGTHS,
         }
+        print(last_data)
         return last_data
+
+    def insert_lights_state_sync(self, lights_state):
+        """
+        Inserta el estado de los luces en la base de datos.
+        """
+        try:
+            new_LightsState = Colors(
+                datetime=datetime.now(),
+                roja=lights_state["roja"],
+                azul=lights_state["azul"],
+                blanca=lights_state["blanca"],
+            )
+            self.session.add(new_LightsState)
+            self.session.commit()
+            print("✔ Lights state inserted in the database.")
+        except Exception as e:
+            print(f"Error al insertar datos: {e}")
+            self.session.rollback()
+
+    def get_latest_color(self):
+        """Devuelve el último valor de los colores de la tabla Colors."""
+        try:
+            latest_color = (
+                self.session.query(Colors).order_by(Colors.datetime.desc()).first()
+            )
+            return {
+                "roja": latest_color.roja,
+                "azul": latest_color.azul,
+                "blanca": latest_color.blanca,
+            }
+        except Exception as e:
+            print(f"Error al obtener los colores: {e}")
+            self.session.rollback()
