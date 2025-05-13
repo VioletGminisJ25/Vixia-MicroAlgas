@@ -46,10 +46,16 @@ export default function Nivo_ResponsiveLine({ wave_length: datos, maxMin: nivo_d
           tickSize: 5,
           tickPadding: 5,
           tickRotation: 0,
-          legend: 'Semana',
+          legend: 'Rango Espectro',
           legendOffset: 36,
           legendPosition: 'middle',
-
+          
+          format: (value) => {
+            if (datos?.x && datos.x[Number(value) - 1] !== undefined) {
+              return datos.x[Number(value) - 1];
+            }
+            return '';
+          },
         }}
         axisLeft={{
           tickSize: 5,

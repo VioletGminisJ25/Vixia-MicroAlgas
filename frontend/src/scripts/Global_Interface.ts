@@ -56,3 +56,13 @@ export interface Interface_Ph_Temp {
   ResponsiveLine: NivoLineData[];
   SwarmPlot: SwarmPlotData;
 }
+
+export interface Config {
+  time_between_measurements: string;
+  time_light: string;
+  time_dark: string;
+  light_white: string;
+  light_blue: string;
+  light_red: string;
+}
+
