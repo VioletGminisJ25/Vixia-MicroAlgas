@@ -97,9 +97,9 @@ class WaveLength_White(db.Model):
     __tablename__ = "wave_length_white"
     id = Column(Integer, primary_key=True, autoincrement=True)
     datetime = Column(DateTime)
-
     position = Column(SmallInteger, nullable=False)
     value = Column(Float, nullable=False)
+    is_reference = Column(Boolean, nullable=False)
 
 
 class Users(db.Model):
@@ -114,3 +114,18 @@ class Users(db.Model):
 
     def __repr__(self):
         return f"<User(id={self.id}, name='{self.name}', email='{self.email}')>"
+
+
+class Config(db.Model):
+    """
+    Modelo para la tabla Config.
+    """
+
+    __tablename__ = "config"
+    datetime = Column(DateTime, primary_key=True)
+    time_between_measurements = Column(Integer, nullable=False)
+    time_light = Column(Integer, nullable=False)
+    time_dark = Column(Integer, nullable=False)
+    light_white = Column(Integer, nullable=False)
+    light_red = Column(Integer, nullable=False)
+    light_blue = Column(Integer, nullable=False)

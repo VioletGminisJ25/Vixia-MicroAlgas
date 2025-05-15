@@ -4,6 +4,7 @@
   "version": "0.0.1",
   "scripts": {
     "dev": "astro dev --host",
+    "dev2": "concurrently \"npm run dev\" \"cd ../backend && .venv\\Scripts\\activate.bat && python app.py\"",
     "build": "astro build",
     "preview": "astro preview",
     "astro": "astro"

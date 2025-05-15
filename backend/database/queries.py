@@ -7,8 +7,11 @@ from database.models import (
     SensorData,
     WaveLength,
     WaveLength_White,
+    Config,
 )
 from database.db_instance import db_instance
+from sqlalchemy.exc import OperationalError, DatabaseError
+from mysql.connector.errors import DatabaseError as MySQLDatabaseError
 
 import random
 from datetime import datetime, timedelta
@@ -16,6 +19,11 @@ from utils.datos_fic_db import generar_dato
 from utils.lib import data_handler, get_periodo_dia
 from sqlalchemy import extract
 from database.executor_instance import executor_instance
+import os
+from dotenv import load_dotenv
+import math
+
+load_dotenv()
 
 WAVELENGTHS = [
     311.93,
@@ -458,7 +466,7 @@ class DataQueries:
                 400,
             )
 
-        selected_data = {}
+        selected_data = {"x": WAVELENGTHS}
         try:
             # --- Consulta Principal Optimizada (Query 1) ---
             # Une SensorData, Rgb y Colors filtrando por el timestamp exacto
@@ -494,12 +502,6 @@ class DataQueries:
                 "ph": main_result.ph,
                 "temperature": main_result.temperature,
             }
-            selected_data["rgb"] = {
-                "r": main_result.r,
-                "g": main_result.g,
-                "b": main_result.b,
-            }
-
             # --- Consulta Optimizada para WaveLength (Query 2) ---
             wavelength_results = (
                 self.session.query(WaveLength.value)
@@ -507,9 +509,16 @@ class DataQueries:
                 .order_by(WaveLength.position)
                 .all()
             )
+            selected_data["rgb"] = (
+                calculate_rgb(
+                    [item[0] for item in wavelength_results],
+                    self.get_reference_wavelength_white(),
+                ),
+            )
 
             # Extraer solo los valores de la lista de tuplas [(valor,), (valor,), ...]
             selected_data["wave_length"] = [item[0] for item in wavelength_results]
+            selected_data["nc"] = calculate_nc(selected_data["wave_length"])
 
             if selected_data == []:
                 return jsonify({"Datos corruptos"}), 400
@@ -522,7 +531,6 @@ class DataQueries:
                 jsonify(
                     {
                         "selected_data": selected_data,
-                        "x": WAVELENGTHS,
                     }
                 ),
                 200,
@@ -793,6 +801,7 @@ class DataQueries:
                         datetime=data["datetime"],
                         position=position,
                         value=value,
+                        is_reference=False,
                     )
                     # Agregar la nueva instancia a la sesión
                 self.session.add(new_data_wave)
@@ -804,39 +813,44 @@ class DataQueries:
             self.session.rollback()
 
     def get_latest_data(self):
-        result = (
-            self.session.query(
-                SensorData.datetime,
-                SensorData.ph,
-                SensorData.temperature,
-                Rgb.r,
-                Rgb.g,
-                Rgb.b,
+        try:
+            result = (
+                self.session.query(
+                    SensorData.datetime,
+                    SensorData.ph,
+                    SensorData.temperature,
+                )
+                .select_from(SensorData)
+                .order_by(SensorData.datetime.desc())
+                .first()
             )
-            .select_from(SensorData)
-            .outerjoin(Rgb, SensorData.datetime == Rgb.datetime)
-            .order_by(SensorData.datetime.desc())
-            .first()
-        )
-        result_wavelength = (
-            self.session.query(WaveLength.value)
-            .select_from(WaveLength)
-            .filter(WaveLength.datetime == result.datetime)
-            .order_by(WaveLength.position)
-            .all()
-        )
-        if not result:
-            return 404
+            result_wavelength = (
+                self.session.query(WaveLength.value)
+                .select_from(WaveLength)
+                .filter(WaveLength.datetime == result.datetime)
+                .order_by(WaveLength.position)
+                .all()
+            )
+            if not result:
+                return 404
 
-        last_data = {
-            "colors": None,
-            "rgb": None,
-            "data": {"temperature": result.temperature, "ph": result.ph},
-            "wave_length": [item[0] for item in result_wavelength],
-            "x": WAVELENGTHS,
-        }
-        print(last_data)
-        return last_data
+            last_data = {
+                "colors": None,
+                "rgb": calculate_rgb(
+                    [item[0] for item in result_wavelength],
+                    self.get_reference_wavelength_white(),
+                ),
+                "data": {"temperature": result.temperature, "ph": result.ph},
+                "wave_length": [item[0] for item in result_wavelength],
+                "x": WAVELENGTHS,
+                "nc": calculate_nc([item[0] for item in result_wavelength]),
+            }
+            print(last_data)
+            return last_data
+        except (OperationalError, DatabaseError, MySQLDatabaseError) as e:
+            print(f"Error al conectar a la base de datos.")
+        except Exception as e:
+            print(f"Error inesperado.")
 
     def insert_lights_state_sync(self, lights_state):
         """
@@ -870,3 +884,186 @@ class DataQueries:
         except Exception as e:
             print(f"Error al obtener los colores: {e}")
             self.session.rollback()
+
+    def get_config(self):
+        try:
+            config = self.session.query(Config).order_by(Config.datetime.desc()).first()
+            return (
+                {
+                    "time_between_measurements": config.time_between_measurements,
+                    "time_light": config.time_light,
+                    "time_dark": config.time_dark,
+                    "light_white": config.light_white,
+                    "light_red": config.light_red,
+                    "light_blue": config.light_blue,
+                },
+                200,
+            )
+        except Exception as e:
+            print(f"Error al obtener la configuracion: {e}")
+            self.session.rollback()
+            return (
+                {
+                    "time_between_measurements": os.getenv("TIME_BETWEEN_MEASURAMENTS"),
+                    "time_light": os.getenv("TIME_LIGHT"),
+                    "time_dark": os.getenv("TIME_DARK"),
+                    "light_white": os.getenv("LIGHT_WHITE"),
+                    "light_red": os.getenv("LIGHT_RED"),
+                    "light_blue": os.getenv("LIGHT_BLUE"),
+                },
+                200,
+            )
+
+    def insert_config(
+        self,
+        time_between_measurements,
+        time_light,
+        time_dark,
+        light_white,
+        light_red,
+        light_blue,
+    ):
+        try:
+            last_config = (
+                self.session.query(Config).order_by(Config.datetime.desc()).first()
+            )
+            if (
+                last_config
+                and last_config.time_between_measurements == time_between_measurements
+                and last_config.time_light == time_light
+                and last_config.time_dark == time_dark
+                and last_config.light_white == light_white
+                and last_config.light_red == light_red
+                and last_config.light_blue == light_blue
+            ):
+                print(
+                    "ℹ La configuración es idéntica a la última guardada. No se insertará."
+                )
+                return {
+                    "status": "info",
+                    "message": "La configuración es idéntica a la última guardada. No se insertó.",
+                }, 200
+            new_config = Config(
+                time_between_measurements=time_between_measurements,
+                time_light=time_light,
+                time_dark=time_dark,
+                light_white=light_white,
+                light_red=light_red,
+                light_blue=light_blue,
+                datetime=datetime.now(),
+            )
+            self.session.add(new_config)
+            self.session.commit()
+            print("✔ Configuración insertada en la base de datos.")
+            return {
+                "status": "success",
+                "message": "Configuración insertada en la base de datos.",
+            }, 200
+        except Exception as e:
+            print(f"Error al insertar configuración: {e}")
+            self.session.rollback()
+            return {
+                "status": "error",
+                "message": "Error al insertar configuración en la base de datos.",
+            }, 500
+
+    def get_last_wavelength_white(self):
+        try:
+            # Recuperar todos los valores correspondientes al último datetime
+            last_datetime = (
+                self.session.query(WaveLength_White.datetime)
+                .order_by(WaveLength_White.datetime.desc())
+                .first()
+            )
+
+            if not last_datetime:
+                print("ℹ No se encontraron datos en WaveLength_White.")
+                return []
+
+            # Recuperar los valores ordenados por posición
+            values = (
+                self.session.query(WaveLength_White.value)
+                .filter(WaveLength_White.datetime == last_datetime[0])
+                .order_by(WaveLength_White.position)
+                .all()
+            )
+
+            # Extraer los valores de la lista de tuplas
+            return [value[0] for value in values]
+        except Exception as e:
+            print(f"Error al obtener el último valor de WaveLength_White: {e}")
+            self.session.rollback()
+            return []
+
+    def get_reference_wavelength_white(self):
+        try:
+            last_datetime = (
+                self.session.query(WaveLength_White.datetime)
+                .filter(WaveLength_White.is_reference == True)
+                .order_by(WaveLength_White.datetime.desc())
+                .first()
+            )
+            # Recuperar los valores de referencia marcados como is_reference = TRUE
+            values = (
+                self.session.query(WaveLength_White.value)
+                .filter(WaveLength_White.datetime == last_datetime[0])
+                .order_by(WaveLength_White.position)
+                .all()
+            )
+
+            # Extraer los valores de la lista de tuplas
+            return [value[0] for value in values]
+        except Exception as e:
+            print(
+                f"Error al obtener los valores de referencia de WaveLength_White: {e}"
+            )
+            self.session.rollback()
+            return []
+
+
+def calculate_nc(wave_length):
+    """
+    Calcula el número de componentes de una onda.
+    """
+    return round(
+        math.pow(wave_length[WAVELENGTHS.index(541.22)], -2.28) * math.pow(10, 12), 2
+    )
+
+
+def calculate_rgb(wave_length, wave_length_white):
+    if wave_length_white == []:
+        return None
+    closest_index_white = min(
+        range(len(WAVELENGTHS)), key=lambda i: abs(WAVELENGTHS[i] - 650)
+    )
+    closest_index_green = min(
+        range(len(WAVELENGTHS)), key=lambda i: abs(WAVELENGTHS[i] - 546)
+    )
+    closest_index_red = min(
+        range(len(WAVELENGTHS)), key=lambda i: abs(WAVELENGTHS[i] - 450)
+    )
+    print(closest_index_white)
+    print(closest_index_green)
+    print(closest_index_red)
+
+    wave_length_white_white = wave_length_white[closest_index_white]
+    wave_length_white_green = wave_length_white[closest_index_green]
+    wave_length_white_red = wave_length_white[closest_index_red]
+
+    print(wave_length_white_white)
+    print(wave_length_white_green)
+    print(wave_length_white_red)
+
+    print(WAVELENGTHS.index(701.59))
+    print(WAVELENGTHS.index(545.88))
+    print(WAVELENGTHS.index(435.92))
+
+    wave_length_white = wave_length[closest_index_white]
+    wave_length_green = wave_length[closest_index_green]
+    wave_length_red = wave_length[closest_index_red]
+
+    red = (255 * wave_length_red) / wave_length_white_red
+    green = (255 * wave_length_green) / wave_length_white_green
+    white = (255 * wave_length_white) / wave_length_white_white
+
+    return {"r": red, "g": green, "b": white}

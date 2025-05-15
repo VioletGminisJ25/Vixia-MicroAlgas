@@ -6,7 +6,7 @@ import os
 import pandas as pd
 import serial.tools.list_ports
 import serial
-from arduino.util import obtener_puertos_usb, measurement_config_send
+from arduino.util import obtener_puertos_usb, async_measurement_config_send
 from dotenv import load_dotenv
 import asyncio
 from database.queries import DataQueries
@@ -106,7 +106,7 @@ WAVELENGTHS = [
     534.18,
     536.53,
     538.88,
-    541.22,
+    541.22,  # Este es el valor que hay que introducir en la formula
     543.55,
     545.88,
     548.20,
@@ -343,9 +343,9 @@ class SerialMonitor:
                 target=self.monitor_serial, daemon=True
             )
             self.monitor_thread.start()
+            asyncio.run(async_measurement_config_send(self, manual=False, reboot=False))
         except serial.SerialException as e:
             print(f"Error al abrir el puerto {self.port}: {e}")
-        asyncio.run(measurement_config_send(self, manual=False))
 
     def stop(self):
         self.running = False
@@ -359,15 +359,22 @@ class SerialMonitor:
         with self.app.app_context():
             self.queries = DataQueries()
             while self.running:
-                if self.serial_port.in_waiting > 0:
-                    data = self.serial_port.read(self.serial_port.in_waiting).decode(
-                        "utf-8", errors="ignore"
-                    )
-                    print(data, end="")
+                try:
+                    if self.serial_port.in_waiting > 0:
+                        data = self.serial_port.read(
+                            self.serial_port.in_waiting
+                        ).decode("utf-8", errors="ignore")
+                        print(data, end="")
 
-                    self.buffer += data
-                    self.messages_handler()
-                    self.process_buffer()
+                        self.buffer += data
+                        self.messages_handler()
+                        self.process_buffer()
+                except serial.SerialException as e:
+                    print("Error en el puerto serial: ", e)
+                    self.running = False
+                    self.serial_port.close()
+                except Exception as e:
+                    print("Error inesperado: ", e)
 
                 time.sleep(0.01)
 
@@ -581,6 +588,7 @@ class SerialMonitor:
         # Guardar en base de datos
 
     def send_command(self, command):
+        print("Commando enviado al Arduino:", command)
         if self.serial_port and self.serial_port.is_open:
             if command.strip().upper() == "M":
                 self.waiting_for_manual = True
@@ -592,7 +600,7 @@ class SerialMonitor:
                 self.socketio.emit("wake_up_state", self.active)
                 self.serial_port.write("M\n".encode("utf-8"))
             else:
-                self.serial_port.write(f"{command}\n".encode("utf-8"))
+                self.serial_port.write(f"{command}".encode("utf-8"))
 
     def get_latest_measurements(self):
         """Return the latest batch of measurements for the dashboard."""
