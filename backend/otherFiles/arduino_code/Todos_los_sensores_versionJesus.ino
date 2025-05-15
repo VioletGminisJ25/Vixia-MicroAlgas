@@ -390,10 +390,12 @@ void loop() {
   if (!valvulaActiva && now - tiempoUltimaValvula >= VALVULA_CERRADA) {
     digitalWrite(VALVULA_PIN, LOW);
     valvulaActiva = true;
+    Serial.println("Valvula activada");
     tiempoUltimaValvula = now;
   } else if (valvulaActiva && now - tiempoUltimaValvula >= VALVULA_ABIERTA) {
     digitalWrite(VALVULA_PIN, HIGH);
     valvulaActiva = false;
+    Serial.println("Valvula activada");
     tiempoUltimaValvula = now;
   }
 

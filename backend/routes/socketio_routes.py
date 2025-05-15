@@ -12,6 +12,7 @@ def register_socketio_events(socketio):
     @socketio.on("connect")
     def handle_connect():
         sid = request.sid
+        print(queries.get_latest_data())
         socketio.emit("arduino_data", queries.get_latest_data(), to=sid)
         socketio.emit("lights_state", queries.get_latest_color(), to=sid)
         socketio.emit(

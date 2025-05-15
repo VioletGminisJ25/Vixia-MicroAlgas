@@ -5,9 +5,9 @@ from flask import current_app
 db_instance = Database()
 
 
-def init_executor(app):
-    """
-    Inicializa el Executor para manejar tareas en segundo plano.
-    """
-    executor = Executor(app)
-    return executor
+# def init_executor(app):
+#     """
+#     Inicializa el Executor para manejar tareas en segundo plano.
+#     """
+#     executor = Executor(app)
+#     return executor

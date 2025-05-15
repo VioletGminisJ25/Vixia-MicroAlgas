@@ -39,13 +39,14 @@ def main():
     init_executor(app, executor_type="thread", max_workers=4)
     socketio = socketio_init(app)
     register_socketio_events(socketio)
-    monitor = create_monitor(app, socketio)
-    monitor.start()
     app.register_blueprint(auth_routes)
     app.register_blueprint(socket_routes)
     app.register_blueprint(data_routes)
-    # IMPORTANTE: Use reloader a false porque crea dos veces y hace dos starts de serial monitor y salta error de que el puerto COM ya está en uso
+    with app.app_context():
+        monitor = create_monitor(app, socketio)
+        monitor.start()
     socketio.run(app, debug=True, host="0.0.0.0", use_reloader=False)
+    # IMPORTANTE: Use reloader a false porque crea dos veces y hace dos starts de serial monitor y salta error de que el puerto COM ya está en uso
     # app.run(debug=False, host="0.0.0.0")
 
 

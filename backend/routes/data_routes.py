@@ -1,7 +1,7 @@
 from flask import Blueprint, request, jsonify
 from database.queries import DataQueries
 import arduino.monitor_instance
-from arduino.util import measurement_config_send
+from arduino.util import async_measurement_config_send, reboot_arduino
 import asyncio
 import websockets.socketio_intance
 
@@ -71,7 +71,9 @@ def manual_mode_route():
     try:
         arduino.monitor_instance.monitor.send_command("M")
         asyncio.run(
-            measurement_config_send(arduino.monitor_instance.monitor, manual=True)
+            async_measurement_config_send(
+                arduino.monitor_instance.monitor, reboot=False, manual=True
+            )
         )
         # Add a return statement after the command is sent
         return jsonify(
@@ -87,3 +89,17 @@ def manual_mode_route():
             },
             500,
         )
+
+
+@data_routes.route("/get_config", methods=["GET"])
+def get_config_route():
+    """Endpoint para obtener la configuracion de los datos de un archivo JSON."""
+    data, error = queries.get_config()
+    return jsonify(data), error
+
+
+@data_routes.route("/change_config", methods=["POST"])
+def change_config():
+    data = request.json
+    message, status = asyncio.run(reboot_arduino(False, data))
+    return jsonify(message), status
