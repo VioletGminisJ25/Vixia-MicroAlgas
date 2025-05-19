@@ -44,7 +44,7 @@ const BotonesEstados: React.FC<BotonesEstadosProps> = ({ isManual, isWake }) => 
                 }), {
             pending: 'Tomando medida...',
             success: 'Datos procesados',
-            error: 'Algo salio mal...'
+            error: 'Algo salio mal...💀'
         })
     };
 
@@ -79,32 +79,41 @@ const BotonesEstados: React.FC<BotonesEstadosProps> = ({ isManual, isWake }) => 
     };
 
     const handleOnSubmit = (event: React.FormEvent) => {
-        event.preventDefault(); // Evita la recarga de la página por defecto
+        event.preventDefault();
         console.log("check!");
-        fetch(import.meta.env.PUBLIC_CHANGE_CONFIG, {
-            method: 'POST', // Generalmente se usa POST o PUT para enviar datos
-            headers: {
-                'Content-Type': 'application/json', // Indica que el cuerpo de la petición es JSON
-            },
-            body: JSON.stringify(config), // Convierte el objeto config a una cadena JSON para enviarlo
-        })
-            .then(response => {
-                if (!response.ok) {
-                    console.error(`Error al guardar la configuración: ${response.status}`);
-                    toast.error('Error al guardar la configuración');
-                    return;
-                }
-                console.log("Configuración guardada exitosamente");
-                toast.success('Configuración guardada exitosamente');
-                setShowModal(false); // Cierra el modal después de un envío exitoso
-                // Aquí podrías realizar alguna acción adicional después de guardar, como recargar datos
+        setShowModal(false);
+        toast.promise(
+            fetch(import.meta.env.PUBLIC_CHANGE_CONFIG, {
+                method: 'POST',
+                headers: {
+                    'Content-Type': 'application/json',
+                },
+                body: JSON.stringify(config),
             })
-            .catch(error => {
-                console.error("Error al realizar la petición para guardar la configuración:", error);
-                toast.error('Algo salió mal al guardar la configuración');
-                setShowModal(false); // También podrías cerrar el modal en caso de error o dejarlo abierto
-            });
+                .then(response => {
+                    if (!response.ok) {
+                        console.error(`Error al guardar la configuración: ${response.status}`);
+                        throw new Error('Error al guardar la configuración');
+                    }
+                    console.log("Configuración guardada exitosamente");
+                })
+                .catch(error => {
+                    console.error("Error al realizar la petición para guardar la configuración:", error);
+                    throw error;
+                })
+                .finally(() => {
+
+                }),
+            {
+                pending: 'Cambiando configuracion del arduino...',
+                success: 'Configuracion modificada',
+                error: 'Algo salió mal... 💀'
+            }
+        );
     };
+
+
+
 
     const isManualBool = typeof isManual === "string"
         ? isManual.toLowerCase() === "true"

@@ -1,49 +1,46 @@
-import type { SampleData } from '../../../scripts/Global_Interface';
-import NivoLine from './Nivo_ResponsiveLine';
+import type { CompareData, SampleData } from '../../../scripts/Global_Interface';
+import NivoLine from '../Nivo/Nivo_ResponsiveLine';
 interface Componente1Props {
     datos: SampleData | null;
     titulo: string;
     lights: { roja: number; blanca: number; azul: number } | null;
 }
 /// Componente que recibe datos y un titulo y renderiza una grafica con los datos
-export default function ComponenteGrafico_Nivo_LongitudDeOnda({ datos, titulo, lights }: Componente1Props) {
+export default function ComponenteGrafico_Nivo_LongitudDeOnda({ datos }: Componente1Props) {
     // Si no hay datos, establecemos un objeto de datos por defecto
     // Esto es útil para evitar errores al intentar acceder a propiedades de datos nulos
-    const colors = lights ?? { roja: 0, blanca: 0, azul: 0 };
-    const rgb = datos?.rgb ?? { r: 1, g: 0, b: 0 };
+    //const colors = lights ?? { roja: 0, blanca: 0, azul: 0 };
+    // const rgb = datos?.rgb ?? { r: 1, g: 0, b: 0 };
     //Estructura del componente, que contiene un div
     //Dentro del div hay un título, botones de colores y una tabla con la gráfica
     //Los botones de colores están habilitados o deshabilitados según los datos
     //La tabla contiene la gráfica y dos botones que muestran el pH y la temperatura
     return (
         <div className="flex flex-col items-center w-full h-[100%] bg-slate-100 dark:bg-[#0f1011] p-4 rounded-lg shadow-lg dark:shadow-lg/100">
-            <div className='flex flex-col items-center text-black dark:text-white font-bold'>{titulo}</div>
+            <div className='flex flex-col items-center text-black dark:text-white font-bold'>{"Pruebas"}</div>
             {/* Botones de colores: deshabilitamos según datos.colors */}
             <div className="flex flex-row space-x-4 mb-4 w-full">
                 <button
                     id="red"
-                    disabled={!colors.roja}
-                    className={`w-[10%] h-12 rounded 
-            ${colors.roja ? 'bg-red-500 text-white' : 'bg-gray-400 text-gray-600 cursor-not-allowed'}`}
-                    title={lights?.roja ? 'Se uso' : 'No se uso'}>
+                    //disabled={!colors.roja}
+                    className={`w-[10%] h-12 rounded `}
+                    title={'No se uso'}>
                     Rojo
                 </button>
 
                 <button
                     id="white"
-                    disabled={!colors.blanca}
-                    className={`w-[10%] h-12 rounded 
-            ${colors.blanca ? 'bg-white text-black' : 'bg-gray-400 text-gray-600 cursor-not-allowed'}`}
-                    title={lights?.blanca ? 'Se uso' : 'No se uso'}>
+                    //disabled={!colors.blanca}
+                    className={`w-[10%] h-12 rounded `}
+                    title={'No se uso'}>
                     Blanco
                 </button>
 
                 <button
                     id="blue"
-                    disabled={!colors.azul}
-                    className={`w-[10%] h-12 rounded 
-            ${colors.azul ? 'bg-blue-500 text-white' : 'bg-gray-400 text-gray-600 cursor-not-allowed'}`}
-                    title={lights?.azul ? 'Se uso' : 'No se uso'}
+                    //disabled={!colors.azul}
+                    className={`w-[10%] h-12 rounded `}
+                    title={'No se uso'}
                 >
                     Azul
                 </button>
@@ -52,14 +49,14 @@ export default function ComponenteGrafico_Nivo_LongitudDeOnda({ datos, titulo, l
                 <div className="flex flex-row items-center ml-auto space-x-2">
                     <p className="text-black dark:text-white font-bold">RGB</p>
                     <div
-                        className="w-21 h-12 rounded"
+                        className="h-12 rounded w-[50%]"
                         style={{
-                            backgroundColor: rgb
-                                ? `rgb(${rgb.r}, ${rgb.g}, ${rgb.b})`
+                            backgroundColor: datos?.rgb
+                                ? `rgb(${datos?.rgb.r}, ${datos?.rgb.g}, ${datos?.rgb.b})`
                                 : '#000000',
                         }}
                         title={datos
-                            ? `rgb(${rgb.r}, ${rgb.g}, ${rgb.b})`
+                            ? `rgb(${datos?.rgb.r}, ${datos?.rgb.g}, ${datos?.rgb.b})`
                             : 'rgb(NaN,NaN,NaN)'}
                     />
                 </div>
@@ -77,6 +74,9 @@ export default function ComponenteGrafico_Nivo_LongitudDeOnda({ datos, titulo, l
                 </button>
                 <button className="w-1/2 h-12 bg-[#ffffff] dark:bg-[#1d1f21] text-black dark:text-white font-bold rounded">
                     <p>{datos?.data.temperature ? Math.round(datos.data.temperature * 10) / 10 : 'sin datos'} °C</p>
+                </button>
+                <button className="w-1/2 h-12 bg-[#ffffff] dark:bg-[#1d1f21] text-black dark:text-white font-bold rounded">
+                    <p>{datos?.data.temperature ? datos.nc : 'sin datos'} °C</p>
                 </button>
             </div>
         </div>

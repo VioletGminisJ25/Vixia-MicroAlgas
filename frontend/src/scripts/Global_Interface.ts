@@ -18,12 +18,13 @@ export interface SampleData {
   };
   wave_length: number[];
   x: number[]
+  nc: number
 }
 
 //Exportar una interza para datos recientes y seleccionados
 export interface CompareData {
-  last_data: SampleData;
-  selected_data: SampleData;
+  last_data: SampleData | null;
+  selected_data: SampleData | null;
 }
 
 //Interfaz para Calendario-ResponsiveLine-SwarmPlot

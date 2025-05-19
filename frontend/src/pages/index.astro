@@ -2,15 +2,13 @@
 import "../styles/global.css";
 import Layout from "../layouts/Layout.astro";
 import Heather from "../components/Cabecera.astro";
-import IndexData from "../components/IndexData.astro";
-import { isAuth } from "../scripts/isAuth";
-import PhData from "../components/PhData.astro";
 import Toastify from "../components/componentes_react/Ui/Toastify";
+import IndexDataComponent from "../components/componentes_react/Graficas/GraficaIndex";
 ---
 
 <!-- Pagina principal --><!-- Esta página se encarga de mostrar los datos mas recientes en una gráfica y un selector de fechas para comparar -->
 <Layout testTitle="Principal">
   <Heather texto="Principal" showBack={false} />
-  <IndexData />
-  <Toastify client:load/>
+  <IndexDataComponent client:only="react" />
+  <Toastify client:load />
 </Layout>

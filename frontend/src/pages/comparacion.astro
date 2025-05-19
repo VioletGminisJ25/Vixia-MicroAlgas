@@ -1,19 +1,14 @@
 ---
 import "../styles/global.css";
-import Calendar from "../components/componentes_react/Ui/SelectorFecha";
 import Layout from "../layouts/Layout.astro";
 import Heather from "../components/Cabecera.astro";
-import CompareComponet from "../components/CompararData.astro";
 import Toastify from "../components/componentes_react/Ui/Toastify";
+import CompareComponent from "../components/componentes_react/CompararDatos/GraficaComparar";
 ---
 
 <!-- Pagina de comparación de datos --><!-- Esta página se encarga de comparar los datos de dos fechas (selecionada y ultima) y mostrar las gráficas correspondientes -->
-
 <Layout testTitle="Comparar">
-    <Heather
-        texto="Comparar"
-        showCompare={false}
-    />
-    <CompareComponet/>
-    <Toastify client:load/>
+    <Heather texto="Comparar" showCompare={false} />
+    <CompareComponent client:only="react" />
+    <Toastify client:load />
 </Layout>

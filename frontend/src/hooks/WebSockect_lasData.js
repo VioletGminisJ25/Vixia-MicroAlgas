@@ -48,7 +48,7 @@ const useWebSocket_lastData = (url) => {
             });
 
             currentSocket.on('arduino_data', (newData) => {
-                console.log('Datos recibidos:', newData);
+                console.log('Datos recibidos websokcet:', newData);
                 setData(newData);
                 toast.success('Ultimos datos recibidos', {});
             });
@@ -66,6 +66,11 @@ const useWebSocket_lastData = (url) => {
             currentSocket.on("wake_up_state", (isWake) => {
                 console.log("wake up SOCKET", isWake)
                 setWake(isWake);
+            });
+
+            currentSocket.on("onreboot", (onReboot) => {
+                console.log("onReboot", onReboot)
+                
             });
 
             setSocket(currentSocket);

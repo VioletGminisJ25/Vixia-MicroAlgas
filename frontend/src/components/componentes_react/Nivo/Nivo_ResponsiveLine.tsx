@@ -49,7 +49,7 @@ export default function Nivo_ResponsiveLine({ wave_length: datos, maxMin: nivo_d
           legend: 'Rango Espectro',
           legendOffset: 36,
           legendPosition: 'middle',
-          
+
           format: (value) => {
             if (datos?.x && datos.x[Number(value) - 1] !== undefined) {
               return datos.x[Number(value) - 1];
@@ -80,8 +80,8 @@ export default function Nivo_ResponsiveLine({ wave_length: datos, maxMin: nivo_d
               borderRadius: '4px',
             }}
           >
-            <strong>{nivo_datos ? "Media:" : "valor"}:</strong> {point.data.yFormatted}<br></br>
-            <strong>{nivo_datos ? "Semana:" : "rango espectro"}</strong> {point.data.xFormatted}<br />
+            <strong>{"valor"}:</strong> {point.data.yFormatted}<br></br>
+            <strong>{nivo_datos ? "Semana:" : "rango espectro"}</strong> {nivo_datos ? String(point.data.xFormatted) : String(datos?.x?.[Number(point.data.x) - 1] ?? point.data.x)}<br />
           </div>
         )}
         legends={showLegend ? [

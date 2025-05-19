@@ -1,7 +1,6 @@
 import { useState } from 'react';
 import DatePickerWithData from '../Ui/SelectorFecha';
-import LastCurrentData from '../Nivo/ComponenteGrafico_Nivo_LongitudDeOnda';
-import SelectedData from '../Nivo/ComponenteGrafico_Nivo_LongitudDeOnda';
+import Grafica from '../CompararDatos/Comparar_NivoLine';
 import type { CompareData } from "../../../scripts/Global_Interface";
 import { motion } from 'framer-motion';
 import { ToastContainer } from 'react-toastify';
@@ -27,7 +26,12 @@ export default function GraficaComparar() {
   // Estado para almacenar los datos seleccionados por el usuario
   const [datos, setDatos] = useState<CompareData | null>(null);
   const { data: datosWebSocket, isConnected, error, lights_state } = useWebSocket_lastData(import.meta.env.PUBLIC_API_URL);
-  const series = [];
+
+  const nivoLineData: CompareData = {
+    last_data: datosWebSocket ?? null, // Asumiendo que datosWebSocket tiene la misma estructura que SampleData
+    selected_data: datos?.selected_data ?? null,
+  };
+
 
   return (
     <div className="flex flex-col h-[90%]">
@@ -42,20 +46,7 @@ export default function GraficaComparar() {
       </div>
 
       {/* Contenedor de gráficas */}
-      <div className="flex flex-1 justify-between items-center gap-x-4 px-4 py-2">
-
-        {/* <motion.div
-          id="graficaAnimacion"
-          className="flex-1 h-[90%] mx-2"
-          variants={appearVariants}
-          initial="hidden"
-          animate="visible"
-        >
-          <SelectedData
-            titulo="FECHafda"
-            datos={datos?.selected_data ?? null} lights={null}
-          />
-        </motion.div> */}
+      <div className="flex flex-1 justify-between items-center gap-x-4 px-4 py-2 bg-white">
 
         {/* Bloque 'lastcurrentdata' */}
         <motion.div
@@ -66,11 +57,7 @@ export default function GraficaComparar() {
           animate="visible"
           transition={{ delay: 0.2 }}
         >
-          <LastCurrentData
-            titulo="FECHA MAS RECIENTE"
-            datos={datosWebSocket ?? null}
-            lights={lights_state ?? null}
-          />
+          <Grafica wave_length={nivoLineData}/>
         </motion.div>
       </div>
 
