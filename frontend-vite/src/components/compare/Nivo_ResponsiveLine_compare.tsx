@@ -86,9 +86,10 @@ export default function NivoLine({ arduino_data: data }: NivoLineProps) {
             )}
             legends={[
                 {
-                    anchor: 'top-left',
+                    anchor: 'top-right',
                     direction: 'row',
-                    translateX: 0,
+                    translateX: 35,
+                    translateY: -15,
                     itemWidth: 130,
                     itemHeight: 0,
                     symbolShape: 'circle'

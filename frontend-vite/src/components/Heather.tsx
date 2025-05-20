@@ -21,7 +21,7 @@ export default function Heather({
     showTemp = true,
 }: HeatherProps) {
     return (<header className="h-[10dvh] bg-white shadow-lg px-6 flex justify-between items-center dark:bg-[#0f1011] dark:shadow-lg/100">
-        <div className="text-2xl font-bold text-blue-600">{texto}</div>
+        <div className="text-2xl font-bold bg-gradient-to-r from-green-700 to-green-400 text-transparent bg-clip-text">{texto}</div>
 
         <nav className="space-x-10 flex items-center">
             <div className="flex items-center gap-10 text-black dark:text-white">
@@ -114,7 +114,7 @@ export default function Heather({
                     showBack && (
                         <Link to="/">
                             <button
-                                className="group cursor-pointer bg-[#ffffff] dark:bg-[#0f1011] relative inline-flex items-center justify-center gap-2 rounded-md text-sm font-medium ring-offset-background transition-colors focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-ring focus-visible:ring-offset-2 disabled:pointer-events-none disabled:opacity-50 hover:bg-[#F5F5F5] dark:hover:bg-[#1d1f21] hover:text-[#06B6D4] h-9 px-3">
+                                className="group cursor-pointer bg-[#ffffff] dark:bg-[#0f1011] relative inline-flex items-center justify-center gap-2 rounded-md text-sm font-medium ring-offset-background transition-colors focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-ring focus-visible:ring-offset-2 disabled:pointer-events-none disabled:opacity-50 hover:bg-[#F5F5F5] dark:hover:bg-[#1d1f21] hover:text-green-400 text-green-700 h-9 px-3">
                                 <svg className="lucide lucide-arrow-left" strokeLinejoin="round" strokeLinecap="round"
                                     strokeWidth="2" stroke="currentColor" fill="none" viewBox="0 0 24 24" height="22" width="22"
                                     xmlns="http://www.w3.org/2000/svg">

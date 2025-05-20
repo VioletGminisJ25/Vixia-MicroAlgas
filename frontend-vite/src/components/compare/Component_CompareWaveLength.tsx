@@ -22,31 +22,27 @@ export default function GraficaComparar() {
     };
 
     return (
-        <div className="flex flex-col h-[90%] w-full">
+        <div className="flex flex-col items-center h-[90%] w-full">
             {/* Selector de fecha */}
             <div className="
-        flex justify-center items-center
-        h-[10%] w-[80%] mx-[10%] mt-[1%]
-        rounded-lg shadow-lg bg-slate-100
-        dark:bg-[#0f1011] dark:ring-0 shadow-lg/100
-      ">
+        flex justify-center items-center h-[10%] w-[60%] rounded-lg shadow-lg bg-slate-100 dark:bg-[#0f1011] dark:ring-0 shadow-lg/100">
                 <DatePickerWithData setDatos={setDatos} />
             </div>
 
             {/* Contenedor de gráficas con divisiones laterales */}
-            <div className="flex flex-row items-center justify-center h-[80%] w-[90%] mx-auto mt-4 gap-4">
+            <div className="flex flex-row justify-center h-[80%] w-[100%] mx-auto mt-4 gap-4">
                 {/* Panel izquierdo */}
 
-                <PanelInfo sampleData={nivoLineData.selected_data} titulo='Selecionada'></PanelInfo>
+                <PanelInfo sampleData={nivoLineData.selected_data} titulo='Datos Selecionados'></PanelInfo>
 
                 {/* Gráfica central */}
-                <div className="flex items-center justify-center h-full w-[60%] bg-white p-4 rounded-lg shadow-md">
+                <div className="flex items-center justify-center h-full w-[60%] bg-white p-4 rounded-lg shadow-md mr-10 ml-10">
                     <Nivo_ResponsiveLine_compare arduino_data={nivoLineData} />
                 </div>
 
                 {/* Panel derecho */}
 
-                <PanelInfo sampleData={nivoLineData.last_data} titulo='Ultimos'></PanelInfo>
+                <PanelInfo sampleData={nivoLineData.last_data} titulo='Ultimos Datos'></PanelInfo>
 
             </div>
 
