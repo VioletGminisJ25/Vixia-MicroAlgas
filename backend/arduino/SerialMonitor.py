@@ -370,13 +370,9 @@ class SerialMonitor:
                         self.messages_handler()
                         self.process_buffer()
                 except serial.SerialException as e:
-                    print("Error en el puerto serial: ", e)
                     self.running = False
                     self.serial_port.close()
-                except Exception as e:
-                    print("Error inesperado: ", e)
-
-                time.sleep(0.01)
+        time.sleep(0.01)
 
     def messages_handler(self):
         buffer2 = self.buffer
