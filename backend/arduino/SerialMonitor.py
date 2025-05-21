@@ -1,3 +1,4 @@
+import math
 import serial
 import threading
 import time
@@ -522,10 +523,14 @@ class SerialMonitor:
                 "arduino_data",
                 {
                     "colors": None,
-                    "rgb": None,
+                    "rgb": calculate_rgb(
+                        [item[0] for item in espectro_avg.tolist()],
+                        self.get_reference_wavelength_white(),
+                    ),
                     "data": {"ph": float(ph_avg), "temperature": float(temp_avg)},
                     "wave_length": espectro_avg.tolist(),
                     "x": WAVELENGTHS,
+                    "nc": calculate_nc([item[0] for item in espectro_avg.tolist()]),
                 },
             )
         self.queries.insert_data(data, self.is_first_measurement)
@@ -576,10 +581,14 @@ class SerialMonitor:
                 "arduino_data",
                 {
                     "colors": None,
-                    "rgb": None,
+                    "rgb": calculate_rgb(
+                        [item[0] for item in espectro_avg.tolist()],
+                        self.get_reference_wavelength_white(),
+                    ),
                     "data": {"ph": float(ph_avg), "temperature": float(temp_avg)},
                     "wave_length": espectro_avg.tolist(),
                     "x": WAVELENGTHS,
+                    "nc": calculate_nc([item[0] for item in espectro_avg.tolist()]),
                 },
             )
         self.queries.insert_data(data, self.is_first_measurement)
@@ -610,6 +619,54 @@ class SerialMonitor:
             "measurement_count": self.measurement_count,
             "is_first_measurement": self.is_first_measurement,
         }
+
+
+def calculate_nc(wave_length):
+    """
+    Calcula el número de componentes de una onda.
+    """
+    return round(
+        math.pow(wave_length[WAVELENGTHS.index(541.22)], -2.28) * math.pow(10, 12), 2
+    )
+
+
+def calculate_rgb(wave_length, wave_length_white):
+    if wave_length_white == []:
+        return None
+    closest_index_white = min(
+        range(len(WAVELENGTHS)), key=lambda i: abs(WAVELENGTHS[i] - 650)
+    )
+    closest_index_green = min(
+        range(len(WAVELENGTHS)), key=lambda i: abs(WAVELENGTHS[i] - 546)
+    )
+    closest_index_red = min(
+        range(len(WAVELENGTHS)), key=lambda i: abs(WAVELENGTHS[i] - 450)
+    )
+    print(closest_index_white)
+    print(closest_index_green)
+    print(closest_index_red)
+
+    wave_length_white_white = wave_length_white[closest_index_white]
+    wave_length_white_green = wave_length_white[closest_index_green]
+    wave_length_white_red = wave_length_white[closest_index_red]
+
+    print(wave_length_white_white)
+    print(wave_length_white_green)
+    print(wave_length_white_red)
+
+    print(WAVELENGTHS.index(701.59))
+    print(WAVELENGTHS.index(545.88))
+    print(WAVELENGTHS.index(435.92))
+
+    wave_length_white = wave_length[closest_index_white]
+    wave_length_green = wave_length[closest_index_green]
+    wave_length_red = wave_length[closest_index_red]
+
+    red = (255 * wave_length_red) / wave_length_white_red
+    green = (255 * wave_length_green) / wave_length_white_green
+    white = (255 * wave_length_white) / wave_length_white_white
+
+    return {"r": red, "g": green, "b": white}
 
 
 # def main():
