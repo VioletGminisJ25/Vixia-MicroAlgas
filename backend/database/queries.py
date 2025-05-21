@@ -779,8 +779,8 @@ class DataQueries:
             )
             new_data_sensor = SensorData(
                 datetime=data["datetime"],
-                ph=data["ph"],
-                temperature=data["temperature"],
+                ph=float(data["ph"]),
+                temperature=float(data["temperature"]),
             )
 
             # Agregar la nueva instancia a la sesión
@@ -790,7 +790,7 @@ class DataQueries:
                     new_data_wave = WaveLength(
                         datetime=data["datetime"],
                         position=position,
-                        value=value,
+                        value=float(value),
                     )
                     self.session.add(new_data_main)
                     self.session.add(new_data_sensor)
@@ -798,7 +798,7 @@ class DataQueries:
                     new_data_wave = WaveLength_White(
                         datetime=data["datetime"],
                         position=position,
-                        value=value,
+                        value=float(value),
                         is_reference=False,
                     )
                     # Agregar la nueva instancia a la sesión
