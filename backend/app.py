@@ -45,7 +45,7 @@ def main():
     with app.app_context():
         monitor = create_monitor(app, socketio)
         monitor.start()
-    socketio.run(app, debug=True, host="0.0.0.0", use_reloader=False)
+    socketio.run(app, debug=True, host="0.0.0.0", use_reloader=False,allow_unsafe_werkzeug=True)
     # IMPORTANTE: Use reloader a false porque crea dos veces y hace dos starts de serial monitor y salta error de que el puerto COM ya está en uso
     # app.run(debug=False, host="0.0.0.0")
 

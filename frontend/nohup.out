@@ -1,0 +1,52 @@
+
+> lunar-field@0.0.1 dev
+> astro dev --host
+
+15:33:57 [types] Generated 13ms
+15:33:57 [content] Syncing content
+15:33:58 [content] Synced content
+
+ astro  v5.6.1 ready in 3264 ms
+
+┃ Local    http://localhost:4321/
+┃ Network  http://193.146.35.219:4321/
+
+15:33:58 watching for file changes...
+15:36:41 [200] /ph 602ms
+15:36:41 [200] /ph 610ms
+15:36:41 [200] /comparacion 611ms
+15:36:41 [200] / 612ms
+15:36:46 [200] / 114ms
+15:36:46 [watch] nohup.out
+15:36:46 [watch] nohup.out
+
+> lunar-field@0.0.1 dev
+> astro dev --host
+
+15:41:34 [types] Generated 5ms
+15:41:34 [content] Syncing content
+15:41:35 [content] Synced content
+
+ astro  v5.6.1 ready in 2986 ms
+
+┃ Local    http://localhost:4321/
+┃ Network  http://193.146.35.219:4321/
+
+15:41:35 watching for file changes...
+15:42:41 [200] / 603ms
+15:42:41 [200] / 615ms
+
+> lunar-field@0.0.1 dev
+> astro dev --host
+
+15:43:01 [types] Generated 3ms
+15:43:01 [content] Syncing content
+15:43:01 [content] Synced content
+
+ astro  v5.6.1 ready in 2814 ms
+
+┃ Local    http://localhost:4321/
+┃ Network  http://193.146.35.219:4321/
+
+15:43:01 watching for file changes...
+15:43:33 [200] / 422ms

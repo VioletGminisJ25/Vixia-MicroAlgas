@@ -509,11 +509,9 @@ class DataQueries:
                 .order_by(WaveLength.position)
                 .all()
             )
-            selected_data["rgb"] = (
-                calculate_rgb(
-                    [item[0] for item in wavelength_results],
-                    self.get_reference_wavelength_white(),
-                ),
+            selected_data["rgb"] = calculate_rgb(
+                [item[0] for item in wavelength_results],
+                self.get_reference_wavelength_white(),
             )
 
             # Extraer solo los valores de la lista de tuplas [(valor,), (valor,), ...]
