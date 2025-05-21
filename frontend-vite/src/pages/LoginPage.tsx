@@ -1,5 +1,4 @@
 // src/pages/LoginPage.tsx (o donde decidas ubicarlo)
-import { ca } from 'date-fns/locale';
 import React, { useState } from 'react';
 import { useNavigate } from 'react-router-dom'; // Importa useNavigate para la redirección
 import { toast, ToastContainer } from 'react-toastify'; // Importa toast y ToastContainer

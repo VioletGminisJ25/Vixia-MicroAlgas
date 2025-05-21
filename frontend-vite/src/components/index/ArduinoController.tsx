@@ -115,19 +115,15 @@ const ArduinoController: React.FC<BotonesEstadosProps> = ({ isManual, isWake }) 
         );
     };
 
-
-
-
     const isManualBool = typeof isManual === "string"
         ? isManual === "true"
         : !!isManual;
 
     return (
         <div
-            className="h-[90%] w-full
-                   bg-slate-100 dark:bg-[#0f1011] p-1 rounded-lg shadow-xl dark:shadow-xl/100
-                   flex flex-col justify-center items-center"
+            className="h-fit w-60 bg-slate-100 dark:bg-[#0f1011] rounded-lg p-4 mt-20"
         >
+            <p className="text-black dark:text-white text-xl font-semibold mb-8 text-center">Controles</p> {/* Clase para el título y un margen inferior */}
             <div
                 className="flex flex-col justify-center items-center w-full h-full gap-4"
             >
@@ -139,7 +135,7 @@ const ArduinoController: React.FC<BotonesEstadosProps> = ({ isManual, isWake }) 
                         itemID='recibirDatos'
                         onClick={handleRecibirMuestras}
                         id="recibirMuestras"
-                        className="w-1/2 h-12 rounded
+                        className="w-[75%] h-12 rounded
                                     bg-white
                                    dark:bg-[#1d1f21] dark:text-white
                                    dark:hover:bg-neutral-700
@@ -158,7 +154,7 @@ const ArduinoController: React.FC<BotonesEstadosProps> = ({ isManual, isWake }) 
                         onClick={handleTomarMuestra}
                         disabled={!isManualBool}
                         className={`
-                            w-1/2 h-12 rounded
+                            w-[75%] h-12 rounded
                             transition-colors duration-200 ease-in-out
                             ${isManualBool
                                 ? `bg-white text-black hover:bg-neutral-200 
@@ -176,7 +172,7 @@ const ArduinoController: React.FC<BotonesEstadosProps> = ({ isManual, isWake }) 
                 >
                     <button
                         onClick={() => { setShowModal(true); handleRellenarCampos() }}
-                        className="w-1/2 h-12 rounded
+                        className="w-[75%] h-12 rounded
                     bg-white hover:
                     dark:bg-[#1d1f21] dark:text-white
                     dark:hover:bg-neutral-700
@@ -240,7 +236,7 @@ const ArduinoController: React.FC<BotonesEstadosProps> = ({ isManual, isWake }) 
                             text-black dark:text-white"
                 >
                     <button
-                        className="w-1/2 h-12 rounded
+                        className="w-[75%] h-12 rounded
                         bg-white hover:
                                     dark:bg-[#1d1f21] dark:text-white
                                     dark:hover:bg-neutral-700

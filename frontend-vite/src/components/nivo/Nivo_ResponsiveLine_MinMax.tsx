@@ -1,7 +1,7 @@
 //Componente de Nivo: https://nivo.rocks/line/
 import { useMemo } from 'react';
 import { ResponsiveLine } from '@nivo/line';
-import type { NivoLineData, SampleData } from '../../interface/Global_Interface';
+import type { NivoLineData } from '../../interface/Global_Interface';
 
 //Tiene una interfaz para los datos
 //Se usan dos datos por que el componente puede usarse para mostar dos datos diferentes
@@ -103,12 +103,4 @@ export default function Nivo_ResponsiveLine({ maxMin: nivo_datos }: NivoLineProp
             />
         </div>
     );
-}
-
-// Auxiliar fuera del componente
-function buildWaveSeries(datos: SampleData): NivoLineData {
-    return {
-        id: 'Longitud de onda',
-        data: datos.wave_length.map((value, idx) => ({ x: idx + 1, y: value })),
-    };
 }

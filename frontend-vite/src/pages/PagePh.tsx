@@ -16,7 +16,7 @@ import { toast } from 'react-toastify'
 export default function Grafica() {
     //Aqui se guardan los estados de los componentes, para el manejo de carga y errores
     const [loading, setLoading] = useState(true);
-    const [error, setError] = useState<string | null>(null);
+    //const [error, setError] = useState<string | null>(null);
     // Aqui se guardan los datos que se reciben del backend.
     const [jsonData, setJsonData] = useState<Interface_Ph_Temp | null>(null);
 
@@ -55,7 +55,7 @@ export default function Grafica() {
                     theme: localStorage.getItem('theme') === 'dark' ? 'dark' : 'light'
                 });
             } catch (e: any) {
-                setError(e.message);
+                //setError(e.message);
                 console.error("Error fetching data (POST):", e);
                 toast.error("Error de conexión", {
                     position: "bottom-right",

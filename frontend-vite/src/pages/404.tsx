@@ -1,6 +1,4 @@
 // src/pages/PageNotFound.tsx
-import React from 'react';
-import Heather from '../components/Heather'; // Asegúrate de que la ruta sea correcta
 
 export default function PageNotFound() {
     return (

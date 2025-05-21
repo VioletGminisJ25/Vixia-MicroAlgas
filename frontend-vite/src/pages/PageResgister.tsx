@@ -5,10 +5,6 @@ import { toast, ToastContainer } from 'react-toastify'; // Importa toast y Toast
 import 'react-toastify/dist/ReactToastify.css'; // Importa los estilos de react-toastify
 
 // Si tienes una interfaz para la respuesta del registro, podrías definirla
-interface RegisterResponse {
-    message: string;
-    // Podrías tener otras propiedades, como un userId, si tu API las devuelve
-}
 
 export default function RegisterPage() {
     const [name, setName] = useState<string>('');

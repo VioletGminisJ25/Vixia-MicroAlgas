@@ -33,8 +33,8 @@ export default function GraficaComparar() {
             <div className="flex flex-row justify-center h-[80%] w-[100%] mx-auto mt-4 gap-4">
                 {/* Panel izquierdo */}
 
-                <PanelInfo sampleData={nivoLineData.selected_data} titulo='Datos Selecionados'></PanelInfo>
 
+                <PanelInfo sampleData={nivoLineData.last_data} titulo='Ultimos Datos'></PanelInfo>
                 {/* Gráfica central */}
                 <div className="flex items-center justify-center h-full w-[60%] bg-white p-4 rounded-lg shadow-md mr-10 ml-10">
                     <Nivo_ResponsiveLine_compare arduino_data={nivoLineData} />
@@ -42,7 +42,7 @@ export default function GraficaComparar() {
 
                 {/* Panel derecho */}
 
-                <PanelInfo sampleData={nivoLineData.last_data} titulo='Ultimos Datos'></PanelInfo>
+                <PanelInfo sampleData={nivoLineData.selected_data} titulo='Datos Selecionados'></PanelInfo>
 
             </div>
 
