@@ -3,10 +3,6 @@ import React from 'react';
 import Nivo_Calendar from "./Nivo_Calendar";
 import type { CalendarData } from "../../interface/Global_Interface";
 
-interface Props {
-    calendar_data: CalendarData[];
-}
-
 //Aqui se gestionada una cosa
 //Si hay mas de un año, se puede selecionar el año con un boton
 //De esta forma se cargan los datos en un calendario y por año, así no renderizamos varios calendarios (uno por año)

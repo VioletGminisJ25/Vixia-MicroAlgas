@@ -20,7 +20,7 @@ const Nivo_Calendar: React.FC<Props> = ({ nivo_data }) => {
                     <ResponsiveCalendar
                         data={yearData.values}
                         from={`${yearData.year}-01-01`}
-                        to={`${yearData.year}-01-31`}
+                        to={`${yearData.year}-02-30`}
                         emptyColor="#eeeeee"
                         colors={['#ff0000', '#f47560', '#00C800', '#f47560', '#ff0000']}
                         margin={{ top: 10, right: 10, bottom: 10, left: 10 }}
