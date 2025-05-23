@@ -7,7 +7,7 @@ import Compare from './pages/PageCompare';
 import Ph from './pages/PagePh';
 import Temp from './pages/PageTemp';
 import PageNotFound from './pages/404'; // Importa tu nuevo componente 404
-import LoginPage from './pages/LoginPage';
+import LoginPage from './pages/PageLogin';
 import PageRegister from './pages/PageResgister'
 
 function App() {
@@ -113,14 +113,14 @@ function App() {
     <>
       <Heather {...headerProps}></Heather>
       <Routes>
+        <Route path='/login' element={<LoginPage></LoginPage>}></Route>
+        <Route path='/register' element={<PageRegister></PageRegister>}></Route>
+        <Route path="*" element={<PageNotFound />} />
         <Route path="/" element={<IndexPage />} />
         <Route path='/comparacion' element={<Compare />} />
         <Route path='/ph' element={<Ph />} />
         <Route path='/temperature' element={<Temp />} />
-        <Route path='/login' element={<LoginPage></LoginPage>}></Route>
-        <Route path='/register' element={<PageRegister></PageRegister>}></Route>
         {/* Esta es la ruta para la página 404 - ¡DEBE SER LA ÚLTIMA! */}
-        <Route path="*" element={<PageNotFound />} />
       </Routes>
     </>
   );

@@ -65,7 +65,7 @@ export default function NivoLine({ arduino_data: data }: NivoLineProps) {
                 legendOffset: -40,
                 legendPosition: 'start',
             }}
-            colors={{ scheme: 'category10' }}
+            colors={['#008b1e', '#000000']}
             pointSize={6}
             useMesh={true}
             enableGridX={true}
