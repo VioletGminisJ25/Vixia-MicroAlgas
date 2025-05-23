@@ -3,10 +3,13 @@ import "../styles/global.css";
 import Heather from "../components/Cabecera.astro";
 import Layout from "../layouts/Layout.astro";
 import PhData from "../components/PhData.astro";
+import Toastify from "../components/componentes_react/Ui/Toastify";
 ---
 
 <!-- Pagina de de sensores --><!-- TODO Por hacer -->
 <Layout testTitle="Evolucion pH">
         <Heather texto="Registros pH" showPh={false} />
+        
         <PhData />
+        <Toastify client:load/>
 </Layout>

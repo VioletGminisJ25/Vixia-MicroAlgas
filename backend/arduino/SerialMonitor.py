@@ -371,13 +371,9 @@ class SerialMonitor:
                         self.messages_handler()
                         self.process_buffer()
                 except serial.SerialException as e:
-                    print("Error en el puerto serial: ", e)
                     self.running = False
                     self.serial_port.close()
-                except Exception as e:
-                    print("Error inesperado: ", e)
-
-                time.sleep(0.01)
+        time.sleep(0.01)
 
     def messages_handler(self):
         buffer2 = self.buffer
@@ -525,12 +521,12 @@ class SerialMonitor:
                     "colors": None,
                     "rgb": calculate_rgb(
                         [item[0] for item in espectro_avg.tolist()],
-                        self.queries.get_reference_wavelength_white(),
+                        self.get_reference_wavelength_white(),
                     ),
                     "data": {"ph": float(ph_avg), "temperature": float(temp_avg)},
                     "wave_length": espectro_avg.tolist(),
                     "x": WAVELENGTHS,
-                    "nc": calculate_nc([item[0] for item in espectro_avg.tolist()]),
+                    "nc": calculate_nc(espectro_avg.tolist()),
                 },
             )
         self.queries.insert_data(data, self.is_first_measurement)
@@ -583,12 +579,12 @@ class SerialMonitor:
                     "colors": None,
                     "rgb": calculate_rgb(
                         [item[0] for item in espectro_avg.tolist()],
-                        self.queries.get_reference_wavelength_white(),
+                        self.get_reference_wavelength_white(),
                     ),
                     "data": {"ph": float(ph_avg), "temperature": float(temp_avg)},
                     "wave_length": espectro_avg.tolist(),
                     "x": WAVELENGTHS,
-                    "nc": calculate_nc([item[0] for item in espectro_avg.tolist()]),
+                    "nc": calculate_nc(espectro_avg.tolist()),
                 },
             )
         self.queries.insert_data(data, self.is_first_measurement)

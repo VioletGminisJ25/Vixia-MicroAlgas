@@ -22,9 +22,9 @@ export default defineConfig({
       CSS: true,
       JavaScript: true,    // para .js / .mjs
       JSON: true,          // para .json
-      SVG: true,           // opcional si manejas SVG aparte
+      SVG: true, 
+      Path:["/src/pages"], 
     }),
     critters()
   ],
-
 });

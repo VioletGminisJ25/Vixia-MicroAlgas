@@ -1,0 +1,15 @@
+
+> lunar-field@0.0.1 dev
+> astro dev --host
+
+09:58:44 [types] Generated 3ms
+09:58:44 [content] Syncing content
+09:58:44 [content] Synced content
+
+ astro  v5.6.1 ready in 3129 ms
+
+┃ Local    http://localhost:4321/
+┃ Network  http://193.146.35.219:4321/
+
+09:58:44 watching for file changes...
+09:58:49 [200] /comparacion 424ms

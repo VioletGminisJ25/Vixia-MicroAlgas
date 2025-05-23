@@ -1,20 +1,21 @@
 ---
 const { testTitle } = Astro.props;
+
 ---
 
 <!-- Layout de la aplicación --><!doctype html>
 <html lang="en">
 	<head>
+		<script>
+			// On page load or when changing themes, best to add inline in `head` to avoid FOUC
+		</script>
 		<meta charset="UTF-8" />
 		<meta name="viewport" content="width=device-width" />
 		<link rel="icon" type="image/svg+xml" href="/favicon.svg" />
 		<meta name="generator" content={Astro.generator} />
+		<meta name="description" content="Aplicación de gestión de datos" />
+		<meta name="keywords" content="graficar, datos, gestión,ph,temp" />
 		<title>{testTitle}</title>
-		<script>
-			
-		</script>
-	</head>
-	<body class="flex flex-col h-screen bg-[#ffffff] dark:bg-[#1d1f21]">
 		<script>
 			if (
 				!localStorage.getItem("isAuth") &&
@@ -25,6 +26,11 @@ const { testTitle } = Astro.props;
 				window.location.href = "/login";
 			}
 		</script>
+	</head>
+	<body
+		class="flex flex-col h-full bg-[#ffffff] dark:bg-[#1d1f21] overflow-x-hidden"
+	>
+		<script></script>
 		<slot />
 	</body>
 </html>
