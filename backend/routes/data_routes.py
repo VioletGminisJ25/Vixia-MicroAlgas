@@ -1,4 +1,5 @@
-from flask import Blueprint, request, jsonify
+from datetime import datetime
+from flask import Blueprint, abort, request, jsonify
 from database.queries import DataQueries
 import arduino.monitor_instance
 from arduino.util import async_measurement_config_send, reboot_arduino
@@ -103,3 +104,23 @@ def change_config():
     data = request.json
     message, status = asyncio.run(reboot_arduino(False, data))
     return jsonify(message), status
+
+
+@data_routes.route("/export", methods=["GET"])
+def export_route():
+    fecha_str = request.args.get("fecha")  # Lee el parámetro `fecha` de la URL
+
+    if not fecha_str:
+        abort(400, description="Falta el parámetro 'fecha' en la URL.")
+
+    try:
+        # Intenta convertirlo a un objeto datetime (ISO 8601)
+        fecha_obj = datetime.fromisoformat(fecha_str)
+    except ValueError:
+        abort(
+            400,
+            description="Formato de fecha inválido. Usa formato ISO 8601 (ej. 2025-05-21T14:30:00).",
+        )
+
+    # Pasa el datetime a tu función de exportación
+    return queries.export_all_data_to_excel(fecha_obj)

@@ -4,12 +4,19 @@ Las contraseñas se hash utilizan SHA-256 con una sal para mayor seguridad.
 """
 
 from dotenv import load_dotenv
-from flask import jsonify
+from flask import jsonify, session
 from markupsafe import escape
 import hashlib
 import pandas as pd
 import json
 import os
+from flask_jwt_extended import (
+    create_access_token,
+    jwt_required,
+    JWTManager,
+    set_access_cookies,
+)
+
 
 load_dotenv()
 
@@ -46,9 +53,17 @@ def login_handler(data):
     email = escape(data.get("email"))
     password = escape(data.get("password"))
     print(f"Email: {email}\nPassword: {password}")
+    access_token = create_access_token(identity=email)
+    response = ""
     if not email or not password:
         return jsonify({"error": "Usuario y contrasenas son requeridos"}), 400
-    return read_file(email, password)
+    message, status = read_file(email, password)
+    if status == 200:
+        response = jsonify({"message": message})
+        set_access_cookies(response, access_token)
+        return response, status
+    else:
+        return jsonify({"error": message}), status
 
 
 def read_file(email, password):
@@ -59,14 +74,14 @@ def read_file(email, password):
         bd = pd.read_json(db_file_path).to_dict()
         if email in bd:
             if bd[email]["password"] == hash_password(password):
-                return jsonify({"message": "Usuario correcto"}), 200
+                return "Usuario correcto", 200
             else:
-                return jsonify({"error": "Contraseña incorrecta"}), 401
+                return "Contraseña incorrecta", 401
         else:
-            return jsonify({"error": "Usuario no encontrado"}), 404
+            return "Usuario no encontrado", 404
     except ValueError as e:
         print(e)
-        return jsonify({"error": "Internal Server Error"}), 500
+        return "Internal Server Error", 500
 
 
 def hash_password(password):

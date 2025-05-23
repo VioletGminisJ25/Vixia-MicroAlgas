@@ -3,6 +3,7 @@ Este modulo define las rutas para la aplicación Flask.
 """
 
 from flask import Blueprint
+from flask_jwt_extended import get_jwt_identity, jwt_required
 from utils.lib import file_path_handler
 from auth.auth import register_handler, login_handler
 from flask import jsonify, request
@@ -52,4 +53,17 @@ def login_route():
         }
     """
     data = request.json
+
     return login_handler(data)
+
+
+@auth_routes.route("/check_auth", methods=["GET"])
+@jwt_required()  # Esta línea asegura que solo los usuarios con un JWT válido puedan acceder
+def check_auth_status():
+    """
+    Endpoint para que el frontend verifique el estado de autenticación.
+    Si la cookie JWT es válida, retorna 200 OK y la identidad del usuario.
+    Si no, Flask-JWT-Extended interceptará y retornará un 401 automáticamente.
+    """
+    current_user_email = get_jwt_identity()
+    return jsonify(logged_in_as=current_user_email), 200

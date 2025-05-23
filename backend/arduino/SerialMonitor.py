@@ -520,8 +520,8 @@ class SerialMonitor:
                 {
                     "colors": None,
                     "rgb": calculate_rgb(
-                        espectro_avg.tolist(),
-                        self.queries.get_reference_wavelength_white(),
+                        [item[0] for item in espectro_avg.tolist()],
+                        self.get_reference_wavelength_white(),
                     ),
                     "data": {"ph": float(ph_avg), "temperature": float(temp_avg)},
                     "wave_length": espectro_avg.tolist(),
@@ -578,8 +578,8 @@ class SerialMonitor:
                 {
                     "colors": None,
                     "rgb": calculate_rgb(
-                        espectro_avg.tolist(),
-                        self.queries.get_reference_wavelength_white(),
+                        [item[0] for item in espectro_avg.tolist()],
+                        self.get_reference_wavelength_white(),
                     ),
                     "data": {"ph": float(ph_avg), "temperature": float(temp_avg)},
                     "wave_length": espectro_avg.tolist(),
