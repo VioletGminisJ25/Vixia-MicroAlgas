@@ -520,13 +520,13 @@ class SerialMonitor:
                 {
                     "colors": None,
                     "rgb": calculate_rgb(
-                        [item[0] for item in espectro_avg.tolist()],
-                        self.get_reference_wavelength_white(),
+                        espectro_avg.tolist(),
+                        self.queries.get_reference_wavelength_white(),
                     ),
                     "data": {"ph": float(ph_avg), "temperature": float(temp_avg)},
                     "wave_length": espectro_avg.tolist(),
                     "x": WAVELENGTHS,
-                    "nc": calculate_nc([item[0] for item in espectro_avg.tolist()]),
+                    "nc": calculate_nc(espectro_avg.tolist()),
                 },
             )
         self.queries.insert_data(data, self.is_first_measurement)
@@ -578,13 +578,13 @@ class SerialMonitor:
                 {
                     "colors": None,
                     "rgb": calculate_rgb(
-                        [item[0] for item in espectro_avg.tolist()],
-                        self.get_reference_wavelength_white(),
+                        espectro_avg.tolist(),
+                        self.queries.get_reference_wavelength_white(),
                     ),
                     "data": {"ph": float(ph_avg), "temperature": float(temp_avg)},
                     "wave_length": espectro_avg.tolist(),
                     "x": WAVELENGTHS,
-                    "nc": calculate_nc([item[0] for item in espectro_avg.tolist()]),
+                    "nc": calculate_nc(espectro_avg.tolist()),
                 },
             )
         self.queries.insert_data(data, self.is_first_measurement)
