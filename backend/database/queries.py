@@ -520,6 +520,7 @@ class DataQueries:
             # Extraer solo los valores de la lista de tuplas [(valor,), (valor,), ...]
             selected_data["wave_length"] = [item[0] for item in wavelength_results]
             selected_data["nc"] = calculate_nc(selected_data["wave_length"])
+            selected_data["datetime"] = str(fecha_dt)
 
             if selected_data == []:
                 return jsonify({"Datos corruptos"}), 400
@@ -836,6 +837,7 @@ class DataQueries:
                 return 404
 
             last_data = {
+                "datetime": str(result.datetime),
                 "colors": None,
                 "rgb": calculate_rgb(
                     [item[0] for item in result_wavelength],
@@ -1127,7 +1129,10 @@ def calculate_nc(wave_length):
     Calcula el número de componentes de una onda.
     """
     return round(
-        math.pow(wave_length[WAVELENGTHS.index(541.22)], -2.28) * math.pow(10, 12), 2
+        # math.pow(wave_length[WAVELENGTHS.index(541.22)], -2.28) * math.pow(10, 12), 2
+        26.83 * math.pow(wave_length[WAVELENGTHS.index(638.42)], 2)
+        - 47448 * wave_length[WAVELENGTHS.index(638.42)]
+        + 2 * math.pow(10, 7)
     )
 
 

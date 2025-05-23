@@ -518,6 +518,7 @@ class SerialMonitor:
             self.socketio.emit(
                 "arduino_data",
                 {
+                    "datetime": datetime_med,
                     "colors": None,
                     "rgb": calculate_rgb(
                         [item[0] for item in espectro_avg.tolist()],
@@ -576,6 +577,7 @@ class SerialMonitor:
             self.socketio.emit(
                 "arduino_data",
                 {
+                    "datetime": datetime_med,
                     "colors": None,
                     "rgb": calculate_rgb(
                         [item[0] for item in espectro_avg.tolist()],
@@ -622,7 +624,10 @@ def calculate_nc(wave_length):
     Calcula el número de componentes de una onda.
     """
     return round(
-        math.pow(wave_length[WAVELENGTHS.index(541.22)], -2.28) * math.pow(10, 12), 2
+        # math.pow(wave_length[WAVELENGTHS.index(541.22)], -2.28) * math.pow(10, 12), 2
+        26.83 * math.pow(wave_length[WAVELENGTHS.index(638.42)], 2)
+        - 47448 * wave_length[WAVELENGTHS.index(638.42)]
+        + 2 * math.pow(10, 7)
     )
 
 
