@@ -37,6 +37,7 @@ export default function NivoLine({ arduino_data: data }: NivoLineProps) {
             xScale={{ type: 'linear', min: 'auto', max: 'auto' }}
             yScale={{ type: 'linear', min: 'auto', max: 'auto' }}
             curve="monotoneX"
+            colors={['#008b1e']}
             axisTop={null}
             axisRight={null}
             enablePoints={false}
@@ -63,7 +64,6 @@ export default function NivoLine({ arduino_data: data }: NivoLineProps) {
                 legendOffset: -40,
                 legendPosition: 'start',
             }}
-            colors={{ scheme: 'category10' }}
             pointSize={6}
             useMesh={true}
             enableGridX={true}

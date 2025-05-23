@@ -3,13 +3,9 @@ import PanelInfo from '../components/compare/PanelInfo';
 import Nivo_ResponsiveLine from '../components/index/Nivo_ResponsiveLine_Index';
 import { ToastContainer } from 'react-toastify';
 
-interface Componente1Props {
-    lights: { roja: number; blanca: number; azul: number } | null;
-}
-
 import WebSocket from '../hooks/WebSockect_lasData'
 export default function GraficoLongitudDeOndaPage() {
-    const { data, isManual, isWake, lightsState } = WebSocket(import.meta.env.VITE_API_URL)
+    const { data, isManual, isWake } = WebSocket(import.meta.env.VITE_API_URL)
     const colors = { roja: 0, blanca: 0, azul: 0 };
     return (
         <div className="h-[90%] w-full flex flex-row items-center justify-center">

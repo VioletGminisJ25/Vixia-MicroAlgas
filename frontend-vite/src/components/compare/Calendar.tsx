@@ -14,9 +14,10 @@ const urlGetComparasion: string = import.meta.env.VITE_GET_COMPARASION;
 
 interface CalendarProps {
   setDatos: React.Dispatch<React.SetStateAction<CompareData | null>>;
+  setData: React.Dispatch<React.SetStateAction<string | null>>;
 }
 
-export default function Calendar({ setDatos }: CalendarProps) {
+export default function Calendar({ setDatos, setData }: CalendarProps) {
   const [startDate, setStartDate] = useState<Date | null>(new Date());
   const [hoursOptions, setHoursOptions] = useState<string[]>([]);
   const [selectedHour, setSelectedHour] = useState<string>('');
@@ -110,6 +111,7 @@ export default function Calendar({ setDatos }: CalendarProps) {
 
       console.log('Comparación recibida:', data);
       setDatos(data);
+      setData(formattedDateTime)
       toast.success('Datos obtenidos', {});
     }).catch(error => {
       console.error('Error al enviar hora:', error);

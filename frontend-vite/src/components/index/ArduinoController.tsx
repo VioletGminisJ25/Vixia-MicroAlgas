@@ -115,6 +115,40 @@ const ArduinoController: React.FC<BotonesEstadosProps> = ({ isManual, isWake }) 
         );
     };
 
+    const handleOnExport = () => {
+        const formattedDate = new Date().toISOString().toString().split('.')[0]; // Ej: "2025-05-22T13:40:45"
+
+        // Codifica la fecha para que sea segura en la URL
+        const encodedDate = encodeURIComponent(formattedDate);
+
+        // Construye la URL con el query parameter
+        // Asumo que tu VITE_SAVE_EXPORT es algo como "http://localhost:5000/api/save_export"
+        const baseUrl = import.meta.env.VITE_SAVE_EXPORT;
+        const urlWithQuery = `${baseUrl}?fecha=${encodedDate}`; // Añade ?parametro=valor
+
+        fetch(urlWithQuery, { method: "GET" })
+            .then((response) => {
+                if (!response.ok) {
+                    throw new Error("Error al exportar Excel");
+                }
+                return response.blob();
+            })
+            .then((blob) => {
+                const url = window.URL.createObjectURL(blob);
+                const a = document.createElement("a");
+                a.href = url;
+                a.download = "datos_vixia_microalgas_recientes.xlsx";  // 👈 Aquí puedes cambiar el nombre si quieres
+                a.style.display = "none";
+                document.body.appendChild(a);
+                a.click();  // 👈 Esto abre la ventana de guardar
+                a.remove();
+                window.URL.revokeObjectURL(url);
+            })
+            .catch((error) => {
+                console.error("Error al descargar archivo:", error);
+            });
+    }
+
     const isManualBool = typeof isManual === "string"
         ? isManual === "true"
         : !!isManual;
@@ -236,6 +270,7 @@ const ArduinoController: React.FC<BotonesEstadosProps> = ({ isManual, isWake }) 
                             text-black dark:text-white"
                 >
                     <button
+                        onClick={handleOnExport}
                         className="w-[75%] h-12 rounded
                         bg-white hover:
                                     dark:bg-[#1d1f21] dark:text-white
