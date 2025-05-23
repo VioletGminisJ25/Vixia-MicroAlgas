@@ -1,5 +1,7 @@
 from collections import defaultdict
-from flask import jsonify
+import io
+from flask import jsonify, send_file, current_app, abort
+import pandas as pd
 from database.models import (
     MainDatetime,
     Rgb,
@@ -22,6 +24,7 @@ from database.executor_instance import executor_instance
 import os
 from dotenv import load_dotenv
 import math
+from sqlalchemy import func
 
 load_dotenv()
 
@@ -509,11 +512,9 @@ class DataQueries:
                 .order_by(WaveLength.position)
                 .all()
             )
-            selected_data["rgb"] = (
-                calculate_rgb(
-                    [item[0] for item in wavelength_results],
-                    self.get_reference_wavelength_white(),
-                ),
+            selected_data["rgb"] = calculate_rgb(
+                [item[0] for item in wavelength_results],
+                self.get_reference_wavelength_white(),
             )
 
             # Extraer solo los valores de la lista de tuplas [(valor,), (valor,), ...]
@@ -890,12 +891,12 @@ class DataQueries:
             config = self.session.query(Config).order_by(Config.datetime.desc()).first()
             return (
                 {
-                    "time_between_measurements": config.time_between_measurements,
-                    "time_light": config.time_light,
-                    "time_dark": config.time_dark,
-                    "light_white": config.light_white,
-                    "light_red": config.light_red,
-                    "light_blue": config.light_blue,
+                    "time_between_measurements": str(config.time_between_measurements),
+                    "time_light": str(config.time_light),
+                    "time_dark": str(config.time_dark),
+                    "light_white": str(config.light_white),
+                    "light_red": str(config.light_red),
+                    "light_blue": str(config.light_blue),
                 },
                 200,
             )
@@ -1019,6 +1020,106 @@ class DataQueries:
             )
             self.session.rollback()
             return []
+
+    def export_all_data_to_excel(self, target_datetime):
+        try:
+            # Diccionario de modelos a exportar
+            models_to_export = {
+                "Sensor_Data": {"model": SensorData, "has_datetime": True},
+                "WaveLength_White": {"model": WaveLength_White, "has_datetime": True},
+                "WaveLength_Data": {"model": WaveLength, "has_datetime": True},
+                "Configuracion": {"model": Config, "has_datetime": True},
+            }
+
+            excel_buffer = io.BytesIO()
+
+            with pd.ExcelWriter(excel_buffer, engine="openpyxl") as writer:
+                for sheet_name, model_info in models_to_export.items():
+                    Model = model_info["model"]
+                    has_datetime_col = model_info["has_datetime"]
+
+                    print(
+                        f"Exportando tabla: {sheet_name} (filtrado por datetime: {has_datetime_col})"
+                    )
+
+                    records = []
+
+                    if has_datetime_col and hasattr(Model, "datetime"):
+                        # Buscar la fecha más cercana
+                        closest_datetime = (
+                            self.session.query(Model.datetime)
+                            .order_by(
+                                func.abs(
+                                    func.unix_timestamp(Model.datetime)
+                                    - func.unix_timestamp(target_datetime)
+                                )
+                            )
+                            .first()
+                        )
+
+                        if closest_datetime and closest_datetime[0]:
+                            closest = closest_datetime[0]
+                            print(f"Fecha más cercana para {sheet_name}: {closest}")
+                            records = Model.query.filter_by(datetime=closest).all()
+                        else:
+                            print(
+                                f"No se encontró una fecha cercana para {sheet_name}."
+                            )
+                    else:
+                        print(f"Exportando todos los registros de {sheet_name}.")
+                        records = Model.query.all()
+
+                    if not records:
+                        print(f"No hay datos para la hoja '{sheet_name}'. Se omitirá.")
+                        continue
+
+                    data_for_df = []
+                    for record in records:
+                        row_data = {}
+                        for column in Model.__table__.columns:
+                            col_name = column.name
+                            value = getattr(record, col_name)
+                            if isinstance(value, (int, float, str, bool)):
+                                row_data[col_name] = value
+                            elif isinstance(value, datetime):
+                                row_data[col_name] = value.strftime("%Y-%m-%d %H:%M:%S")
+                            else:
+                                row_data[col_name] = str(value)
+                        data_for_df.append(row_data)
+
+                    df = pd.DataFrame(data_for_df)
+                    if sheet_name in ["WaveLength_Data", "WaveLength_White"]:
+                        df["WAVELENGTHS"] = WAVELENGTHS[: len(df)]
+                    if sheet_name == "Sensor_Data":
+                        wave_length_values = (
+                            self.session.query(WaveLength.value)
+                            .filter(WaveLength.datetime == closest_datetime[0])
+                            .order_by(WaveLength.position)
+                            .all()
+                        )
+                        # Convertir los resultados en listas de valores
+                        wave_length = [item[0] for item in wave_length_values]
+
+                        # Calcular nc para cada fila de Sensor_Data
+                        df["nc"] = df.apply(
+                            lambda row: calculate_nc(wave_length), axis=1
+                        )
+                    df.to_excel(writer, sheet_name=sheet_name, index=False)
+
+            excel_buffer.seek(0)
+
+            return send_file(
+                excel_buffer,
+                mimetype="application/vnd.openxmlformats-officedocument.spreadsheetml.sheet",
+                as_attachment=True,
+                download_name="datos_vixia_microalgas.xlsx",
+            )
+
+        except Exception as e:
+            current_app.logger.error(
+                f"Error al exportar datos a Excel: {e}", exc_info=True
+            )
+            abort(500, description=f"Error interno al exportar datos: {e}")
 
 
 def calculate_nc(wave_length):

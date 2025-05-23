@@ -111,6 +111,7 @@ class Users(db.Model):
     name = Column(String(100), nullable=False)
     password = Column(String(100), nullable=False)
     email = Column(String(100), primary_key=True, nullable=False)
+    profile_image = Column(String(255), nullable=True, default="default.jpg")
 
     def __repr__(self):
         return f"<User(id={self.id}, name='{self.name}', email='{self.email}')>"

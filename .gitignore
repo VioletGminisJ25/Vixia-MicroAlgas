@@ -13,3 +13,4 @@ pnpm-debug.log*
 __pycache__/
 *.py[cod]
 *.pyo
+backend/websockets/socketio_intance.py

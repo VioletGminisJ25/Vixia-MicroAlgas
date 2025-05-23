@@ -15,6 +15,7 @@ from flask_compress import Compress
 from config import Config
 from dotenv import load_dotenv
 from arduino.monitor_instance import create_monitor
+from flask_jwt_extended import create_access_token, jwt_required, JWTManager
 
 
 import os
@@ -30,7 +31,8 @@ def main():
 
     app = Flask(__name__)
     app.config.from_object(Config)  # Carga la configuración desde el archivo config.py
-    CORS(app)
+    CORS(app, supports_credentials=True)
+    JWTManager(app)
     compress = (
         Compress()
     )  # Inicializa la compresión de respuestas para comprimir json y html
@@ -42,6 +44,7 @@ def main():
     app.register_blueprint(auth_routes)
     app.register_blueprint(socket_routes)
     app.register_blueprint(data_routes)
+
     with app.app_context():
         monitor = create_monitor(app, socketio)
         monitor.start()
