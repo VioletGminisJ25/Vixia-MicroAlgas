@@ -7,9 +7,10 @@ import { data } from 'react-router-dom';
 interface BotonesEstadosProps {
     isManual: boolean | null;
     isWake: boolean | null;
+    datetime: string | null;
     // ... otras posibles props
 }
-const ArduinoController: React.FC<BotonesEstadosProps> = ({ isManual, isWake }) => {
+const ArduinoController: React.FC<BotonesEstadosProps> = ({ isManual, isWake, datetime }) => {
     const [showModal, setShowModal] = useState(false);
     const [config, setConfig] = useState<Config>({
         time_between_measurements: '',
@@ -117,7 +118,7 @@ const ArduinoController: React.FC<BotonesEstadosProps> = ({ isManual, isWake }) 
 
     const handleOnExport = () => {
         const formattedDate = new Date().toISOString().toString().split('.')[0]; // Ej: "2025-05-22T13:40:45"
-
+        console.log(formattedDate)
         // Codifica la fecha para que sea segura en la URL
         const encodedDate = encodeURIComponent(formattedDate);
 
@@ -137,7 +138,7 @@ const ArduinoController: React.FC<BotonesEstadosProps> = ({ isManual, isWake }) 
                 const url = window.URL.createObjectURL(blob);
                 const a = document.createElement("a");
                 a.href = url;
-                a.download = "datos_vixia_microalgas_recientes.xlsx";  // 👈 Aquí puedes cambiar el nombre si quieres
+                a.download = `Datos-${datetime?.toString().replace(" ", "T")}.xlsx`;
                 a.style.display = "none";
                 document.body.appendChild(a);
                 a.click();  // 👈 Esto abre la ventana de guardar
@@ -186,11 +187,11 @@ const ArduinoController: React.FC<BotonesEstadosProps> = ({ isManual, isWake }) 
                     <button
                         id='muestraManual'
                         onClick={handleTomarMuestra}
-                        disabled={!isManualBool}
+                        disabled={!isManual}
                         className={`
                             w-[75%] h-12 rounded
                             transition-colors duration-200 ease-in-out
-                            ${isManualBool
+                            ${isManual
                                 ? `bg-white text-black hover:bg-neutral-200 
                                  dark:bg-[#1d1f21] dark:text-white dark:hover:bg-neutral-700`
                                 : `bg-gray-200 text-gray-400 cursor-not-allowed
@@ -272,10 +273,7 @@ const ArduinoController: React.FC<BotonesEstadosProps> = ({ isManual, isWake }) 
                     <button
                         onClick={handleOnExport}
                         className="w-[75%] h-12 rounded
-                        bg-white hover:
-                                    dark:bg-[#1d1f21] dark:text-white
-                                    dark:hover:bg-neutral-700
-                                    hover:bg-neutral-200"
+                         text-white bg-green-700 hover:bg-green-800"
                     >
                         Guardar en excel
                     </button>

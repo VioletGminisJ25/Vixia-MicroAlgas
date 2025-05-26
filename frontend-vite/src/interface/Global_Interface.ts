@@ -2,6 +2,7 @@
 
 //Aqui para los datos de las graficas
 export interface SampleData {
+    datetime:string,
     colors: {
         blue: boolean;
         red: boolean;
@@ -67,3 +68,8 @@ export interface Config {
     light_red: string;
 }
 
+export interface LightsState {
+    roja: boolean;
+    azul: boolean;
+    blanca: boolean;
+}
