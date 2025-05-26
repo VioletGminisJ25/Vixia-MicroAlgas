@@ -4,9 +4,10 @@ import Nivo_ResponsiveLine from '../components/index/Nivo_ResponsiveLine_Index';
 import { ToastContainer } from 'react-toastify';
 
 import WebSocket from '../hooks/WebSockect_lasData'
+
 export default function GraficoLongitudDeOndaPage() {
-    const { data, isManual, isWake } = WebSocket(import.meta.env.VITE_API_URL)
-    const colors = { roja: 0, blanca: 0, azul: 0 };
+    const { data, isManual, isWake, lightsState } = WebSocket(import.meta.env.VITE_API_URL)
+
     return (
         <div className="h-[90%] w-full flex flex-row items-center justify-center">
             <div className="flex flex-col items-center h-[90%] w-full ">
@@ -17,28 +18,28 @@ export default function GraficoLongitudDeOndaPage() {
                     <div className='h-full w-full flex flex-row justify-start items-center gap-2.5 p-8'>
                         <button
                             id="red"
-                            disabled={true}
+                            disabled={lightsState?.roja}
                             className={`min-w-[120px] h-12 rounded 
-            ${colors.roja ? 'bg-red-500 text-white' : 'bg-gray-400 text-gray-600 cursor-not-allowed'}`}
-                            title={colors?.roja ? 'Se uso' : 'No se uso'}>
+            ${lightsState?.roja ? 'bg-red-500 text-white' : 'bg-gray-400 text-gray-600 cursor-not-allowed'}`}
+                            title={lightsState?.roja ? 'Se uso' : 'No se uso'}>
                             Rojo
                         </button>
 
                         <button
                             id="white"
-                            disabled={true}
+                            disabled={lightsState?.blanca}
                             className={`min-w-[120px] h-12 rounded 
-            ${colors.blanca ? 'bg-white text-black' : 'bg-gray-400 text-gray-600 cursor-not-allowed'}`}
-                            title={colors?.blanca ? 'Se uso' : 'No se uso'}>
+            ${lightsState?.blanca ? 'bg-white text-black' : 'bg-gray-400 text-gray-600 cursor-not-allowed'}`}
+                            title={lightsState?.blanca ? 'Se uso' : 'No se uso'}>
                             Blanco
                         </button>
 
                         <button
                             id="blue"
-                            disabled={!colors.azul}
+                            disabled={lightsState?.azul}
                             className={`min-w-[120px] h-12 rounded 
-            ${colors.azul ? 'bg-blue-500 text-white' : 'bg-gray-400 text-gray-600 cursor-not-allowed'}`}
-                            title={colors?.azul ? 'Se uso' : 'No se uso'}
+            ${lightsState?.azul ? 'bg-blue-500 text-white' : 'bg-gray-400 text-gray-600 cursor-not-allowed'}`}
+                            title={lightsState?.azul ? 'Se uso' : 'No se uso'}
                         >
                             Azul
                         </button>
@@ -54,7 +55,7 @@ export default function GraficoLongitudDeOndaPage() {
                     <div className="flex items-center justify-center h-full w-[60%] bg-white p-4 rounded-lg shadow-md mr-10 ml-10">
                         <Nivo_ResponsiveLine arduino_data={data} />
                     </div>
-                    <ArduinoController isManual={isManual} isWake={isWake} />
+                    <ArduinoController isManual={isManual} isWake={isWake} datetime={data?.datetime ?? null} />
                 </div>
 
                 {/* Contenedor de notificaciones, con estilos únicos, las 'Toastify' son enviadas mediante el websocket */}

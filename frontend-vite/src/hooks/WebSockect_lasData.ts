@@ -1,12 +1,9 @@
 import { useState, useEffect, useCallback, useRef } from 'react';
 import { io, Socket } from 'socket.io-client';
 import { toast } from 'react-toastify';
-import type { SampleData } from '../interface/Global_Interface';
+import type { SampleData, LightsState } from '../interface/Global_Interface';
 
-interface LightsState {
-    // Define your lights state shape
-    [key: string]: any;
-}
+
 
 export interface UseWebSocketLastDataResult {
     lightsState: LightsState | null;

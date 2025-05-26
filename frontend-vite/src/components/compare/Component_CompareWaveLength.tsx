@@ -39,7 +39,7 @@ export default function GraficaComparar() {
                 const url = window.URL.createObjectURL(blob);
                 const a = document.createElement("a");
                 a.href = url;
-                a.download = "datos_vixia_microalgas_recientes.xlsx";  // 👈 Aquí puedes cambiar el nombre si quieres
+                a.download = `Datos-${datos?.selected_data?.datetime?.toString().replace(" ", "T")}.xlsx`;  // 👈 Aquí puedes cambiar el nombre si quieres
                 a.style.display = "none";
                 document.body.appendChild(a);
                 a.click();  // 👈 Esto abre la ventana de guardar
