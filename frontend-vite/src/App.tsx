@@ -11,7 +11,7 @@ import PageNotFound from './pages/404';
 import Login from './pages/PageLogin';
 import Register from './pages/PageResgister'
 import Sensores from './pages/PageSensores';
-import ProtectedRoute from './components/ProtectedRoute'; 
+import ProtectedRoute from './components/ProtectedRoute';
 
 function App() {
   const location = useLocation();
@@ -148,28 +148,23 @@ function App() {
         <Route path='/register' element={<Register />} />
 
         <Route path='/' element={
-          <ProtectedRoute isAllowed={loged}>
-            <Index />
-          </ProtectedRoute>
+          <Index />
+
         } />
         <Route path='/comparacion' element={
-          <ProtectedRoute isAllowed={loged}>
-            <Compare />
-          </ProtectedRoute>
+          <Compare />
         } />
         <Route path='/ph' element={
-          <ProtectedRoute isAllowed={loged}>
-            <Ph />
-          </ProtectedRoute>
+          <Ph />
         } />
         <Route path='/temperature' element={
-          <ProtectedRoute isAllowed={loged}>
-            <Temp />
-          </ProtectedRoute>
+          <Temp />
         } />
-
+        <Route path='/sensores' element={
+          <Sensores />
+        } />
         <Route path="*" element={
-          loged ? <PageNotFound /> : <Navigate to="/login" />
+          <PageNotFound />
         } />
       </Routes>
     </>
