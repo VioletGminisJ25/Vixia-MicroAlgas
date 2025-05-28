@@ -1,91 +1,24 @@
 import React from 'react';
-import styled from 'styled-components';
 
 interface CloseButtonProps {
-    onClick: () => void; // Prop para la función de cerrar
+    onClick: () => void;
 }
 
 const CloseButton: React.FC<CloseButtonProps> = ({ onClick }) => {
     return (
-        <StyledWrapper>
-            <button className="button" onClick={onClick}>
-                <span className="X" />
-                <span className="Y" />
-                <div className="close">Close</div>
+        <div className="relative">
+            <button
+                onClick={onClick}
+                className="relative w-8 h-8 rounded-full border-none bg-[rgba(180,83,107,0.11)] transition-colors duration-500 hover:bg-red-700 active:bg-[rgb(130,0,0)] group"
+            >
+                <span className="absolute top-1/2 left-1/2 w-4 h-[1.5px] bg-white transform -translate-x-1/2 rotate-45" />
+                <span className="absolute top-1/2 left-1/2 w-4 h-[1.5px] bg-white transform -translate-x-1/2 -rotate-45" />
+                <div className="absolute flex items-center justify-center px-3 py-1 text-xs w-12 h-7 bg-[rgb(19,22,24)] text-[rgb(187,229,236)] rounded top-[-70%] left-1/2 transform -translate-x-1/2 opacity-0 pointer-events-none group-hover:opacity-100 transition-opacity duration-200 delay-[250ms]">
+                    Close
+                </div>
             </button>
-        </StyledWrapper>
+        </div>
     );
-}
-
-const StyledWrapper = styled.div`
-  .button {
-    position: relative;
-    width: 4em;
-    height: 4em;
-    border: none;
-    background: rgba(180, 83, 107, 0.11);
-    border-radius: 5px;
-    transition: background 0.5s;
-  }
-
-  .X {
-    content: "";
-    position: absolute;
-    top: 50%;
-    left: 50%;
-    width: 2em;
-    height: 1.5px;
-    background-color: rgb(255, 255, 255);
-    transform: translateX(-50%) rotate(45deg);
-  }
-
-  .Y {
-    content: "";
-    position: absolute;
-    top: 50%;
-    left: 50%;
-    width: 2em;
-    height: 1.5px;
-    background-color: #fff;
-    transform: translateX(-50%) rotate(-45deg);
-  }
-
-  .close {
-    position: absolute;
-    display: flex;
-    padding: 0.8rem 1.5rem;
-    align-items: center;
-    justify-content: center;
-    transform: translateX(-50%);
-    top: -70%;
-    left: 50%;
-    width: 3em;
-    height: 1.7em;
-    font-size: 12px;
-    background-color: rgb(19, 22, 24);
-    color: rgb(187, 229, 236);
-    border: none;
-    border-radius: 3px;
-    pointer-events: none;
-    opacity: 0;
-  }
-
-  .button:hover {
-    background-color: rgb(211, 21, 21);
-  }
-
-  .button:active {
-    background-color: rgb(130, 0, 0);
-  }
-
-  .button:hover > .close {
-    animation: close 0.2s forwards 0.25s;
-  }
-
-  @keyframes close {
-    100% {
-      opacity: 1;
-    }
-  }`;
+};
 
 export default CloseButton;
