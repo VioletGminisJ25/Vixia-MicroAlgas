@@ -151,10 +151,6 @@ const ArduinoController: React.FC<BotonesEstadosProps> = ({ isManual, isWake, da
             });
     }
 
-    const isManualBool = typeof isManual === "string"
-        ? isManual === "true"
-        : !!isManual;
-
     return (
         <div
             className="h-fit w-60 bg-slate-100 dark:bg-[#0f1011] rounded-lg p-4 mt-20"
