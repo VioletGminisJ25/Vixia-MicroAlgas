@@ -16,41 +16,68 @@ from config import Config
 from dotenv import load_dotenv
 from arduino.monitor_instance import create_monitor
 from flask_jwt_extended import create_access_token, jwt_required, JWTManager
+from flask_migrate import Migrate
 
 
 import os
 
-
 load_dotenv()
 
 
-def main():
+def create_app(test_config=None):
     """
-    Función principal que inicializa la aplicación Flask y configura las rutas y la base de datos.
+    Función de fábrica para crear y configurar la aplicación Flask.
+    Permite pasar una configuración de prueba para los tests.
     """
-
     app = Flask(__name__)
-    app.config.from_object(Config)  # Carga la configuración desde el archivo config.py
+
+    migrate = Migrate()
+    if test_config is None:
+        # Cargar la configuración por defecto si no estamos en modo test
+        app.config.from_object(Config)
+    else:
+        # Cargar la configuración de test si se proporciona
+        app.config.from_mapping(test_config)
+
     CORS(app, supports_credentials=True)
     JWTManager(app)
-    compress = (
-        Compress()
-    )  # Inicializa la compresión de respuestas para comprimir json y html
+    
+    compress = Compress()
     compress.init_app(app)
+    
     db_instance.init_db(app)
+    migrate.init_app(app, db_instance.db)
     init_executor(app, executor_type="thread", max_workers=4)
-    socketio = socketio_init(app)
+    
+
+    socketio = socketio_init(app) 
     register_socketio_events(socketio)
+    
+    # Registra tus Blueprints
     app.register_blueprint(auth_routes)
     app.register_blueprint(socket_routes)
     app.register_blueprint(data_routes)
 
+
+    
+    return app, socketio # Retorna app y socketio si lo necesitas en el main o para tests de websockets
+
+
+def main():
+    """
+    Función principal que inicializa y ejecuta la aplicación Flask con SocketIO.
+    """
+    app, socketio = create_app()
+
     with app.app_context():
+
         monitor = create_monitor(app, socketio)
         monitor.start()
-    socketio.run(app, debug=True, host="0.0.0.0", use_reloader=False,allow_unsafe_werkzeug=True)
-    # IMPORTANTE: Use reloader a false porque crea dos veces y hace dos starts de serial monitor y salta error de que el puerto COM ya está en uso
-    # app.run(debug=False, host="0.0.0.0")
+
+    socketio.run(
+        app, debug=True, host="0.0.0.0", use_reloader=False, allow_unsafe_werkzeug=True
+    )
+
 
 
 if __name__ == "__main__":

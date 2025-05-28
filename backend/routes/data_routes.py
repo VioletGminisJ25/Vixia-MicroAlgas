@@ -106,6 +106,18 @@ def change_config():
     return jsonify(message), status
 
 
+@data_routes.route("/get_name", methods=["GET"])
+def get_route_name():
+    message, status = queries.get_proc_name()
+    return jsonify(message), status
+
+
+@data_routes.route("/get_all_names", methods=["GET"])
+def get_route_names():
+    message, status = queries.get_proc_names()
+    return jsonify(message), status
+
+
 @data_routes.route("/export", methods=["GET"])
 def export_route():
     fecha_str = request.args.get("fecha")  # Lee el parámetro `fecha` de la URL

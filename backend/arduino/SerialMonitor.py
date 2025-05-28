@@ -309,7 +309,34 @@ WAVELENGTHS = [
 
 
 class SerialMonitor:
+    """
+    This is th class for manage the serial communication with the arduino.
+    It is responsible for reading the data from the serial port and processing it.
+    It also has methods for saving the data to a file and sending it to the client.
+    """
+
     def __init__(self, baud_rate, app, socketio):
+        """
+        Initialize the SerialMonitor class.
+
+        Args:
+            baud_rate (int): The baud rate of the serial port.
+            serial_port (str): The serial port to which the data will be sent.
+            running (bool): A flag indicating whether the serial monitor is running.
+            monitor_thread (Thread): The thread that is monitoring the serial port.
+            buffer (str): A buffer to store the incoming data.
+            save_dir (str): The directory where the data will be saved.
+            is_first_measurement (bool): A flag indicating whether it is the first measurement.
+            measurement_count (int): The number of measurements taken so far.
+            current_batch (list): A list of dictionaries containing the current batch of measurements.
+            manual_batch (list): A list of dictionaries containing the manual batch of measurements.
+            waiting_for_manual (bool): A flag indicating whether the user is waiting for a manual measurement.
+            manual_name (str): The name of the manual measurement.
+            port (str): The serial port to which the data will be sent.
+            timeout (int): The timeout for the serial port.
+            app (Flask): The Flask application object.
+            socketio (SocketIO): The SocketIO object.
+        """
         self.baud_rate = baud_rate
         self.serial_port = None
         self.running = False
@@ -332,6 +359,12 @@ class SerialMonitor:
         self.white_measurement_started = False
 
     def start(self):
+        """
+        Start the serial monitor.
+
+        Search for the serial port and open it.
+        Start the monitoring thread.
+        """
         try:
             self.serial_port = serial.Serial(
                 self.port, self.baud_rate, timeout=self.timeout
@@ -344,11 +377,15 @@ class SerialMonitor:
                 target=self.monitor_serial, daemon=True
             )
             self.monitor_thread.start()
-            asyncio.run(async_measurement_config_send(self, manual=False, reboot=False))
         except serial.SerialException as e:
             print(f"Error al abrir el puerto {self.port}: {e}")
 
     def stop(self):
+        """
+        Stop the serial monitor.
+
+        Close the serial port and join the monitoring thread.
+        """
         self.running = False
         if self.monitor_thread:
             self.monitor_thread.join()
@@ -357,8 +394,14 @@ class SerialMonitor:
             print("Puerto cerrado.")
 
     def monitor_serial(self):
+        """
+        Monitor the serial port and process the incoming data.
+        It also handles the manual measurements and saves the data to a file.
+        It sends the data to the client using SocketIO.
+        """
         with self.app.app_context():
             self.queries = DataQueries()
+            asyncio.run(async_measurement_config_send(self, manual=False, reboot=False))
             while self.running:
                 try:
                     if self.serial_port.in_waiting > 0:
@@ -376,6 +419,12 @@ class SerialMonitor:
         time.sleep(0.01)
 
     def messages_handler(self):
+        """
+        Handle the incoming messages from the serial port.
+        It processes the messages for lights events, manual measurements, white measurements.
+        For light events it updates the database and sends the data to the client with the light upate event.
+        For white measurements it updates the database and sends the data to the client with the manual measurement event.
+        """
         buffer2 = self.buffer
         while "\n" in buffer2:  # Procesar cualquier línea completa en el buffer
             try:
@@ -422,6 +471,11 @@ class SerialMonitor:
                 print(f"Error al procesar el mensaje de luces: {e}")
 
     def process_buffer(self):
+        """
+        Process the buffer and update the database.
+
+        Handle the measurements messages, the arduino sends te data between the "h" and "a" characters, so the buffer is divided into these two parts.
+        """
 
         # print(f"\nBuffer actual: {self.buffer}\n")  # Depuración
 
@@ -442,6 +496,12 @@ class SerialMonitor:
                 break
 
     def handle_arduino_message(self, message):
+        """
+        Handle the message from the proccessed buffer.
+
+        It validates the message format and extracts the data from the message.
+        If the message is valid, it updates the database and sends the data to the client.
+        """
         datos = message.split(",")
         if len(datos) < 4 or datos[0] != "h" or datos[-1] != "a":
             print("Formato de datos inválido.")
@@ -486,6 +546,9 @@ class SerialMonitor:
                     print("Calibración del blanco completada.")
 
     def save_batch(self, timestamp, tipo):
+        """
+        Saves the spectrum and temperature/ph data to the database and sends it to the client with websockets.
+        """
         # Crear DataFrame para el espectrómetro
         espectro_data = []
         for espectrometro, _, _ in self.current_batch:
@@ -536,14 +599,10 @@ class SerialMonitor:
         if not self.white_measurement_started:
             self.socketio.emit("manual_mode", "True")
 
-        # Guardar en archivos Excel
-        # espectro_file = os.path.join(self.save_dir, "valores_espectro.xlsx")
-        # temp_file = os.path.join(self.save_dir, "valores_temperatura.xlsx")
-        # ph_file = os.path.join(self.save_dir, "valores_ph.xlsx")
-
-        # Función para agregar datos sin sobrescribir y preservar comentarios
-
     def save_manual_batch(self, timestamp):
+        """
+        Saves the manual measurement data to the database and sends it to the client with websockets.
+        """
         print("✔ Manual measurement success")
         self.active = False
         self.socketio.emit("wake_up_state", self.active)
@@ -595,13 +654,21 @@ class SerialMonitor:
         # Guardar en base de datos
 
     def send_command(self, command):
+        """Handle the incoming commands from the client and send them to the arduino.
+
+        It checks if the command is "M" and if the arduino is waiting for a manual measurement.
+        If the command is "M" and the arduino is waiting for a manual measurement, it sets the waiting_for_manual flag to False and sends the manual measurement data to the arduino.
+        If the command is "M" and the arduino is not waiting for a manual measurement, it sends the command to the arduino.
+        If the command is not "M", it sends the command to the arduino.
+        """
+
         print("Commando enviado al Arduino:", command)
         if self.serial_port and self.serial_port.is_open:
             if command.strip().upper() == "M":
                 self.waiting_for_manual = True
                 self.manual_batch = []
                 # self.manual_name = input(
-                #     "Introduce un nombre para esta muestra manual: "
+                #     "Introduce un nombre para esta muestratracert  manual: "
                 # ).strip()
                 print(f"Enviando 'M' al Arduino")
                 self.socketio.emit("wake_up_state", self.active)
@@ -625,13 +692,14 @@ def calculate_nc(wave_length):
     """
     return round(
         # math.pow(wave_length[WAVELENGTHS.index(541.22)], -2.28) * math.pow(10, 12), 2
-        26.83 * math.pow(wave_length[WAVELENGTHS.index(638.42)], 2)
-        - 47448 * wave_length[WAVELENGTHS.index(638.42)]
-        + 2 * math.pow(10, 7)
+        5 * math.pow(10, 7) * math.exp(-0.005 * wave_length[WAVELENGTHS.index(638.42)])
     )
 
 
 def calculate_rgb(wave_length, wave_length_white):
+    """
+    Calculate the RGB values for a given wavelength.
+    """
     if wave_length_white == []:
         return None
     closest_index_white = min(
@@ -643,21 +711,21 @@ def calculate_rgb(wave_length, wave_length_white):
     closest_index_red = min(
         range(len(WAVELENGTHS)), key=lambda i: abs(WAVELENGTHS[i] - 450)
     )
-    print(closest_index_white)
-    print(closest_index_green)
-    print(closest_index_red)
+    # print(closest_index_white)
+    # print(closest_index_green)
+    # print(closest_index_red)
 
     wave_length_white_white = wave_length_white[closest_index_white]
     wave_length_white_green = wave_length_white[closest_index_green]
     wave_length_white_red = wave_length_white[closest_index_red]
 
-    print(wave_length_white_white)
-    print(wave_length_white_green)
-    print(wave_length_white_red)
+    # print(wave_length_white_white)
+    # print(wave_length_white_green)
+    # print(wave_length_white_red)
 
-    print(WAVELENGTHS.index(701.59))
-    print(WAVELENGTHS.index(545.88))
-    print(WAVELENGTHS.index(435.92))
+    # print(WAVELENGTHS.index(701.59))
+    # print(WAVELENGTHS.index(545.88))
+    # print(WAVELENGTHS.index(435.92))
 
     wave_length_white = wave_length[closest_index_white]
     wave_length_green = wave_length[closest_index_green]
@@ -668,17 +736,3 @@ def calculate_rgb(wave_length, wave_length_white):
     white = (255 * wave_length_white) / wave_length_white_white
 
     return {"r": red, "g": green, "b": white}
-
-
-# def main():
-
-
-#     try:
-#         print(" Escribe comandos para enviar al Arduino (Ctrl+C para salir):")
-#         while True:
-#             comando = input()
-#             monitor.send_command(comando)
-#     except KeyboardInterrupt:
-#         print("\nInterrupción por usuario.")
-#     finally:
-#         monitor.stop()

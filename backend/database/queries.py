@@ -785,6 +785,7 @@ class DataQueries:
                 datetime=data["datetime"],
                 ph=float(data["ph"]),
                 temperature=float(data["temperature"]),
+                nc=calculate_nc([item[0] for item in data["value"].values()]),
             )
 
             # Agregar la nueva instancia a la sesión
@@ -815,6 +816,9 @@ class DataQueries:
             self.session.rollback()
 
     def get_latest_data(self):
+        """
+        Obtiene los datos de la tabla SensorData Y WaveLength mas recientes.
+        """
         try:
             result = (
                 self.session.query(
@@ -889,6 +893,11 @@ class DataQueries:
             self.session.rollback()
 
     def get_config(self):
+        """
+        Obtiene la configuración de la tabla Config.
+        Devuelve un diccionario con las configuraciones.
+        Si no hay configuración, devuelve un diccionario vacío.
+        """
         try:
             config = self.session.query(Config).order_by(Config.datetime.desc()).first()
             return (
@@ -919,6 +928,7 @@ class DataQueries:
 
     def insert_config(
         self,
+        name,
         time_between_measurements,
         time_light,
         time_dark,
@@ -926,21 +936,30 @@ class DataQueries:
         light_red,
         light_blue,
     ):
+        """
+        Inserta la configuración en la tabla Config.
+        Si la configuración ya existe, actualiza la configuración.
+        Devuelve un diccionario con la información de la configuración insertada.
+        Si la configuración no existe, devuelve un diccionario con la información de la configuración insertada.
+
+        Args:
+            time_between_measurements (int): El tiempo entre las mediciones.
+            time_light (int): El tiempo de la luz.
+            time_dark (int): El tiempo de la oscuridad.
+            light_white (int): El valor de la luz blanca.
+            light_red (int): El valor de la luz roja.
+            light_blue (int): El valor de la luz azul.
+
+        Returns:
+            dict: Diccionario con la información de la configuración insertada.
+        """
         try:
             last_config = (
                 self.session.query(Config).order_by(Config.datetime.desc()).first()
             )
-            if (
-                last_config
-                and last_config.time_between_measurements == time_between_measurements
-                and last_config.time_light == time_light
-                and last_config.time_dark == time_dark
-                and last_config.light_white == light_white
-                and last_config.light_red == light_red
-                and last_config.light_blue == light_blue
-            ):
+            if last_config and last_config.name == name:
                 print(
-                    "ℹ La configuración es idéntica a la última guardada. No se insertará."
+                    "La configuración es idéntica a la última guardada. No se insertará."
                 )
                 return {
                     "status": "info",
@@ -953,6 +972,7 @@ class DataQueries:
                 light_white=light_white,
                 light_red=light_red,
                 light_blue=light_blue,
+                name=name,
                 datetime=datetime.now(),
             )
             self.session.add(new_config)
@@ -971,6 +991,13 @@ class DataQueries:
             }, 500
 
     def get_last_wavelength_white(self):
+        """
+        Obtiene el último valor de la tabla WaveLength_White.
+        Devuelve una lista con los valores de la tabla WaveLength_White.
+
+        Returns:
+            list: Lista con los valores de la tabla WaveLength_White.
+        """
         try:
             # Recuperar todos los valores correspondientes al último datetime
             last_datetime = (
@@ -999,6 +1026,13 @@ class DataQueries:
             return []
 
     def get_reference_wavelength_white(self):
+        """
+        Obtiene los valores de la tabla WaveLength_White marcados como is_reference = TRUE.
+        Devuelve una lista con los valores de la tabla WaveLength_White.
+
+        Returns:
+            list: Lista con los valores de la tabla WaveLength_White.
+        """
         try:
             last_datetime = (
                 self.session.query(WaveLength_White.datetime)
@@ -1024,6 +1058,16 @@ class DataQueries:
             return []
 
     def export_all_data_to_excel(self, target_datetime):
+        """
+        Exporta todos los datos de la base de datos a un archivo Excel.
+        Devuelve un archivo Excel con los datos exportados.
+
+        Args:
+            target_datetime (datetime): La fecha y hora a la que se quiere exportar los datos.
+
+        Returns:
+            file: Archivo Excel con los datos exportados.
+        """
         try:
             # Diccionario de modelos a exportar
             models_to_export = {
@@ -1123,6 +1167,51 @@ class DataQueries:
             )
             abort(500, description=f"Error interno al exportar datos: {e}")
 
+    def get_proc_name(self):
+        try:
+            query = (
+                self.session.query(Config.name).order_by(Config.datetime.desc()).first()
+            )
+            return query[0], 200
+        except Exception as e:
+            print(
+                f"Error al obtener los valores de referencia de WaveLength_White: {e}"
+            )
+            self.session.rollback()
+            return []
+
+    def get_proc_names(self):
+        try:
+            query = (
+                self.session.query(Config.name)
+                .filter(Config.name.isnot(None))
+                .order_by(Config.datetime.desc())
+                .all()
+            )
+            return [item[0] for item in query], 200
+        except Exception as e:
+            print(
+                f"Error al obtener los valores de referencia de WaveLength_White: {e}"
+            )
+            self.session.rollback()
+            return []
+
+    def get_proc_dates(self, name):
+        try:
+            query = (
+                self.session.query(Config.datetime).filter(Config.name == name).first()
+            )
+            query2 = (
+                self.session.query(Config.datetime).filter(Config.datetime>query[0]).order_by(Config.datetime.desc()).first()
+            )
+            return query[0], query2[0], 200
+        except Exception as e:
+            print(
+                f"Error al obtener los valores de referencia de WaveLength_White: {e}"
+            )
+            self.session.rollback()
+            return []
+
 
 def calculate_nc(wave_length):
     """
@@ -1130,13 +1219,19 @@ def calculate_nc(wave_length):
     """
     return round(
         # math.pow(wave_length[WAVELENGTHS.index(541.22)], -2.28) * math.pow(10, 12), 2
-        26.83 * math.pow(wave_length[WAVELENGTHS.index(638.42)], 2)
-        - 47448 * wave_length[WAVELENGTHS.index(638.42)]
-        + 2 * math.pow(10, 7)
+        # 26.83 * math.pow(wave_length[WAVELENGTHS.index(638.42)], 2)
+        # - 47448 * wave_length[WAVELENGTHS.index(638.42)]
+        # + 2 * math.pow(10, 7)
+        5
+        * math.pow(10, 7)
+        * math.exp(-0.005 * wave_length[WAVELENGTHS.index(638.42)])
     )
 
 
 def calculate_rgb(wave_length, wave_length_white):
+    """
+    Calcula el RGB para un valor de wave_length y wave_length_white.
+    """
     if wave_length_white == []:
         return None
     closest_index_white = min(
