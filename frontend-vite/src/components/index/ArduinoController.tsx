@@ -230,36 +230,36 @@ const ArduinoController: React.FC<BotonesEstadosProps> = ({ isManual, isWake, da
                             <form className="space-y-4 text-sm text-gray-800 dark:text-white" onSubmit={handleOnSubmit}>
                                 <div>
                                     <label className="block mb-1">¿Cuál es el nombre de la medida?:</label>
-                                    <input value={config?.name} name='name' onChange={(e) => setConfig({ ...config, name: e.target.value })} type="text" className="w-full p-2 rounded bg-gray-100 dark:bg-gray-800" placeholder='Nombre de la medida' />
+                                    <input required value={config?.name} name='name' onChange={(e) => setConfig({ ...config, name: e.target.value })} type="text" className="w-full p-2 rounded bg-gray-100 dark:bg-gray-800" placeholder='Nombre de la medida' />
                                 </div>
                                 <div>
                                     <label className="block mb-1">¿Cuál es el tiempo entre medidas? (en minutos):</label>
-                                    <input value={config?.time_between_measurements} name='time_between_measurements' onChange={(e) => setConfig({ ...config, time_between_measurements: e.target.value })} type="number" step="0.1" min="0" className="w-full p-2 rounded bg-gray-100 dark:bg-gray-800" />
+                                    <input required value={config?.time_between_measurements} name='time_between_measurements' onChange={(e) => setConfig({ ...config, time_between_measurements: e.target.value })} type="number" step="0.1" min="0" className="w-full p-2 rounded bg-gray-100 dark:bg-gray-800" />
                                 </div>
 
                                 <div>
                                     <label className="block mb-1">¿Cuál es el tiempo de luz? (en minutos):</label>
-                                    <input value={config?.time_light} onChange={(e) => setConfig({ ...config, time_light: e.target.value })} name='time_light' type="number" step="0.1" min="0" className="w-full p-2 rounded bg-gray-100 dark:bg-gray-800" />
+                                    <input required value={config?.time_light} onChange={(e) => setConfig({ ...config, time_light: e.target.value })} name='time_light' type="number" step="0.1" min="0" className="w-full p-2 rounded bg-gray-100 dark:bg-gray-800" />
                                 </div>
 
                                 <div>
                                     <label className="block mb-1">¿Cuál es el tiempo de oscuridad? (en minutos):</label>
-                                    <input value={config?.time_dark} onChange={(e) => setConfig({ ...config, time_dark: e.target.value })} name='time_dark' type="number" step="0.1" min="0" className="w-full p-2 rounded bg-gray-100 dark:bg-gray-800" />
+                                    <input required value={config?.time_dark} onChange={(e) => setConfig({ ...config, time_dark: e.target.value })} name='time_dark' type="number" step="0.1" min="0" className="w-full p-2 rounded bg-gray-100 dark:bg-gray-800" />
                                 </div>
 
                                 <div>
                                     <label className="block mb-1">Porcentaje luz blanca (0–100):</label>
-                                    <input value={config?.light_white} onChange={(e) => setConfig({ ...config, light_white: e.target.value })} name='light_white' type="number" min="0" max="100" className="w-full p-2 rounded bg-gray-100 dark:bg-gray-800" />
+                                    <input required value={config?.light_white} onChange={(e) => setConfig({ ...config, light_white: e.target.value })} name='light_white' type="number" min="0" max="100" className="w-full p-2 rounded bg-gray-100 dark:bg-gray-800" />
                                 </div>
 
                                 <div>
                                     <label className="block mb-1">Porcentaje luz azul (0–100):</label>
-                                    <input value={config?.light_blue} onChange={(e) => setConfig({ ...config, light_blue: e.target.value })} name='light_blue' type="number" min="0" max="100" className="w-full p-2 rounded bg-gray-100 dark:bg-gray-800" />
+                                    <input required value={config?.light_blue} onChange={(e) => setConfig({ ...config, light_blue: e.target.value })} name='light_blue' type="number" min="0" max="100" className="w-full p-2 rounded bg-gray-100 dark:bg-gray-800" />
                                 </div>
 
                                 <div>
                                     <label className="block mb-1">Porcentaje luz roja (0–100):</label>
-                                    <input value={config?.light_red} onChange={(e) => setConfig({ ...config, light_red: e.target.value })} name='light_red' type="number" min="0" max="100" className="w-full p-2 rounded bg-gray-100 dark:bg-gray-800" />
+                                    <input required value={config?.light_red} onChange={(e) => setConfig({ ...config, light_red: e.target.value })} name='light_red' type="number" min="0" max="100" className="w-full p-2 rounded bg-gray-100 dark:bg-gray-800" />
                                 </div>
 
                                 <div className="flex justify-center pt-2">
