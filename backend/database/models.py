@@ -66,6 +66,7 @@ class SensorData(db.Model):
 
     ph = Column(Float, nullable=False)
     temperature = Column(Float, nullable=False)
+    nc = Column(Float, nullable=False)
 
     main_datetime = db.relationship(
         "MainDatetime", backref=db.backref("sensor_data", uselist=False)
@@ -123,10 +124,11 @@ class Config(db.Model):
     """
 
     __tablename__ = "config"
-    datetime = Column(DateTime, primary_key=True)
+    datetime = Column(DateTime)
     time_between_measurements = Column(Integer, nullable=False)
     time_light = Column(Integer, nullable=False)
     time_dark = Column(Integer, nullable=False)
     light_white = Column(Integer, nullable=False)
     light_red = Column(Integer, nullable=False)
     light_blue = Column(Integer, nullable=False)
+    name = Column(String(100), nullable=False, primary_key=True)

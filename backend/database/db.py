@@ -6,7 +6,14 @@ from mysql.connector.errors import DatabaseError as MySQLDatabaseError
 
 
 class Database:
+    """
+    Clase para manejar la conexión a la base de datos.
+    Contiene métodos para inicializar la base de datos y crear las tablas necesarias.
+    """
     def __init__(self, db=None):
+        """
+        Inicializa la clase Database y establece la sesión de la base de datos.
+        """
         self.db = db or SQLAlchemy()
         self.connected = False
 

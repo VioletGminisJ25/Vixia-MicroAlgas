@@ -1,11 +1,11 @@
 import serial.tools.list_ports
-
 from dotenv import load_dotenv
 import os
 import asyncio
 import websockets.socketio_intance
 from database.queries import DataQueries
 import arduino.monitor_instance
+from colorama import init, Fore
 
 queries = DataQueries()
 
@@ -13,6 +13,16 @@ load_dotenv()
 
 
 def obtener_puertos_usb(vid, pid):
+    """
+    This function is used to find the serial port that matches the given VID and PID.
+
+    Args:
+        vid (str): The vendor ID of the serial port.
+        pid (str): The product ID of the serial port.
+
+    Returns:
+        str: The serial port that matches the given VID and PID.
+    """
     puertos = serial.tools.list_ports.comports()
     for puerto in puertos:
         # Extraer VID y PID desde el puerto en formato hexadecimal
@@ -25,8 +35,6 @@ def obtener_puertos_usb(vid, pid):
             return puerto.device  # Devuelve el puerto correspondiente
     return None
 
-
-from colorama import init, Fore
 
 # Hace que despues de cada cadena vuelva a estar en el color por defecto
 init(autoreset=True)
@@ -43,6 +51,20 @@ async def async_measurement_config_send(
     red=os.getenv("LIGHT_RED"),
     blue=os.getenv("LIGHT_BLUE"),
 ):
+    """
+    This function is used to send the configuration to the arduino.
+
+    Args:
+        monitor (SerialMonitor): The SerialMonitor object.
+        manual (bool): A flag indicating whether the user is waiting for a manual measurement.
+        reboot (bool): A flag indicating whether the arduino should be rebooted.
+        time (str, optional): The time between measurements. Defaults to os.getenv("TIME_BETWEEN_MEASURAMENTS").
+        light (str, optional): The time for the light to be on. Defaults to os.getenv("TIME_LIGHT").
+        dark (str, optional): The time for the light to be off. Defaults to os.getenv("TIME_DARK").
+        white (str, optional): The white light wavelength. Defaults to os.getenv("LIGHT_WHITE").
+        red (str, optional): The red light wavelength. Defaults to os.getenv("LIGHT_RED").
+        blue (str, optional): The blue light wavelength. Defaults to os.getenv("LIGHT_BLUE").
+    """
 
     values = [time, light, dark, white, red, blue]
     data, _ = queries.get_config()
@@ -78,6 +100,16 @@ async def reboot_arduino(
     manual,
     data,
 ):
+    """
+    This function is used to reboot the arduino.
+
+    Args:
+        manual (bool): A flag indicating whether the user is waiting for a manual measurement.
+        data (dict): The configuration data.
+
+    Returns:
+        dict: The result of the reboot operation.
+    """
     websockets.socketio_intance.socketio.emit("onreboot", "True")
     time = data.get("time_between_measurements")
     light = data.get("time_light")
@@ -85,12 +117,13 @@ async def reboot_arduino(
     white = data.get("light_white")
     red = data.get("light_red")
     blue = data.get("light_blue")
+    name = data.get("name")
     arduino.monitor_instance.monitor.send_command("R")
     await asyncio.sleep(0.20)
     arduino.monitor_instance.monitor.send_command("S")
     await asyncio.sleep(1)
 
-    result = queries.insert_config(time, light, dark, white, red, blue)
+    result = queries.insert_config(name,time, light, dark, white, red, blue)
     await async_measurement_config_send(
         arduino.monitor_instance.monitor,
         manual,
