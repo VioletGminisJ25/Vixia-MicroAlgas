@@ -1,5 +1,6 @@
 // src/App.tsx
-import { Routes, Route, useLocation } from 'react-router-dom';
+import { useEffect, useState } from 'react';
+import { Routes, Route, useLocation, Navigate } from 'react-router-dom';
 import Heather from './components/Heather';
 
 import Index from './pages/PageIndex';
@@ -10,9 +11,26 @@ import PageNotFound from './pages/404';
 import Login from './pages/PageLogin';
 import Register from './pages/PageResgister'
 import Sensores from './pages/PageSensores';
+import ProtectedRoute from './components/ProtectedRoute'; 
 
 function App() {
   const location = useLocation();
+  const [loged, setLoged] = useState<boolean | null>(null);
+
+  useEffect(() => {
+    const url = import.meta.env.VITE_CHECK_AUTH;
+    console.log("VITE_CHECK_AUTH =", url);
+
+    fetch(url, { credentials: 'include' })
+      .then(res => {
+        if (res.ok) setLoged(true);
+        else setLoged(false);
+      })
+      .catch(err => {
+        console.error("Error al verificar autenticación:", err);
+        setLoged(false);
+      });
+  }, [location.pathname]);
 
   let headerProps = {
     texto: 'Principal',
@@ -126,15 +144,33 @@ function App() {
     <>
       <Heather {...headerProps}></Heather>
       <Routes>
-        <Route path='/login' element={<Login></Login>}></Route>
-        <Route path='/register' element={<Register></Register>}></Route>
-        <Route path="/" element={<Index />} />
-        <Route path='/comparacion' element={<Compare />} />
-        <Route path='/ph' element={<Ph />} />
-        <Route path='/temperature' element={<Temp />} />
-        <Route path='/sensores' element={<Sensores />} />
-        {/* Esta es la ruta para la página 404 - ¡DEBE SER LA ÚLTIMA! */}
-        <Route path="*" element={<PageNotFound />} />
+        <Route path='/login' element={<Login />} />
+        <Route path='/register' element={<Register />} />
+
+        <Route path='/' element={
+          <ProtectedRoute isAllowed={loged}>
+            <Index />
+          </ProtectedRoute>
+        } />
+        <Route path='/comparacion' element={
+          <ProtectedRoute isAllowed={loged}>
+            <Compare />
+          </ProtectedRoute>
+        } />
+        <Route path='/ph' element={
+          <ProtectedRoute isAllowed={loged}>
+            <Ph />
+          </ProtectedRoute>
+        } />
+        <Route path='/temperature' element={
+          <ProtectedRoute isAllowed={loged}>
+            <Temp />
+          </ProtectedRoute>
+        } />
+
+        <Route path="*" element={
+          loged ? <PageNotFound /> : <Navigate to="/login" />
+        } />
       </Routes>
     </>
   );

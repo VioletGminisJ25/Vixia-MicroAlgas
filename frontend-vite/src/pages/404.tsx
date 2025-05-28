@@ -1,5 +1,7 @@
 // src/pages/PageNotFound.tsx
 
+import { Link } from "react-router-dom";
+
 export default function PageNotFound() {
     return (
         <>
@@ -10,9 +12,7 @@ export default function PageNotFound() {
                     La página que buscas no existe
                 </p>
                 <p className="text-6xl sm:text-8xl font-bold bg-gradient-to-r from-green-700 to-green-400 text-transparent bg-clip-text">404</p>
-                <a href="/" className="mt-8 px-6 py-3 bg-green-600 text-white rounded-lg shadow-md hover:bg-green-700 transition duration-300">
-                    Volver a la página principal
-                </a>
+                <Link to={"/"} className="mt-4 px-6 py-3 bg-green-600 text-white rounded-lg shadow-md hover:bg-green-700 transition duration-300">Volver a la página principal</Link>
             </div>
         </>
     );

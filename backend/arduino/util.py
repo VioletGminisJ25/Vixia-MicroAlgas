@@ -93,7 +93,7 @@ async def async_measurement_config_send(
         monitor.send_command(str(data))
         print(f"\n{Fore.RED} Enviando: {data}\n")
         await asyncio.sleep(4)
-    websockets.socketio_intance.socketio.emit("manual_mode", "True")
+    websockets.socketio_intance.socketio.emit("manual_mode", True)
 
 
 async def reboot_arduino(

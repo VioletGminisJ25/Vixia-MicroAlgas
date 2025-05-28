@@ -1202,7 +1202,10 @@ class DataQueries:
                 self.session.query(Config.datetime).filter(Config.name == name).first()
             )
             query2 = (
-                self.session.query(Config.datetime).filter(Config.datetime>query[0]).order_by(Config.datetime.desc()).first()
+                self.session.query(Config.datetime)
+                .filter(Config.datetime > query[0])
+                .order_by(Config.datetime.desc())
+                .first()
             )
             return query[0], query2[0], 200
         except Exception as e:
@@ -1222,8 +1225,7 @@ def calculate_nc(wave_length):
         # 26.83 * math.pow(wave_length[WAVELENGTHS.index(638.42)], 2)
         # - 47448 * wave_length[WAVELENGTHS.index(638.42)]
         # + 2 * math.pow(10, 7)
-        5
-        * math.pow(10, 7)
+        (5 * math.pow(10, 7))
         * math.exp(-0.005 * wave_length[WAVELENGTHS.index(638.42)])
     )
 

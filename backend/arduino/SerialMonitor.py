@@ -409,7 +409,6 @@ class SerialMonitor:
                             self.serial_port.in_waiting
                         ).decode("utf-8", errors="ignore")
                         print(data, end="")
-
                         self.buffer += data
                         self.messages_handler()
                         self.process_buffer()
@@ -483,7 +482,7 @@ class SerialMonitor:
         end_idx = self.buffer.find("a", start_idx)
         if start_idx != -1 and end_idx != -1 and end_idx > start_idx:
             if not self.automatic_mode:
-                self.socketio.emit("manual_mode", "False")
+                self.socketio.emit("manual_mode", False)
             self.automatic_mode = True
         while True:
             start_idx = self.buffer.find("h")
@@ -584,8 +583,8 @@ class SerialMonitor:
                     "datetime": datetime_med,
                     "colors": None,
                     "rgb": calculate_rgb(
-                        [item[0] for item in espectro_avg.tolist()],
-                        self.get_reference_wavelength_white(),
+                        espectro_avg.tolist(),
+                        self.queries.get_reference_wavelength_white(),
                     ),
                     "data": {"ph": float(ph_avg), "temperature": float(temp_avg)},
                     "wave_length": espectro_avg.tolist(),
@@ -597,7 +596,7 @@ class SerialMonitor:
         print("Datos guardados en la base de datos.")
         self.automatic_mode = False
         if not self.white_measurement_started:
-            self.socketio.emit("manual_mode", "True")
+            self.socketio.emit("manual_mode", True)
 
     def save_manual_batch(self, timestamp):
         """
@@ -639,8 +638,8 @@ class SerialMonitor:
                     "datetime": datetime_med,
                     "colors": None,
                     "rgb": calculate_rgb(
-                        [item[0] for item in espectro_avg.tolist()],
-                        self.get_reference_wavelength_white(),
+                        espectro_avg.tolist(),
+                        self.queries.get_reference_wavelength_white(),
                     ),
                     "data": {"ph": float(ph_avg), "temperature": float(temp_avg)},
                     "wave_length": espectro_avg.tolist(),
@@ -692,7 +691,11 @@ def calculate_nc(wave_length):
     """
     return round(
         # math.pow(wave_length[WAVELENGTHS.index(541.22)], -2.28) * math.pow(10, 12), 2
-        5 * math.pow(10, 7) * math.exp(-0.005 * wave_length[WAVELENGTHS.index(638.42)])
+        # 26.83 * math.pow(wave_length[WAVELENGTHS.index(638.42)], 2)
+        # - 47448 * wave_length[WAVELENGTHS.index(638.42)]
+        # + 2 * math.pow(10, 7)
+        (5 * math.pow(10, 7))
+        * math.exp(-0.005 * wave_length[WAVELENGTHS.index(638.42)])
     )
 
 

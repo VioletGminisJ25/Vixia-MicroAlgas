@@ -3,7 +3,7 @@ import type { CompareData } from '../../interface/Global_Interface';
 import DatePickerWithData from './Calendar'
 import Nivo_ResponsiveLine_compare from './Nivo_ResponsiveLine_compare'
 import useWebSocketLastData from '../../hooks/WebSockect_lasData';
-import { ToastContainer } from 'react-toastify';
+import { toast, ToastContainer } from 'react-toastify';
 import PanelInfo from './PanelInfo';
 
 /// Componente principal que contiene el selector de fecha
@@ -28,27 +28,34 @@ export default function GraficaComparar() {
         const baseUrl = import.meta.env.VITE_SAVE_EXPORT;
         const urlWithQuery = `${baseUrl}?fecha=${data}`; // Añade ?parametro=valor
         console.log(urlWithQuery);
-        fetch(urlWithQuery, { method: "GET" })
-            .then((response) => {
-                if (!response.ok) {
-                    throw new Error("Error al exportar Excel");
-                }
-                return response.blob();
-            })
-            .then((blob) => {
-                const url = window.URL.createObjectURL(blob);
-                const a = document.createElement("a");
-                a.href = url;
-                a.download = `Datos-${datos?.selected_data?.datetime?.toString().replace(" ", "T")}.xlsx`;  // 👈 Aquí puedes cambiar el nombre si quieres
-                a.style.display = "none";
-                document.body.appendChild(a);
-                a.click();  // 👈 Esto abre la ventana de guardar
-                a.remove();
-                window.URL.revokeObjectURL(url);
-            })
-            .catch((error) => {
-                console.error("Error al descargar archivo:", error);
-            });
+
+        toast.promise(
+            fetch(urlWithQuery, { method: "GET" })
+                .then((response) => {
+                    if (!response.ok) {
+                        throw new Error("Error al exportar Excel");
+                    }
+                    return response.blob();
+
+                })
+                .then((blob) => {
+                    const url = window.URL.createObjectURL(blob);
+                    const a = document.createElement("a");
+                    a.href = url;
+                    a.download = `Datos-${datos?.selected_data?.datetime?.toString().replace(" ", "T")}.xlsx`;  // 👈 Aquí puedes cambiar el nombre si quieres
+                    a.style.display = "none";
+                    document.body.appendChild(a);
+                    a.click();  // 👈 Esto abre la ventana de guardar
+                    a.remove();
+                    window.URL.revokeObjectURL(url);
+                })
+                .catch((error) => {
+                    console.error("Error al descargar archivo:", error);
+                }), {
+            pending: 'Descargando datos...',
+            success: 'Iniciando descarga...',
+            error: 'Algo salio mal...💀'
+        })
     }
 
 

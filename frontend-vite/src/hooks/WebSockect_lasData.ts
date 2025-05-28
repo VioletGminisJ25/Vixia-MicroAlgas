@@ -1,9 +1,7 @@
 import { useState, useEffect, useCallback, useRef } from 'react';
 import { io, Socket } from 'socket.io-client';
 import { toast } from 'react-toastify';
-import type { SampleData, LightsState } from '../interface/Global_Interface';
-
-
+import type { SampleData,LightsState } from '../interface/Global_Interface';
 
 export interface UseWebSocketLastDataResult {
     lightsState: LightsState | null;
@@ -74,13 +72,13 @@ export default function useWebSocketLastData(
                 toast.success('New data received!');
             });
 
-            newSocket.on('lights_state', (state: LightsState) => {
+            newSocket.on('lights_state', (state) => {
                 console.log('Lights state:', state);
                 setLightsState(state);
             });
 
             newSocket.on('manual_mode', (manual: boolean) => {
-                console.log('Manual mode:', manual);
+                console.log('Manual mode:', manual,);
                 setManual(manual);
             });
 

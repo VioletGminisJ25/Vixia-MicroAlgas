@@ -118,37 +118,44 @@ const ArduinoController: React.FC<BotonesEstadosProps> = ({ isManual, isWake, da
     };
 
     const handleOnExport = () => {
-        const formattedDate = new Date().toISOString().toString().split('.')[0]; // Ej: "2025-05-22T13:40:45"
-        console.log(formattedDate)
-        // Codifica la fecha para que sea segura en la URL
+        const now = new Date();
+
+        // Formato YYYY-MM-DDTHH:mm:ss en hora local
+        const pad = (n: number) => n.toString().padStart(2, '0');
+        const formattedDate = `${now.getFullYear()}-${pad(now.getMonth() + 1)}-${pad(now.getDate())}T${pad(now.getHours())}:${pad(now.getMinutes())}:${pad(now.getSeconds())}`;
+
+        console.log(formattedDate);
+
         const encodedDate = encodeURIComponent(formattedDate);
-
-        // Construye la URL con el query parameter
-        // Asumo que tu VITE_SAVE_EXPORT es algo como "http://localhost:5000/api/save_export"
         const baseUrl = import.meta.env.VITE_SAVE_EXPORT;
-        const urlWithQuery = `${baseUrl}?fecha=${encodedDate}`; // Añade ?parametro=valor
+        const urlWithQuery = `${baseUrl}?fecha=${encodedDate}`;
 
-        fetch(urlWithQuery, { method: "GET" })
-            .then((response) => {
-                if (!response.ok) {
-                    throw new Error("Error al exportar Excel");
-                }
-                return response.blob();
-            })
-            .then((blob) => {
-                const url = window.URL.createObjectURL(blob);
-                const a = document.createElement("a");
-                a.href = url;
-                a.download = `Datos-${datetime?.toString().replace(" ", "T")}.xlsx`;
-                a.style.display = "none";
-                document.body.appendChild(a);
-                a.click();  // 👈 Esto abre la ventana de guardar
-                a.remove();
-                window.URL.revokeObjectURL(url);
-            })
-            .catch((error) => {
-                console.error("Error al descargar archivo:", error);
-            });
+        toast.promise(
+            fetch(urlWithQuery, { method: "GET" })
+                .then((response) => {
+                    if (!response.ok) {
+                        throw new Error("Error al exportar Excel");
+                    }
+                    return response.blob();
+                })
+                .then((blob) => {
+                    const url = window.URL.createObjectURL(blob);
+                    const a = document.createElement("a");
+                    a.href = url;
+                    a.download = `Datos-${datetime?.toString().replace(" ", "T")}.xlsx`;
+                    a.style.display = "none";
+                    document.body.appendChild(a);
+                    a.click();
+                    a.remove();
+                    window.URL.revokeObjectURL(url);
+                })
+                .catch((error) => {
+                    console.error("Error al descargar archivo:", error);
+                }), {
+            pending: 'Descargando datos...',
+            success: 'Iniciando descarga...',
+            error: 'Algo salio mal...💀'
+        })
     }
 
     return (
