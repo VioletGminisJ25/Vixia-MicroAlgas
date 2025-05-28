@@ -13,6 +13,7 @@ interface BotonesEstadosProps {
 const ArduinoController: React.FC<BotonesEstadosProps> = ({ isManual, isWake, datetime }) => {
     const [showModal, setShowModal] = useState(false);
     const [config, setConfig] = useState<Config>({
+        name: '',
         time_between_measurements: '',
         time_light: '',
         time_dark: '',
@@ -150,10 +151,6 @@ const ArduinoController: React.FC<BotonesEstadosProps> = ({ isManual, isWake, da
             });
     }
 
-    const isManualBool = typeof isManual === "string"
-        ? isManual === "true"
-        : !!isManual;
-
     return (
         <div
             className="h-fit w-60 bg-slate-100 dark:bg-[#0f1011] rounded-lg p-4 mt-20"
@@ -219,9 +216,15 @@ const ArduinoController: React.FC<BotonesEstadosProps> = ({ isManual, isWake, da
                 {showModal && (
                     <div className="fixed inset-0 bg-black/80 flex justify-center items-center z-50 backdrop-blur-sm">
                         <div className="bg-white dark:bg-black p-6 rounded-lg shadow-lg w-96 relative"> {/* Añadimos 'relative' aquí */}
-                            <h2 className="text-lg font-semibold mb-4 dark:text-white">Cambiar parámetros</h2>
-                            <Close onClick={() => setShowModal(false)} /> {/* Usamos el componente Close */}
+                            <div className='flex justify-between items-baseline'>
+                                <h2 className="text-lg font-semibold mb-4 dark:text-white">Cambiar parámetros</h2>
+                                <Close onClick={() => setShowModal(false)} /> {/* Usamos el componente Close */}
+                            </div>
                             <form className="space-y-4 text-sm text-gray-800 dark:text-white" onSubmit={handleOnSubmit}>
+                                <div>
+                                    <label className="block mb-1">¿Cuál es el nombre de la medida?:</label>
+                                    <input value={config?.name} name='name' onChange={(e) => setConfig({ ...config, name: e.target.value })} type="text" className="w-full p-2 rounded bg-gray-100 dark:bg-gray-800" placeholder='Nombre de la medida' />
+                                </div>
                                 <div>
                                     <label className="block mb-1">¿Cuál es el tiempo entre medidas? (en minutos):</label>
                                     <input value={config?.time_between_measurements} name='time_between_measurements' onChange={(e) => setConfig({ ...config, time_between_measurements: e.target.value })} type="number" step="0.1" min="0" className="w-full p-2 rounded bg-gray-100 dark:bg-gray-800" />
@@ -252,11 +255,11 @@ const ArduinoController: React.FC<BotonesEstadosProps> = ({ isManual, isWake, da
                                     <input value={config?.light_red} onChange={(e) => setConfig({ ...config, light_red: e.target.value })} name='light_red' type="number" min="0" max="100" className="w-full p-2 rounded bg-gray-100 dark:bg-gray-800" />
                                 </div>
 
-                                <div className="flex justify-end pt-2">
+                                <div className="flex justify-center pt-2">
                                     <button
                                         type="submit"
 
-                                        className="bg-blue-500 hover:bg-blue-600 text-white px-4 py-2 rounded"
+                                        className="bg-emerald-600 hover:bg-emerald-700 text-white px-4 py-2 rounded"
                                     >
                                         Enviar
                                     </button>

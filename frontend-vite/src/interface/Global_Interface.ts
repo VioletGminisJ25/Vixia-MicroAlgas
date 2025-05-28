@@ -60,6 +60,7 @@ export interface Interface_Ph_Temp {
 }
 
 export interface Config {
+    name: string;
     time_between_measurements: string;
     time_light: string;
     time_dark: string;
