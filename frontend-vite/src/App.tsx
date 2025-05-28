@@ -2,13 +2,14 @@
 import { Routes, Route, useLocation } from 'react-router-dom';
 import Heather from './components/Heather';
 
-import IndexPage from './pages/PageIndex';
+import Index from './pages/PageIndex';
 import Compare from './pages/PageCompare';
 import Ph from './pages/PagePh';
 import Temp from './pages/PageTemp';
-import PageNotFound from './pages/404'; // Importa tu nuevo componente 404
-import LoginPage from './pages/PageLogin';
-import PageRegister from './pages/PageResgister'
+import PageNotFound from './pages/404';
+import Login from './pages/PageLogin';
+import Register from './pages/PageResgister'
+import Sensores from './pages/PageSensores';
 
 function App() {
   const location = useLocation();
@@ -90,6 +91,18 @@ function App() {
         showTemp: false,
       };
       break;
+    case '/sensores':
+      headerProps = {
+        texto: 'Sensores',
+        showCompare: true,
+        showSensores: false,
+        showPrediciones: true,
+        showBack: true,
+        showPh: true,
+        showTemp: true,
+      };
+      break;
+
     default:
       // Este 'default' se ejecutará si la ruta no coincide con ninguna de las anteriores.
       // Aquí puedes decidir si quieres un texto de "Página Desconocida"
@@ -113,14 +126,15 @@ function App() {
     <>
       <Heather {...headerProps}></Heather>
       <Routes>
-        <Route path='/login' element={<LoginPage></LoginPage>}></Route>
-        <Route path='/register' element={<PageRegister></PageRegister>}></Route>
-        <Route path="*" element={<PageNotFound />} />
-        <Route path="/" element={<IndexPage />} />
+        <Route path='/login' element={<Login></Login>}></Route>
+        <Route path='/register' element={<Register></Register>}></Route>
+        <Route path="/" element={<Index />} />
         <Route path='/comparacion' element={<Compare />} />
         <Route path='/ph' element={<Ph />} />
         <Route path='/temperature' element={<Temp />} />
+        <Route path='/sensores' element={<Sensores />} />
         {/* Esta es la ruta para la página 404 - ¡DEBE SER LA ÚLTIMA! */}
+        <Route path="*" element={<PageNotFound />} />
       </Routes>
     </>
   );
