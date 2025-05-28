@@ -1,12 +1,12 @@
 # 🌿 Vixia Microalgas
 
-**Vixia Microalgas** es una plataforma de monitoreo y visualización de cultivos de microalgas. Integra sensores físicos conectados a un Arduino para la recolección de datos como temperatura, pH y espectros, procesados y visualizados a través de una arquitectura moderna con un frontend en **Astro** y un backend en **Flask**.
+**Vixia Microalgas** es una plataforma de monitoreo y visualización de cultivos de microalgas. Integra sensores físicos conectados a un Arduino para la recolección de datos como temperatura, pH y espectros, procesados y visualizados a través de una arquitectura moderna con un frontend en **Vite** y un backend en **Flask**.
 
 ---
 
 ## ⚙️ Tecnologías
 
-- 🌐 **Frontend:** [Astro](https://astro.build)
+- 🌐 **Frontend:** [Vite](https://vite.dev/guide/)
 - 🧠 **Backend:** [Flask](https://flask.palletsprojects.com/)
 - 🧪 **Sensores:** Arduino (temperatura, pH, espectros)
 - 📁 **Formato de datos:** Archivos JSON 
@@ -25,7 +25,7 @@ vixia-microalgas/
 │   ├── otherFiles/       # Archivo provisional de conexión con arduino y script de arduino
 │   ├── requirements.txt      # Dependencias del backend
 │   └── bd/               # Almacenamiento de datos recolectados (JSONs diarios)
-├── frontend/             # Proyecto Astro para la interfaz de usuario
+├── frontend-vite/             # Proyecto Astro para la interfaz de usuario
 │   ├── src/              # Componentes, páginas y estilos
 │   └── public/           # Recursos estáticos
 ├── README.md             # Documentación del proyecto
@@ -47,10 +47,10 @@ pip install -r requirements.txt
 flask run
 ```
 
-### 🌐 Frontend (Astro)
+### 🌐 Frontend (Vite)
 
 ```bash
-cd frontend
+cd frontend-vite
 npm install
 npm run dev
 ```
@@ -71,4 +71,4 @@ npm run dev
 - Desarrollado por:
     - **Javier Santos Rodal**(BackEnd) 
     - **F.Javier García González** (FrontEnd) 
-    - **Guillermo Bastos** (Supervisor)
+    
