@@ -12,6 +12,7 @@
   "dependencies": {
     "@nivo/calendar": "^0.98.0",
     "@nivo/line": "^0.96.0",
+    "@nivo/scatterplot": "^0.99.0",
     "@nivo/swarmplot": "^0.98.0",
     "@tailwindcss/vite": "^4.1.7",
     "date-fns": "^4.1.0",

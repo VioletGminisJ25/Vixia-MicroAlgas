@@ -42,8 +42,6 @@ export default function NivoLine({ arduino_data: data }: NivoLineProps) {
             axisTop={null}
             axisRight={null}
             enablePoints={false}
-            
-            motionConfig="molasses"
             axisBottom={{
                 tickSize: 5,
                 tickPadding: 5,

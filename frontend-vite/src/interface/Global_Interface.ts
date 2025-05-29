@@ -1,8 +1,10 @@
 //Interfaz base usada para datos de la API
 
+import NivoLine from "../components/index/Nivo_ResponsiveLine_Index";
+
 //Aqui para los datos de las graficas
 export interface SampleData {
-    datetime:string,
+    datetime: string,
     colors: {
         blue: boolean;
         red: boolean;
@@ -22,23 +24,11 @@ export interface SampleData {
     nc: number
 }
 
-//Exportar una interza para datos recientes y seleccionados
-export interface CompareData {
-    last_data: SampleData | null;
-    selected_data: SampleData | null;
-}
-
 //Interfaz para Calendario-ResponsiveLine-SwarmPlot
 export interface CalendarData {
     values: { day: string; value: number }[];
     year: number;
 }
-
-export interface NivoLineData {
-    id: string,
-    data: { x: number; y: number }[];
-}
-
 export interface SwarmPlotData {
     ID: string;
     datos: {
@@ -53,11 +43,6 @@ export interface SwarmPlotData {
     };
 }
 
-export interface Interface_Ph_Temp {
-    Calendar: CalendarData[];
-    ResponsiveLine: NivoLineData[];
-    SwarmPlot: SwarmPlotData;
-}
 
 export interface Config {
     name: string;
@@ -73,4 +58,31 @@ export interface LightsState {
     roja: boolean;
     azul: boolean;
     blanca: boolean;
+}
+export interface Interface_Ph_Temp {
+    Calendar: CalendarData[];
+    ResponsiveLine: NivoLineData[];
+    SwarmPlot: SwarmPlotData;
+}
+
+export interface NivoLineData {
+    data: { x: string | number; y: number }[];
+    id: string,
+}
+
+export interface Sensor {
+    0: NivoLineData;
+    1: NivoLineData;
+}[]
+
+export interface SensorData {
+    nc_time: NivoLineData;
+    nc_value: NivoLineData;
+    sensors: Sensor
+}
+
+//Exportar una interza para datos recientes y seleccionados
+export interface CompareData {
+    last_data: SampleData | null;
+    selected_data: SampleData | null;
 }

@@ -1,7 +1,7 @@
 import { useState, useEffect } from 'react';
-import CalendarByYear from "../components/nivo/ComponenteGrafico_Nivo_Calendar";
-import Swarmplot from "../components/nivo/Nivo_SwarmPlot";
-import NivoLineChart from "../components/nivo/Nivo_ResponsiveLine_MinMax";
+import CalendarByYear from "../components/nivo_antiguos_borrar_/ComponenteGrafico_Nivo_Calendar";
+import Swarmplot from "../components/nivo_antiguos_borrar_/Nivo_SwarmPlot";
+import NivoLineChart from "../components/nivo_antiguos_borrar_/Nivo_ResponsiveLine_MinMax";
 import type { Interface_Ph_Temp } from '../interface/Global_Interface';
 import Loader from "../components/ui/Loader";
 
