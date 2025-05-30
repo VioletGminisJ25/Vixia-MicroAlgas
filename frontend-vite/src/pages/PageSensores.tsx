@@ -1,14 +1,102 @@
+import { useEffect, useState } from 'react';
 import { ToastContainer } from "react-toastify";
+import 'react-toastify/dist/ReactToastify.css'; // Make sure to import toastify styles
+import NivoLine from '../components/sensores/Nivo_ResponsiveLine_Sensores';
+import NivoLine2 from '../components/sensores/Nivo_ResponsiveLine_Sensores2';
+import ScatterPlot from '../components/sensores/Nivo_ScatterPlot';
+import type { SensorData, NivoLineData, Sensor } from '../interface/Global_Interface';
 
 export default function PageSensores() {
+    const [sensorNames, setSensorNames] = useState<string[]>([]);
+    const [selectedSensor, setSelectedSensor] = useState<string>('');
+    const [ncTime, setNcTime] = useState<NivoLineData | null>(null); // Initialize with null
+    const [ncValue, setNcValue] = useState<NivoLineData | null>(null); // Initialize with null
+    const [sensor, setsensor] = useState<Sensor | null>(null);
+
+    useEffect(() => {
+        const fetchSensorNames = async () => {
+            try {
+                const response = await fetch(import.meta.env.VITE_GET_ALL_NAMES, { method: 'GET' });
+                if (!response.ok) {
+                    throw new Error(`HTTP error! status: ${response.status}`);
+                }
+                const data: string[] = await response.json();
+                console.log("sensores", data);
+                setSensorNames(data);
+                if (data.length > 0) {
+                    setSelectedSensor(data[0]);
+                    await handleSensorChange({ target: { value: data[0] } } as React.ChangeEvent<HTMLSelectElement>);
+                }
+            } catch (error) {
+                console.error("Error al obtener la configuración:", error);
+            }
+        };
+
+        fetchSensorNames();
+    }, []);
+
+    const handleSensorChange = async (event: React.ChangeEvent<HTMLSelectElement>): Promise<void> => {
+        const name: string = event.target.value;
+        setSelectedSensor(name);
+        try {
+            const response: Response = await fetch(`${import.meta.env.VITE_PROC_NAME}?name=${name}`, { method: 'GET' });
+            if (!response.ok) {
+                throw new Error(`HTTP error! status: ${response.status}`);
+            }
+            const info_back: SensorData = await response.json();
+            console.log(`Data from backend for ${name}:`, info_back);
+
+            setNcValue(info_back.nc_value);
+            setNcTime(info_back.nc_time);
+            setsensor(info_back.sensors);
+            // The console.log here will still show the previous state value due to closure.
+            // The actual state will be updated for the next render.
+        } catch (error) {
+            console.error(`Error fetching data for ${name}:`, error);
+        }
+    };
+
     return (
-        <div className="flex flex-col items-center h-[90%] w-full">
-            {/* Selector de fecha */}
+        <div className="min-h-screen bg-gray-50 dark:bg-gray-900 text-gray-900 dark:text-gray-100 p-6 sm:p-8 md:p-10 flex flex-col items-center">
+            {/* Page Title */}
+            <h1 className="text-4xl font-extrabold mb-8 text-center text-blue-700 dark:text-blue-400">
+                Dashboard de Sensores
+            </h1>
 
-            {/* Contenedor de gráficas con divisiones laterales */}
+            {/* Sensor Selector */}
+            <div className="mb-10 p-4 bg-white dark:bg-gray-800 rounded-lg shadow-lg flex flex-col sm:flex-row items-center space-y-4 sm:space-y-0 sm:space-x-4">
+                <label htmlFor="sensor-select" className="text-lg font-semibold text-gray-700 dark:text-gray-200">
+                    Selecciona un sensor:
+                </label>
+                <div className="relative">
+                    <select
+                        id="sensor-select"
+                        value={selectedSensor}
+                        onChange={handleSensorChange}
+                        className="block appearance-none w-full bg-gray-100 dark:bg-gray-700 border border-gray-300 dark:border-gray-600 text-gray-800 dark:text-gray-200 py-3 px-6 pr-10 rounded-lg shadow-sm focus:outline-none focus:ring-2 focus:ring-blue-500 focus:border-blue-500 transition duration-200 ease-in-out cursor-pointer text-base"
+                    >
+                        {sensorNames.length > 0 ? (
+                            sensorNames.map((name, index) => (
+                                <option key={index} value={name}>
+                                    {name}
+                                </option>
+                            ))
+                        ) : (
+                            <option value="">Cargando sensores...</option>
+                        )}
+                    </select>
 
 
-            {/* Contenedor de notificaciones, con estilos únicos, las 'Toastify' son enviadas mediante el websocket */}
+                </div>
+            </div>
+            <div className="grid grid-cols-2 grid-rows-2 gap-4 w-full h-full p-4">
+                <div className='h-[400px] bg-slate-100 dark:bg-[#0f1011] rounded-lg'>{ncValue && <ScatterPlot data={ncValue} />}</div>
+                <div className='h-[400px] bg-slate-100 dark:bg-[#0f1011] rounded-lg'> {ncTime && <NivoLine2 data={ncTime} />}</div>
+                <div className='h-[400px] bg-slate-100 dark:bg-[#0f1011] rounded-lg'> {sensor && <NivoLine2 data={sensor[1]} />}</div>
+                <div className='h-[400px] bg-slate-100 dark:bg-[#0f1011] rounded-lg'> {sensor && <NivoLine2 data={sensor[0]} />}</div>
+            </div>
+
+
             <ToastContainer
                 position="bottom-right"
                 autoClose={2000}
@@ -22,6 +110,6 @@ export default function PageSensores() {
                 pauseOnHover
                 theme={localStorage.getItem('theme') === 'dark' ? 'dark' : 'light'}
             />
-        </div>
+        </div >
     );
 }
