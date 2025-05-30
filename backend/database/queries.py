@@ -825,6 +825,7 @@ class DataQueries:
                     SensorData.datetime,
                     SensorData.ph,
                     SensorData.temperature,
+                    SensorData.nc,
                 )
                 .select_from(SensorData)
                 .order_by(SensorData.datetime.desc())
@@ -840,6 +841,9 @@ class DataQueries:
             if not result:
                 return 404
 
+            nc = result.nc
+            if not nc:
+                nc = calculate_nc([item[0] for item in result_wavelength])
             last_data = {
                 "datetime": str(result.datetime),
                 "colors": None,
@@ -850,7 +854,7 @@ class DataQueries:
                 "data": {"temperature": result.temperature, "ph": result.ph},
                 "wave_length": [item[0] for item in result_wavelength],
                 "x": WAVELENGTHS,
-                "nc": calculate_nc([item[0] for item in result_wavelength]),
+                "nc": nc,
             }
             print(last_data)
             return last_data
@@ -1207,27 +1211,101 @@ class DataQueries:
                 .order_by(Config.datetime.desc())
                 .first()
             )
+            print(f"Datos: {query}, {query2}")
+            if not query2:
+                query2 = [None]
             return query[0], query2[0], 200
         except Exception as e:
-            print(
-                f"Error al obtener los valores de referencia de WaveLength_White: {e}"
-            )
+            print(f"Error: {e}")
             self.session.rollback()
-            return []
+            return None, None, 500
+
+    def get_proc(self, name):
+        data_ph, data2, status = self.get_proc_dates(name)
+        if status != 200 or not data_ph:
+            return {"message": "Hubo un error al obtener los datos"}, status
+
+        if data2 == None:
+            query = (
+                self.session.query(
+                    SensorData.datetime,
+                    SensorData.ph,
+                    SensorData.temperature,
+                    SensorData.nc,
+                    WaveLength.value,
+                )
+                .select_from(SensorData)
+                .join(WaveLength, SensorData.datetime == WaveLength.datetime)
+                .filter(SensorData.datetime >= data_ph)
+                .filter(WaveLength.position == 134)
+                .all()
+            )
+        else:
+            query = (
+                self.session.query(
+                    SensorData.datetime,
+                    SensorData.ph,
+                    SensorData.temperature,
+                    SensorData.nc,
+                    WaveLength.value,
+                )
+                .select_from(SensorData)
+                .join(WaveLength, SensorData.datetime == WaveLength.datetime)
+                .filter(SensorData.datetime.between(data_ph, data2))
+                .filter(WaveLength.position == 134)
+                .all()
+            )
+        data_ph = []
+        data_temp = []
+        data_nc = []
+        data_nc_value = []
+        for item in query:
+            data_ph.append({"x": item[0], "y": item[1]})
+            data_temp.append({"x": item[0], "y": item[2]})
+            nc_value = item[3]
+            if not item[3]:
+                nc_value = calculate_nc(None, item[4])
+            data_nc.append({"x": item[0], "y": nc_value})
+            data_nc_value.append({"x": item[4], "y": nc_value})
+        output = {
+            "sensors": [
+                {
+                    "id": "ph",
+                    "data": data_ph,
+                },
+                {
+                    "id": "temperature",
+                    "data": data_temp,
+                },
+            ],
+            "nc_time": {
+                "id": "nc",
+                "data": data_nc,
+            },
+            "nc_value": {
+                "id": "nc",
+                "data": data_nc_value,
+            },
+        }
+        return output, 200
 
 
-def calculate_nc(wave_length):
+def calculate_nc(wave_length, value=None):
     """
     Calcula el número de componentes de una onda.
     """
-    return round(
-        # math.pow(wave_length[WAVELENGTHS.index(541.22)], -2.28) * math.pow(10, 12), 2
-        # 26.83 * math.pow(wave_length[WAVELENGTHS.index(638.42)], 2)
-        # - 47448 * wave_length[WAVELENGTHS.index(638.42)]
-        # + 2 * math.pow(10, 7)
-        (5 * math.pow(10, 7))
-        * math.exp(-0.005 * wave_length[WAVELENGTHS.index(638.42)])
-    )
+    if not wave_length:
+        result = round((5 * math.pow(10, 7)) * math.exp(-0.005 * value))
+    else:
+        result = round(
+            # math.pow(wave_length[WAVELENGTHS.index(541.22)], -2.28) * math.pow(10, 12), 2
+            # 26.83 * math.pow(wave_length[WAVELENGTHS.index(638.42)], 2)
+            # - 47448 * wave_length[WAVELENGTHS.index(638.42)]
+            # + 2 * math.pow(10, 7)
+            (5 * math.pow(10, 7))
+            * math.exp(-0.005 * wave_length[WAVELENGTHS.index(638.42)])
+        )
+    return result
 
 
 def calculate_rgb(wave_length, wave_length_white):
@@ -1245,21 +1323,21 @@ def calculate_rgb(wave_length, wave_length_white):
     closest_index_red = min(
         range(len(WAVELENGTHS)), key=lambda i: abs(WAVELENGTHS[i] - 450)
     )
-    print(closest_index_white)
-    print(closest_index_green)
-    print(closest_index_red)
+    # print(closest_index_white)
+    # print(closest_index_green)
+    # print(closest_index_red)
 
     wave_length_white_white = wave_length_white[closest_index_white]
     wave_length_white_green = wave_length_white[closest_index_green]
     wave_length_white_red = wave_length_white[closest_index_red]
 
-    print(wave_length_white_white)
-    print(wave_length_white_green)
-    print(wave_length_white_red)
+    # print(wave_length_white_white)
+    # print(wave_length_white_green)
+    # print(wave_length_white_red)
 
-    print(WAVELENGTHS.index(701.59))
-    print(WAVELENGTHS.index(545.88))
-    print(WAVELENGTHS.index(435.92))
+    # print(WAVELENGTHS.index(701.59))
+    # print(WAVELENGTHS.index(545.88))
+    # print(WAVELENGTHS.index(435.92))
 
     wave_length_white = wave_length[closest_index_white]
     wave_length_green = wave_length[closest_index_green]
