@@ -85,15 +85,16 @@ export default function PageSensores() {
                             <option value="">Cargando sensores...</option>
                         )}
                     </select>
-                    <div className="pointer-events-none absolute inset-y-0 right-0 flex items-center px-3 text-gray-700 dark:text-gray-300">
-                        <svg className="fill-current h-4 w-4" xmlns="http://www.w3.org/2000/svg" viewBox="0 0 20 20">
-                            <path d="M9.293 12.95l.707.707L15.657 8l-1.414-1.414L10 10.828 5.757 6.586 4.343 8z" />
-                        </svg>
-                    </div>
+
+
                 </div>
             </div>
-
-            {ncValue && <ScatterPlot data={ncValue} />}
+            <div className="grid grid-cols-2 grid-rows-2 gap-4 w-full h-full p-4">
+                <div className='h-[400px] bg-slate-100 dark:bg-[#0f1011] rounded-lg'>{ncValue && <ScatterPlot data={ncValue} />}</div>
+                <div className='h-[400px] bg-slate-100 dark:bg-[#0f1011] rounded-lg'> {ncTime && <NivoLine2 data={ncTime} />}</div>
+                <div className='h-[400px] bg-slate-100 dark:bg-[#0f1011] rounded-lg'> {sensor && <NivoLine2 data={sensor[1]} />}</div>
+                <div className='h-[400px] bg-slate-100 dark:bg-[#0f1011] rounded-lg'> {sensor && <NivoLine2 data={sensor[0]} />}</div>
+            </div>
 
 
             <ToastContainer

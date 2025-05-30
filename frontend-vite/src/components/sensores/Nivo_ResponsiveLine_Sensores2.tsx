@@ -6,8 +6,10 @@ interface NivoLineProps {
 }
 
 export default function NivoLine({ data }: NivoLineProps) {
-    console.log("Datos recibidos en NivoLine:", data); // Para verificar que los datos llegan bien
+    console.log("Datos recibidos en NivoLine:", data);
 
+    const xValues = data.data.map(d => d.x);
+    const tickValues = xValues.filter((_, index) => index % 20 === 0);
     return (
         <div className="w-full h-full p-4">
             <ResponsiveLineCanvas /* or Line for fixed dimensions */
@@ -15,13 +17,14 @@ export default function NivoLine({ data }: NivoLineProps) {
                 margin={{ top: 50, right: 110, bottom: 50, left: 60 }}
                 yScale={{ type: 'linear', min: 'auto', max: 'auto', stacked: true, reverse: false }}
                 axisBottom={{
+                    tickValues,
                     tickSize: 5,
                     tickPadding: 10,
-                    tickRotation: 90,
+                    tickRotation: 0,
                     legend: 'Tiempo',
                     legendOffset: 36,
                     legendPosition: 'middle',
-                    tickValues: 'every 10', // 👈 esto define que solo haya un tick cada 10 unidades
+
                 }}
                 axisLeft={{ legend: 'count', legendOffset: -40 }}
                 pointSize={10}

@@ -22,14 +22,9 @@ export default function NivoLine({ data }: NivoLineProps) {
                     legend: 'Tiempo',
                     legendOffset: 36,
                     legendPosition: 'middle',
-                    tickValues: 'every 10', // 👈 esto define que solo haya un tick cada 10 unidades
+                    tickValues: 10, // 👈 esto define que solo haya un tick cada 10 unidades
                 }}
-                axisLeft={{ legend: 'count', legendOffset: -40 }}
-                
-              
-               
-                
-                
+                axisLeft={{ legend: 'count', legendOffset: -40 }}   
                 legends={[
                     {
                         anchor: 'bottom-right',
