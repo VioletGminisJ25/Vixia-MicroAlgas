@@ -118,6 +118,14 @@ def get_route_names():
     return jsonify(message), status
 
 
+@data_routes.route("/proc")
+def get_route_proc():
+    """Endpoint para obtener el proceso de los datos de un archivo JSON."""
+    proc_name = request.args.get("name")
+    message, status = queries.get_proc(proc_name)
+    return jsonify(message), status
+
+
 @data_routes.route("/export", methods=["GET"])
 def export_route():
     fecha_str = request.args.get("fecha")  # Lee el parámetro `fecha` de la URL
