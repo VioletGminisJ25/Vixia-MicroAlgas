@@ -16,7 +16,7 @@ export default function NivoLine({ data }: NivoLineProps) {
                 data={[data]} /* data is an array of objects */
                 margin={{ top: 50, right: 110, bottom: 100, left: 60 }}
                 yScale={{ type: 'linear', min: 'auto', max: 'auto' }}
-                xScale={{ type: 'time', format: '%Y-%m-%dT%H:%M:%S', precision: 'minute' }}
+                xScale={{ type: 'time', format: '%Y-%m-%dT%H:%M:%S', precision: 'minute', useUTC: false }}
                 colors={{ scheme: 'dark2' }}
                 axisBottom={{
                     format: '%m-%d %H:%M',
