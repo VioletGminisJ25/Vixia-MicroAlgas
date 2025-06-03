@@ -64,7 +64,7 @@ export default function GraficoLongitudDeOndaPage() {
                         </button>
                     </div>
                     <div className='h-full w-full flex flex-row justify-end items-center gap-2.5 p-8'>
-                        <p className='text-black dark:text-white'>{name ?? 'Sin nombre'}</p>
+                        <p className='text-black dark:text-white '>{name ?? 'Sin nombre'}</p>
                     </div>
                 </div>
 

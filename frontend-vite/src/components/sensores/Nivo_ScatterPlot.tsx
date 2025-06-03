@@ -1,6 +1,6 @@
-import { ResponsiveLine, ResponsiveLineCanvas } from '@nivo/line';
-import {ResponsiveScatterPlotCanvas} from '@nivo/scatterplot';  
-import type { NivoLineData, Sensor } from '../../interface/Global_Interface';
+
+import { ResponsiveScatterPlotCanvas } from '@nivo/scatterplot';
+import type { NivoLineData } from '../../interface/Global_Interface';
 
 interface NivoLineProps {
     data: NivoLineData; // Esperamos un array de NivoLineData
@@ -14,7 +14,9 @@ export default function NivoLine({ data }: NivoLineProps) {
             <ResponsiveScatterPlotCanvas /* or Line for fixed dimensions */
                 data={[data]} /* data is an array of objects */
                 margin={{ top: 50, right: 110, bottom: 50, left: 60 }}
-                yScale={{ type: 'linear', min: 'auto', max: 'auto', stacked: true, reverse: false }}
+                yScale={{ type: 'linear', min: 'auto', max: 'auto' }}
+                xScale={{ type: 'linear', min: 'auto', max: 'auto' }}
+                colors={{ scheme: 'dark2' }}
                 axisBottom={{
                     tickSize: 5,
                     tickPadding: 10,
@@ -24,7 +26,6 @@ export default function NivoLine({ data }: NivoLineProps) {
                     legendPosition: 'middle',
                     tickValues: 10, // 👈 esto define que solo haya un tick cada 10 unidades
                 }}
-                axisLeft={{ legend: 'count', legendOffset: -40 }}   
                 legends={[
                     {
                         anchor: 'bottom-right',

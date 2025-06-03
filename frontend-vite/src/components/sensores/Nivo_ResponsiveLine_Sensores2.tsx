@@ -1,5 +1,6 @@
-import { ResponsiveLine, ResponsiveLineCanvas } from '@nivo/line';
-import type { NivoLineData, Sensor } from '../../interface/Global_Interface';
+import { ResponsiveLineCanvas } from '@nivo/line';
+import type { NivoLineData } from '../../interface/Global_Interface';
+import { format } from 'date-fns';
 
 interface NivoLineProps {
     data: NivoLineData; // Esperamos un array de NivoLineData
@@ -8,25 +9,24 @@ interface NivoLineProps {
 export default function NivoLine({ data }: NivoLineProps) {
     console.log("Datos recibidos en NivoLine:", data);
 
-    const xValues = data.data.map(d => d.x);
-    const tickValues = xValues.filter((_, index) => index % 20 === 0);
+
     return (
         <div className="w-full h-full p-4">
             <ResponsiveLineCanvas /* or Line for fixed dimensions */
                 data={[data]} /* data is an array of objects */
-                margin={{ top: 50, right: 110, bottom: 50, left: 60 }}
-                yScale={{ type: 'linear', min: 'auto', max: 'auto', stacked: true, reverse: false }}
+                margin={{ top: 50, right: 110, bottom: 100, left: 60 }}
+                yScale={{ type: 'linear', min: 'auto', max: 'auto' }}
+                xScale={{ type: 'time', format: '%Y-%m-%dT%H:%M:%S', precision: 'minute' }}
+                colors={{ scheme: 'dark2' }}
                 axisBottom={{
-                    tickValues,
+                    format: '%m-%d %H:%M',
                     tickSize: 5,
                     tickPadding: 10,
-                    tickRotation: 0,
+                    tickRotation: 45,
                     legend: 'Tiempo',
-                    legendOffset: 36,
+                    legendOffset: 106,
                     legendPosition: 'middle',
-
                 }}
-                axisLeft={{ legend: 'count', legendOffset: -40 }}
                 pointSize={10}
                 enablePoints={false}
                 pointColor={{ theme: 'background' }}
@@ -42,7 +42,29 @@ export default function NivoLine({ data }: NivoLineProps) {
                         symbolShape: 'circle'
                     }
                 ]}
+                tooltip={({ point }) => (
+                    <div
+                        style={{
+                            background: 'white',
+                            padding: '9px 12px',
+                            border: '1px solid #ccc',
+                            borderRadius: '4px',
+                            color: '#000',
+                        }}
+                    >
+                        <strong>{point.seriesId}: </strong>
+                        <strong >
+                            y: {point.data.yFormatted},
+                        </strong>
+                        <span> </span>
+                        <strong style={{ marginRight: '10px' }}>
+                            x: {format(new Date(point.data.x), 'MM-dd HH:mm')}
+                        </strong>
+                    </div>
+                )
+                }
             />
-        </div>
+        </div >
     );
 }
+

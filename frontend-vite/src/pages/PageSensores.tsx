@@ -1,7 +1,6 @@
 import { useEffect, useState } from 'react';
 import { ToastContainer } from "react-toastify";
 import 'react-toastify/dist/ReactToastify.css'; // Make sure to import toastify styles
-import NivoLine from '../components/sensores/Nivo_ResponsiveLine_Sensores';
 import NivoLine2 from '../components/sensores/Nivo_ResponsiveLine_Sensores2';
 import ScatterPlot from '../components/sensores/Nivo_ScatterPlot';
 import type { SensorData, NivoLineData, Sensor } from '../interface/Global_Interface';
@@ -57,14 +56,9 @@ export default function PageSensores() {
     };
 
     return (
-        <div className="min-h-screen bg-gray-50 dark:bg-gray-900 text-gray-900 dark:text-gray-100 p-6 sm:p-8 md:p-10 flex flex-col items-center">
-            {/* Page Title */}
-            <h1 className="text-4xl font-extrabold mb-8 text-center text-blue-700 dark:text-blue-400">
-                Dashboard de Sensores
-            </h1>
-
+        <div className="min-h-screen bg-[#FFFFFF] dark:bg-[#1D1F21] text-gray-900 p-6 sm:p-8 md:p-10 flex flex-col items-center">
             {/* Sensor Selector */}
-            <div className="mb-10 p-4 bg-white dark:bg-gray-800 rounded-lg shadow-lg flex flex-col sm:flex-row items-center space-y-4 sm:space-y-0 sm:space-x-4">
+            <div className="mb-10 p-4 bg-white dark:bg-[#0F1011] rounded-lg shadow-lg flex flex-col sm:flex-row items-center space-y-4 sm:space-y-0 sm:space-x-4">
                 <label htmlFor="sensor-select" className="text-lg font-semibold text-gray-700 dark:text-gray-200">
                     Selecciona un sensor:
                 </label>
@@ -73,7 +67,7 @@ export default function PageSensores() {
                         id="sensor-select"
                         value={selectedSensor}
                         onChange={handleSensorChange}
-                        className="block appearance-none w-full bg-gray-100 dark:bg-gray-700 border border-gray-300 dark:border-gray-600 text-gray-800 dark:text-gray-200 py-3 px-6 pr-10 rounded-lg shadow-sm focus:outline-none focus:ring-2 focus:ring-blue-500 focus:border-blue-500 transition duration-200 ease-in-out cursor-pointer text-base"
+                        className=" bg-white dark:bg-[#1d1f21] text-black dark:text-white border dark:border-white border-black rounded px-2 py-2 text-sm text-center"
                     >
                         {sensorNames.length > 0 ? (
                             sensorNames.map((name, index) => (
@@ -90,10 +84,10 @@ export default function PageSensores() {
                 </div>
             </div>
             <div className="grid grid-cols-2 grid-rows-2 gap-4 w-full h-full p-4">
-                <div className='h-[400px] bg-slate-100 dark:bg-[#0f1011] rounded-lg'>{ncValue && <ScatterPlot data={ncValue} />}</div>
-                <div className='h-[400px] bg-slate-100 dark:bg-[#0f1011] rounded-lg'> {ncTime && <NivoLine2 data={ncTime} />}</div>
-                <div className='h-[400px] bg-slate-100 dark:bg-[#0f1011] rounded-lg'> {sensor && <NivoLine2 data={sensor[1]} />}</div>
-                <div className='h-[400px] bg-slate-100 dark:bg-[#0f1011] rounded-lg'> {sensor && <NivoLine2 data={sensor[0]} />}</div>
+                <div className='h-[400px] bg-slate-100 rounded-lg'>{ncValue && <ScatterPlot data={ncValue} />}</div>
+                <div className='h-[400px] bg-slate-100 rounded-lg'> {ncTime && <NivoLine2 data={ncTime} />}</div>
+                <div className='h-[400px] bg-slate-100 rounded-lg'> {sensor && <NivoLine2 data={sensor[0]} />}</div>
+                  <div className='h-[400px] bg-slate-100 rounded-lg'> {sensor && <NivoLine2 data={sensor[1]} />}</div>
             </div>
 
 

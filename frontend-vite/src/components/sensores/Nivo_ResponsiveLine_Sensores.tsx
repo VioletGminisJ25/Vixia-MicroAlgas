@@ -1,5 +1,5 @@
-import { ResponsiveLine, ResponsiveLineCanvas } from '@nivo/line';
-import type { NivoLineData, Sensor } from '../../interface/Global_Interface';
+import {  ResponsiveLineCanvas } from '@nivo/line';
+import type { Sensor } from '../../interface/Global_Interface';
 
 interface NivoLineProps {
     data: Sensor; // Esperamos un array de NivoLineData

@@ -12,63 +12,8 @@ interface NivoLineProps {
 }
 
 export default function NivoLine({ arduino_data: data }: NivoLineProps) {
-    const currentTheme = localStorage.getItem("theme");
-
-    const lightTheme = {
-        background: "#ffffff",
-        text: {
-            fontSize: 11,
-            fill: "#333333",
-        },
-        axis: {
-            domain: { line: { stroke: "#777", strokeWidth: 1 } },
-            legend: { text: { fontSize: 12, fill: "#333" } },
-            ticks: {
-                line: { stroke: "#777", strokeWidth: 1 },
-                text: { fontSize: 11, fill: "#333" },
-            },
-        },
-        grid: { line: { stroke: "#ddd", strokeWidth: 1 } },
-        legends: {
-            text: { fontSize: 11, fill: "#333" },
-        },
-        tooltip: {
-            container: {
-                background: "#fff",
-                color: "#333",
-                fontSize: 12,
-            },
-        },
-    };
-
-    const darkTheme = {
-        background: "#1a1a1a",
-        text: {
-            fontSize: 11,
-            fill: "#f0f0f0",
-        },
-        axis: {
-            domain: { line: { stroke: "#888", strokeWidth: 1 } },
-            legend: { text: { fontSize: 12, fill: "#f0f0f0" } },
-            ticks: {
-                line: { stroke: "#888", strokeWidth: 1 },
-                text: { fontSize: 11, fill: "#f0f0f0" },
-            },
-        },
-        grid: { line: { stroke: "#444", strokeWidth: 1 } },
-        legends: {
-            text: { fontSize: 11, fill: "#f0f0f0" },
-        },
-        tooltip: {
-            container: {
-                background: "#333",
-                color: "#f0f0f0",
-                fontSize: 12,
-            },
-        },
-    };
-
-    const selectedTheme = currentTheme === "dark" ? darkTheme : lightTheme;
+    
+    
     console.log(data)
     const serie = []
     if (data != null) {

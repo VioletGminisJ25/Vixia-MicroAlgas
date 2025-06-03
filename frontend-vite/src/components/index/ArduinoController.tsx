@@ -84,7 +84,20 @@ const ArduinoController: React.FC<BotonesEstadosProps> = ({ isManual, isWake, da
     };
 
     const handleOnSubmit = (event: React.FormEvent) => {
+
         event.preventDefault();
+        const white = Number(config?.light_white);
+        const blue = Number(config?.light_blue);
+        const red = Number(config?.light_red);
+
+        
+
+        // Verifica suma total
+        if ((white + blue + red) > 100) {
+            toast.warn("La suma total de las luces no puede superar el 100%.");
+            return;
+        }
+        
         console.log("check!");
         setShowModal(false);
         toast.promise(

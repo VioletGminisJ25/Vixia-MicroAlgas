@@ -1,36 +1,34 @@
 // src/App.tsx
-import { useEffect, useState } from 'react';
-import { Routes, Route, useLocation, Navigate } from 'react-router-dom';
+
+import { Routes, Route, useLocation } from 'react-router-dom';
 import Heather from './components/Heather';
 
 import Index from './pages/PageIndex';
 import Compare from './pages/PageCompare';
-import Ph from './pages/PagePh';
-import Temp from './pages/PageTemp';
 import PageNotFound from './pages/404';
 import Login from './pages/PageLogin';
 import Register from './pages/PageResgister'
 import Sensores from './pages/PageSensores';
-import ProtectedRoute from './components/ProtectedRoute';
+
 
 function App() {
   const location = useLocation();
-  const [loged, setLoged] = useState<boolean | null>(null);
+  
 
-  useEffect(() => {
-    const url = import.meta.env.VITE_CHECK_AUTH;
-    console.log("VITE_CHECK_AUTH =", url);
+  // useEffect(() => {
+  //   const url = import.meta.env.VITE_CHECK_AUTH;
+  //   console.log("VITE_CHECK_AUTH =", url);
 
-    fetch(url, { credentials: 'include' })
-      .then(res => {
-        if (res.ok) setLoged(true);
-        else setLoged(false);
-      })
-      .catch(err => {
-        console.error("Error al verificar autenticación:", err);
-        setLoged(false);
-      });
-  }, [location.pathname]);
+  //   fetch(url, { credentials: 'include' })
+  //     .then(res => {
+  //       if (res.ok) setLoged(true);
+  //       else setLoged(false);
+  //     })
+  //     .catch(err => {
+  //       console.error("Error al verificar autenticación:", err);
+  //       setLoged(false);
+  //     });
+  // }, [location.pathname]);
 
   let headerProps = {
     texto: 'Principal',
@@ -153,12 +151,6 @@ function App() {
         } />
         <Route path='/comparacion' element={
           <Compare />
-        } />
-        <Route path='/ph' element={
-          <Ph />
-        } />
-        <Route path='/temperature' element={
-          <Temp />
         } />
         <Route path='/sensores' element={
           <Sensores />

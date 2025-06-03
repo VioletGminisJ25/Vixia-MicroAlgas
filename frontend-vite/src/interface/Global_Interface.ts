@@ -1,7 +1,5 @@
 //Interfaz base usada para datos de la API
 
-import NivoLine from "../components/index/Nivo_ResponsiveLine_Index";
-
 //Aqui para los datos de las graficas
 export interface SampleData {
     datetime: string,
@@ -68,6 +66,11 @@ export interface Interface_Ph_Temp {
 export interface NivoLineData {
     data: { x: string | number; y: number }[];
     id: string,
+}
+
+export interface NivoLineDataTest {
+    data: { x: string | number; y: number }[];
+    id: Date,
 }
 
 export interface Sensor {
