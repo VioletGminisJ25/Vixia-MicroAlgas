@@ -159,7 +159,9 @@ const ArduinoController: React.FC<BotonesEstadosProps> = ({ isManual, isWake, da
 
     const handleSensorChange = (event: React.ChangeEvent<HTMLSelectElement>) => {
         setSelectedSensor(event.target.value);
+
     };
+
     const handleOnExport = () => {
         const baseUrl = import.meta.env.VITE_SAVE_EXPORT_PROC;
         const urlWithQuery = `${baseUrl}?name=${encodeURIComponent(selectedSensor)}`;
@@ -199,21 +201,10 @@ const ArduinoController: React.FC<BotonesEstadosProps> = ({ isManual, isWake, da
             <div className="flex flex-col justify-center items-center w-full h-full gap-4">
                 <div
                     className="flex flex-row justify-center items-center w-full
-                             text-black dark:text-white"
+                    text-black dark:text-white"
                 >
-                    <SwitchState></SwitchState>
-                    <button
-                        itemID="recibirDatos"
-                        onClick={handleRecibirMuestras}
-                        id="recibirMuestras"
-                        className="w-[75%] h-12 rounded
-                                 bg-white
-                                dark:bg-[#1d1f21] dark:text-white
-                                dark:hover:bg-neutral-700
-                                  hover:bg-neutral-200"
-                    >
-                        {isWake ? "Apagar" : "Encender"}
-                    </button>
+                    <SwitchState checked={isWake} onChange={handleRecibirMuestras} />
+                   
                 </div>
 
                 <div

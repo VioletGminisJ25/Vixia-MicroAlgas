@@ -1,7 +1,7 @@
 import { useState, useEffect, useCallback, useRef } from 'react';
 import { io, Socket } from 'socket.io-client';
 import { toast } from 'react-toastify';
-import type { SampleData,LightsState } from '../interface/Global_Interface';
+import type { SampleData, LightsState } from '../interface/Global_Interface';
 
 export interface UseWebSocketLastDataResult {
     lightsState: LightsState | null;
@@ -35,21 +35,21 @@ export default function useWebSocketLastData(
 
     const connect = useCallback(() => {
         if (!socketRef.current) {
-            const newSocket = io(url, { timeout: 10000 });
+            const newSocket = io(url, { timeout: 10000, reconnectionDelay: 5000, });
             socketRef.current = newSocket;
 
             newSocket.on('connect', () => {
                 console.log('Connected to WebSocket server');
                 setIsConnected(true);
                 setError(null);
-                toast.success('Connected to server!');
+                toast.success('Conectado al servidor');
             });
 
             newSocket.on('connect_error', (err: Error) => {
                 console.error('WebSocket connection error:', err);
                 setIsConnected(false);
                 setError(err);
-                toast.error(err.message);
+                toast.error("Error al conectar al servidor");
             });
 
             newSocket.on('connect_timeout', (timeout: number) => {
@@ -69,7 +69,7 @@ export default function useWebSocketLastData(
             newSocket.on('arduino_data', (newData: SampleData) => {
                 console.log('Received data from WebSocket:', newData);
                 setData(newData);
-                toast.success('New data received!');
+                toast.success('Ultimos datos recibidos!');
             });
 
             newSocket.on('lights_state', (state) => {
