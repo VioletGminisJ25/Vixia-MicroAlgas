@@ -1,11 +1,9 @@
 
-import React, { useEffect, useState } from 'react';
+import React, { useState } from 'react';
 import { toast } from 'react-toastify';
 import type { Config } from '../../interface/Global_Interface';
 import Close from "../ui/Close"
 import { data } from 'react-router-dom';
-import SwitchState from '../ui/SwitchState';
-
 interface BotonesEstadosProps {
     isManual: boolean | null;
     isWake: boolean | null;
@@ -13,8 +11,6 @@ interface BotonesEstadosProps {
     // ... otras posibles props
 }
 const ArduinoController: React.FC<BotonesEstadosProps> = ({ isManual, isWake, datetime }) => {
-    const [sensorNames, setSensorNames] = useState<string[]>([]);
-    const [selectedSensor, setSelectedSensor] = useState<string>('');
     const [showModal, setShowModal] = useState(false);
     const [config, setConfig] = useState<Config>({
         name: '',
@@ -25,29 +21,6 @@ const ArduinoController: React.FC<BotonesEstadosProps> = ({ isManual, isWake, da
         light_blue: '',
         light_red: ''
     });
-
-
-    useEffect(() => {
-        const fetchSensorNames = async () => {
-            try {
-                const response = await fetch(import.meta.env.VITE_GET_ALL_NAMES, { method: 'GET' });
-                if (!response.ok) {
-                    throw new Error(`HTTP error! status: ${response.status}`);
-                }
-                const data: string[] = await response.json();
-                console.log("sensores", data);
-                setSensorNames(data);
-                if (data.length > 0) {
-                    setSelectedSensor(data[0]);
-                    // await handleSensorChange({ target: { value: data[0] } } as React.ChangeEvent<HTMLSelectElement>);
-                }
-            } catch (error) {
-                console.error("Error al obtener la configuración:", error);
-            }
-        };
-
-        fetchSensorNames();
-    }, []);
 
     const handleTomarMuestra = () => {
         console.log("¡Botón 'Tomar muestra manual' clickeado!");
@@ -117,14 +90,14 @@ const ArduinoController: React.FC<BotonesEstadosProps> = ({ isManual, isWake, da
         const blue = Number(config?.light_blue);
         const red = Number(config?.light_red);
 
-
+        
 
         // Verifica suma total
         if ((white + blue + red) > 100) {
             toast.warn("La suma total de las luces no puede superar el 100%.");
             return;
         }
-
+        
         console.log("check!");
         setShowModal(false);
         toast.promise(
@@ -157,12 +130,18 @@ const ArduinoController: React.FC<BotonesEstadosProps> = ({ isManual, isWake, da
         );
     };
 
-    const handleSensorChange = (event: React.ChangeEvent<HTMLSelectElement>) => {
-        setSelectedSensor(event.target.value);
-    };
     const handleOnExport = () => {
-        const baseUrl = import.meta.env.VITE_SAVE_EXPORT_PROC;
-        const urlWithQuery = `${baseUrl}?name=${encodeURIComponent(selectedSensor)}`;
+        const now = new Date();
+
+        // Formato YYYY-MM-DDTHH:mm:ss en hora local
+        const pad = (n: number) => n.toString().padStart(2, '0');
+        const formattedDate = `${now.getFullYear()}-${pad(now.getMonth() + 1)}-${pad(now.getDate())}T${pad(now.getHours())}:${pad(now.getMinutes())}:${pad(now.getSeconds())}`;
+
+        console.log(formattedDate);
+
+        const encodedDate = encodeURIComponent(formattedDate);
+        const baseUrl = import.meta.env.VITE_SAVE_EXPORT;
+        const urlWithQuery = `${baseUrl}?fecha=${encodedDate}`;
 
         toast.promise(
             fetch(urlWithQuery, { method: "GET" })
@@ -193,24 +172,26 @@ const ArduinoController: React.FC<BotonesEstadosProps> = ({ isManual, isWake, da
     }
 
     return (
-        <div className="h-fit w-60 bg-slate-100 dark:bg-[#0f1011] rounded-lg p-4 mt-20">
-            <p className="text-black dark:text-white text-xl font-semibold mb-8 text-center">Controles</p>{" "}
-            {/* Clase para el título y un margen inferior */}
-            <div className="flex flex-col justify-center items-center w-full h-full gap-4">
+        <div
+            className="h-fit w-60 bg-slate-100 dark:bg-[#0f1011] rounded-lg p-4 mt-20"
+        >
+            <p className="text-black dark:text-white text-xl font-semibold mb-8 text-center">Controles</p> {/* Clase para el título y un margen inferior */}
+            <div
+                className="flex flex-col justify-center items-center w-full h-full gap-4"
+            >
                 <div
                     className="flex flex-row justify-center items-center w-full
-                             text-black dark:text-white"
+                           text-black dark:text-white"
                 >
-                    <SwitchState></SwitchState>
                     <button
-                        itemID="recibirDatos"
+                        itemID='recibirDatos'
                         onClick={handleRecibirMuestras}
                         id="recibirMuestras"
                         className="w-[75%] h-12 rounded
-                                 bg-white
-                                dark:bg-[#1d1f21] dark:text-white
-                                dark:hover:bg-neutral-700
-                                  hover:bg-neutral-200"
+                                    bg-white
+                                   dark:bg-[#1d1f21] dark:text-white
+                                   dark:hover:bg-neutral-700
+                                      hover:bg-neutral-200"
                     >
                         {isWake ? "Apagar" : "Encender"}
                     </button>
@@ -218,37 +199,33 @@ const ArduinoController: React.FC<BotonesEstadosProps> = ({ isManual, isWake, da
 
                 <div
                     className="flex flex-row justify-center items-center w-full
-                             text-black dark:text-white"
+                            text-black dark:text-white"
                 >
                     <button
-                        id="muestraManual"
+                        id='muestraManual'
                         onClick={handleTomarMuestra}
                         disabled={!isManual}
                         className={`
-                                 w-[75%] h-12 rounded
-                                 transition-colors duration-200 ease-in-out
-                                 ${isManual
+                            w-[75%] h-12 rounded
+                            transition-colors duration-200 ease-in-out
+                            ${isManual
                                 ? `bg-white text-black hover:bg-neutral-200 
                                  dark:bg-[#1d1f21] dark:text-white dark:hover:bg-neutral-700`
                                 : `bg-gray-200 text-gray-400 cursor-not-allowed
-                                 dark:bg-gray-700 dark:text-gray-500`
-                            }
-                               `}
+                                 dark:bg-gray-700 dark:text-gray-500`}
+                          `}
                     >
                         Tomar muestra manual
                     </button>
                 </div>
                 <div
                     className="flex flex-row justify-center items-center w-full
-                             text-black dark:text-white"
+                            text-black dark:text-white"
                 >
                     <button
-                        onClick={() => {
-                            setShowModal(true);
-                            handleRellenarCampos();
-                        }}
+                        onClick={() => { setShowModal(true); handleRellenarCampos() }}
                         className="w-[75%] h-12 rounded
-                    bg-white
+                    bg-white hover:
                     dark:bg-[#1d1f21] dark:text-white
                     dark:hover:bg-neutral-700
                     hover:bg-neutral-200"
@@ -258,129 +235,50 @@ const ArduinoController: React.FC<BotonesEstadosProps> = ({ isManual, isWake, da
                 </div>
                 {showModal && (
                     <div className="fixed inset-0 bg-black/80 flex justify-center items-center z-50 backdrop-blur-sm">
-                        <div className="bg-white dark:bg-black p-6 rounded-lg shadow-lg w-96 relative">
-                            {" "}
-                            {/* Añadimos 'relative' aquí */}
-                            <div className="flex justify-between items-baseline">
-                                <h2 className="text-lg font-semibold mb-4 dark:text-white">
-                                    Cambiar parámetros
-                                </h2>
-                                <Close onClick={() => setShowModal(false)} />{" "}
-                                {/* Usamos el componente Close */}
+                        <div className="bg-white dark:bg-black p-6 rounded-lg shadow-lg w-96 relative"> {/* Añadimos 'relative' aquí */}
+                            <div className='flex justify-between items-baseline'>
+                                <h2 className="text-lg font-semibold mb-4 dark:text-white">Cambiar parámetros</h2>
+                                <Close onClick={() => setShowModal(false)} /> {/* Usamos el componente Close */}
                             </div>
-                            <form
-                                className="space-y-4 text-sm text-gray-800 dark:text-white"
-                                onSubmit={handleOnSubmit}
-                            >
+                            <form className="space-y-4 text-sm text-gray-800 dark:text-white" onSubmit={handleOnSubmit}>
                                 <div>
-                                    <label className="block mb-1">
-                                        ¿Cuál es el nombre de la medida?:
-                                    </label>
-                                    <input
-                                        required
-                                        value={config?.name}
-                                        name="name"
-                                        onChange={(e) => setConfig({ ...config, name: e.target.value })}
-                                        type="text"
-                                        className="w-full p-2 rounded bg-gray-100 dark:bg-gray-800"
-                                        placeholder="Nombre de la medida"
-                                    />
+                                    <label className="block mb-1">¿Cuál es el nombre de la medida?:</label>
+                                    <input required value={config?.name} name='name' onChange={(e) => setConfig({ ...config, name: e.target.value })} type="text" className="w-full p-2 rounded bg-gray-100 dark:bg-gray-800" placeholder='Nombre de la medida' />
                                 </div>
                                 <div>
-                                    <label className="block mb-1">
-                                        ¿Cuál es el tiempo entre medidas? (en minutos):
-                                    </label>
-                                    <input
-                                        required
-                                        value={config?.time_between_measurements}
-                                        name="time_between_measurements"
-                                        onChange={(e) =>
-                                            setConfig({ ...config, time_between_measurements: e.target.value })
-                                        }
-                                        type="number"
-                                        step="0.1"
-                                        min="0"
-                                        className="w-full p-2 rounded bg-gray-100 dark:bg-gray-800"
-                                    />
+                                    <label className="block mb-1">¿Cuál es el tiempo entre medidas? (en minutos):</label>
+                                    <input required value={config?.time_between_measurements} name='time_between_measurements' onChange={(e) => setConfig({ ...config, time_between_measurements: e.target.value })} type="number" step="0.1" min="0" className="w-full p-2 rounded bg-gray-100 dark:bg-gray-800" />
                                 </div>
 
                                 <div>
-                                    <label className="block mb-1">
-                                        ¿Cuál es el tiempo de luz? (en minutos):
-                                    </label>
-                                    <input
-                                        required
-                                        value={config?.time_light}
-                                        onChange={(e) => setConfig({ ...config, time_light: e.target.value })}
-                                        name="time_light"
-                                        type="number"
-                                        step="0.1"
-                                        min="0"
-                                        className="w-full p-2 rounded bg-gray-100 dark:bg-gray-800"
-                                    />
+                                    <label className="block mb-1">¿Cuál es el tiempo de luz? (en minutos):</label>
+                                    <input required value={config?.time_light} onChange={(e) => setConfig({ ...config, time_light: e.target.value })} name='time_light' type="number" step="0.1" min="0" className="w-full p-2 rounded bg-gray-100 dark:bg-gray-800" />
                                 </div>
 
                                 <div>
-                                    <label className="block mb-1">
-                                        ¿Cuál es el tiempo de oscuridad? (en minutos):
-                                    </label>
-                                    <input
-                                        required
-                                        value={config?.time_dark}
-                                        onChange={(e) => setConfig({ ...config, time_dark: e.target.value })}
-                                        name="time_dark"
-                                        type="number"
-                                        step="0.1"
-                                        min="0"
-                                        className="w-full p-2 rounded bg-gray-100 dark:bg-gray-800"
-                                    />
+                                    <label className="block mb-1">¿Cuál es el tiempo de oscuridad? (en minutos):</label>
+                                    <input required value={config?.time_dark} onChange={(e) => setConfig({ ...config, time_dark: e.target.value })} name='time_dark' type="number" step="0.1" min="0" className="w-full p-2 rounded bg-gray-100 dark:bg-gray-800" />
                                 </div>
 
                                 <div>
                                     <label className="block mb-1">Porcentaje luz blanca (0–100):</label>
-                                    <input
-                                        required
-                                        value={config?.light_white}
-                                        onChange={(e) => setConfig({ ...config, light_white: e.target.value })}
-                                        name="light_white"
-                                        type="number"
-                                        min="0"
-                                        max="100"
-                                        className="w-full p-2 rounded bg-gray-100 dark:bg-gray-800"
-                                    />
+                                    <input required value={config?.light_white} onChange={(e) => setConfig({ ...config, light_white: e.target.value })} name='light_white' type="number" min="0" max="100" className="w-full p-2 rounded bg-gray-100 dark:bg-gray-800" />
                                 </div>
 
                                 <div>
                                     <label className="block mb-1">Porcentaje luz azul (0–100):</label>
-                                    <input
-                                        required
-                                        value={config?.light_blue}
-                                        onChange={(e) => setConfig({ ...config, light_blue: e.target.value })}
-                                        name="light_blue"
-                                        type="number"
-                                        min="0"
-                                        max="100"
-                                        className="w-full p-2 rounded bg-gray-100 dark:bg-gray-800"
-                                    />
+                                    <input required value={config?.light_blue} onChange={(e) => setConfig({ ...config, light_blue: e.target.value })} name='light_blue' type="number" min="0" max="100" className="w-full p-2 rounded bg-gray-100 dark:bg-gray-800" />
                                 </div>
 
                                 <div>
                                     <label className="block mb-1">Porcentaje luz roja (0–100):</label>
-                                    <input
-                                        required
-                                        value={config?.light_red}
-                                        onChange={(e) => setConfig({ ...config, light_red: e.target.value })}
-                                        name="light_red"
-                                        type="number"
-                                        min="0"
-                                        max="100"
-                                        className="w-full p-2 rounded bg-gray-100 dark:bg-gray-800"
-                                    />
+                                    <input required value={config?.light_red} onChange={(e) => setConfig({ ...config, light_red: e.target.value })} name='light_red' type="number" min="0" max="100" className="w-full p-2 rounded bg-gray-100 dark:bg-gray-800" />
                                 </div>
 
                                 <div className="flex justify-center pt-2">
                                     <button
                                         type="submit"
+
                                         className="bg-emerald-600 hover:bg-emerald-700 text-white px-4 py-2 rounded"
                                     >
                                         Enviar
@@ -391,58 +289,20 @@ const ArduinoController: React.FC<BotonesEstadosProps> = ({ isManual, isWake, da
                     </div>
                 )}
 
-                {/* Contenedor del Select y el Botón de Descarga */}
                 <div
-                    className="flex flex-row justify-center items-center w-full gap-2
-                             text-black dark:text-white"
+                    className="flex flex-row justify-center items-center w-full
+                            text-black dark:text-white"
                 >
-                    <select
-                        value={selectedSensor}
-                        onChange={(e) => setSelectedSensor(e.target.value)}
-                        id="sensor-select"
-                        className="w-[55%] h-12 rounded
-        bg-white dark:bg-[#1d1f21] text-black dark:text-white
-        border border-gray-300 dark:border-gray-600
-        focus:outline-none focus:ring-2 focus:ring-green-500 focus:border-transparent
-        px-3 text-sm text-left leading-tight cursor-pointer"
-                    >
-                        {sensorNames.length > 0 ? (
-                            sensorNames.map((name, index) => (
-                                <option key={index} value={name}>
-                                    {name}
-                                </option>
-                            ))
-                        ) : (
-                            <option value="">Cargando sensores...</option>
-                        )}
-                    </select>
                     <button
                         onClick={handleOnExport}
-                        value={selectedSensor}
-                        className="w-[20%] h-12 rounded
-                             text-white bg-green-700 hover:bg-green-800
-                             flex justify-center items-center"
+                        className="w-[75%] h-12 rounded
+                         text-white bg-green-700 hover:bg-green-800"
                     >
-                        <svg
-                            xmlns="http://www.w3.org/2000/svg"
-                            width="20"
-                            height="20"
-                            viewBox="0 0 24 24"
-                            fill="none"
-                            stroke="currentColor"
-                            strokeWidth="2"
-                            strokeLinecap="round"
-                            strokeLinejoin="round"
-                            className="feather feather-download"
-                        >
-                            <path d="M21 15v4a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2v-4"></path>
-                            <polyline points="7 10 12 15 17 10"></polyline>
-                            <line x1="12" y1="15" x2="12" y2="3"></line>
-                        </svg>
+                        Guardar en excel
                     </button>
                 </div>
             </div>
-        </div>
+        </div >
     );
 }
 

@@ -9,9 +9,7 @@ def socketio_init(app):
         app,
         cors_allowed_origins=[
             "http://localhost:4321",
-            "http://193.146.35.219:4321",
-            "http://localhost:4000",
-            "http://193.146.35.219:4000",
+            "http://193.146.35.176:4321",
         ],  # Cambiar esto si es necesario al pasar a otro equipo
     )
     return socketio

@@ -22,7 +22,7 @@ export default function GraficaComparar() {
         selected_data: datos?.selected_data ?? null,
     };
 
-    const handleOnExportaSelect = () => {
+    const handleOnExport = () => {
         // Construye la URL con el query parameter
         // Asumo que tu VITE_SAVE_EXPORT es algo como "http://localhost:5000/api/save_export"
         const baseUrl = import.meta.env.VITE_SAVE_EXPORT;
@@ -58,46 +58,6 @@ export default function GraficaComparar() {
         })
     }
 
-    const handleOnExportLast = () => {
-        const now = new Date();
-
-        // Formato YYYY-MM-DDTHH:mm:ss en hora local
-        const pad = (n: number) => n.toString().padStart(2, '0');
-        const formattedDate = `${now.getFullYear()}-${pad(now.getMonth() + 1)}-${pad(now.getDate())}T${pad(now.getHours())}:${pad(now.getMinutes())}:${pad(now.getSeconds())}`;
-
-        console.log(formattedDate);
-
-        const encodedDate = encodeURIComponent(formattedDate);
-        const baseUrl = import.meta.env.VITE_SAVE_EXPORT;
-        const urlWithQuery = `${baseUrl}?fecha=${encodedDate}`;
-
-        toast.promise(
-            fetch(urlWithQuery, { method: "GET" })
-                .then((response) => {
-                    if (!response.ok) {
-                        throw new Error("Error al exportar Excel");
-                    }
-                    return response.blob();
-                })
-                .then((blob) => {
-                    const url = window.URL.createObjectURL(blob);
-                    const a = document.createElement("a");
-                    a.href = url;
-                    a.download = `Datos-${datosWebSocket?.datetime?.toString().replace(" ", "T")}.xlsx`;
-                    a.style.display = "none";
-                    document.body.appendChild(a);
-                    a.click();
-                    a.remove();
-                    window.URL.revokeObjectURL(url);
-                })
-                .catch((error) => {
-                    console.error("Error al descargar archivo:", error);
-                }), {
-            pending: 'Descargando datos...',
-            success: 'Iniciando descarga...',
-            error: 'Algo salio mal...💀'
-        })
-    }
 
     return (
         <div className="flex flex-col items-center h-[90%] w-full relative"> {/* Añadido relative para el posicionamiento absoluto si lo quisieras flotante */}
@@ -111,19 +71,8 @@ export default function GraficaComparar() {
 
             {/* Contenedor de gráficas con divisiones laterales */}
             <div className="flex flex-row justify-center h-[80%] w-[100%] mx-auto mt-4 gap-4">
-
                 {/* Panel izquierdo */}
-                <div className="flex flex-col items-center gap-4">
-                    <PanelInfo sampleData={nivoLineData.last_data} titulo="Últimos Datos" />
-                    <button
-                        id='takeLast'
-                        onClick={handleOnExportLast}
-                        className={`
-                            w-[65%] h-10 rounded text-white bg-green-700 hover:bg-green-800`}
-                    >
-                        Guardar en Excel
-                    </button>
-                </div>
+                <PanelInfo sampleData={nivoLineData.last_data} titulo="Últimos Datos" />
 
                 {/* Gráfica central */}
                 <div className="flex items-center justify-center h-full w-[60%] bg-white p-4 rounded-lg shadow-md mr-10 ml-10">
@@ -134,8 +83,8 @@ export default function GraficaComparar() {
                 <div className="flex flex-col items-center gap-4">
                     <PanelInfo sampleData={nivoLineData.selected_data} titulo="Datos Seleccionados" />
                     <button
-                        id='takeSelected'
-                        onClick={handleOnExportaSelect}
+                        id='muestraManual'
+                        onClick={handleOnExport}
                         className={`
                             w-[65%] h-10 rounded text-white bg-green-700 hover:bg-green-800`}
                     >

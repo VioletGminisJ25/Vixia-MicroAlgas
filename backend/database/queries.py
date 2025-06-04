@@ -785,7 +785,7 @@ class DataQueries:
                 datetime=data["datetime"],
                 ph=float(data["ph"]),
                 temperature=float(data["temperature"]),
-                nc=calculate_nc(data["value"]),
+                nc=calculate_nc([item[0] for item in data["value"].values()]),
             )
 
             # Agregar la nueva instancia a la sesión
@@ -1260,12 +1260,12 @@ class DataQueries:
         data_nc = []
         data_nc_value = []
         for item in query:
-            data_ph.append({"x": item[0].isoformat(), "y": item[1]})
-            data_temp.append({"x": item[0].isoformat(), "y": item[2]})
+            data_ph.append({"x": item[0], "y": item[1]})
+            data_temp.append({"x": item[0], "y": item[2]})
             nc_value = item[3]
             if not item[3]:
                 nc_value = calculate_nc(None, item[4])
-            data_nc.append({"x": item[0].isoformat(), "y": nc_value})
+            data_nc.append({"x": item[0], "y": nc_value})
             data_nc_value.append({"x": item[4], "y": nc_value})
         output = {
             "sensors": [
@@ -1294,7 +1294,7 @@ def calculate_nc(wave_length, value=None):
     """
     Calcula el número de componentes de una onda.
     """
-    if wave_length is None or len(wave_length) == 0:
+    if not wave_length:
         result = round((5 * math.pow(10, 7)) * math.exp(-0.005 * value))
     else:
         result = round(
