@@ -10,6 +10,8 @@ def socketio_init(app):
         cors_allowed_origins=[
             "http://localhost:4321",
             "http://193.146.35.176:4321",
+            "http://193.146.35.176:4000",
+            "http://localhost:4000",
         ],  # Cambiar esto si es necesario al pasar a otro equipo
     )
     return socketio
