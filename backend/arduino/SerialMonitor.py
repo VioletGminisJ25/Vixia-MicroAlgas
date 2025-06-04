@@ -592,7 +592,7 @@ class SerialMonitor:
                     "nc": calculate_nc(espectro_avg.tolist()),
                 },
             )
-            self.queries.insert_data(data, self.is_first_measurement)
+        self.queries.insert_data(data, self.is_first_measurement)
         print("Datos guardados en la base de datos.")
         self.automatic_mode = False
         if not self.white_measurement_started:
