@@ -17,7 +17,7 @@ def register_socketio_events(socketio):
         socketio.emit("lights_state", queries.get_latest_color(), to=sid)
         socketio.emit(
             "manual_mode",
-            str(not arduino.monitor_instance.monitor.automatic_mode),
+            not arduino.monitor_instance.monitor.automatic_mode,
             to=sid,
         )
         socketio.emit("wake_up_state", arduino.monitor_instance.monitor.active, to=sid)

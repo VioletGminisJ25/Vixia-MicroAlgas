@@ -377,8 +377,15 @@ class SerialMonitor:
                 target=self.monitor_serial, daemon=True
             )
             self.monitor_thread.start()
+            threading.Thread(
+                target=self.async_measurement_config_send, daemon=True
+            ).start()
         except serial.SerialException as e:
             print(f"Error al abrir el puerto {self.port}: {e}")
+
+    def async_measurement_config_send(self, manual=False, reboot=False):
+        with self.app.app_context():
+            asyncio.run(async_measurement_config_send(self, manual=False, reboot=False))
 
     def stop(self):
         """
@@ -401,7 +408,6 @@ class SerialMonitor:
         """
         with self.app.app_context():
             self.queries = DataQueries()
-            asyncio.run(async_measurement_config_send(self, manual=False, reboot=False))
             while self.running:
                 try:
                     if self.serial_port.in_waiting > 0:

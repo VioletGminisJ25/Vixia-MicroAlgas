@@ -12,6 +12,8 @@ interface NivoLineProps {
 }
 
 export default function NivoLine({ arduino_data: data }: NivoLineProps) {
+    
+    
     console.log(data)
     const serie = []
     if (data != null) {
@@ -31,7 +33,7 @@ export default function NivoLine({ arduino_data: data }: NivoLineProps) {
         serie.push(selected_data)
 
         // 👇 Añade un punto personalizado a x = 10, y = 0.82
-   
+
     }
     return (<div className="w-full h-full p-4"> {/* altura fija */}
         <ResponsiveLine
@@ -85,7 +87,7 @@ export default function NivoLine({ arduino_data: data }: NivoLineProps) {
                     <strong>Rango Espectro:</strong> {data?.x && data.x[point.data.x - 1] !== undefined ? data.x[point.data.x - 1] : 'N/A'}<br></br>
                 </div>
             )}
-
+           
         />
     </div>)
 }
