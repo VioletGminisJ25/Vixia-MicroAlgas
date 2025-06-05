@@ -55,24 +55,24 @@ const StyledWrapper = styled.div`
     animation-delay: 0.1s;
   }
 
-  @keyframes pulse {
-    0% {
-      transform: scale(0.8);
-      background-color: #b3d4fc;
-      box-shadow: 0 0 0 0 rgba(178, 212, 252, 0.7);
-    }
+ @keyframes pulse {
+  0% {
+    transform: scale(0.8);
+    background-color: #00B657; /* verde medio brillante */
+    box-shadow: 0 0 0 0 rgba(0, 182, 87, 0.6);
+  }
 
-    50% {
-      transform: scale(1.2);
-      background-color: #6793fb;
-      box-shadow: 0 0 0 10px rgba(178, 212, 252, 0);
-    }
+  50% {
+    transform: scale(1.2);
+    background-color: #008437; /* verde más oscuro */
+    box-shadow: 0 0 0 10px rgba(0, 182, 87, 0);
+  }
 
-    100% {
-      transform: scale(0.8);
-      background-color: #b3d4fc;
-      box-shadow: 0 0 0 0 rgba(178, 212, 252, 0.7);
-    }
-  }`;
+  100% {
+    transform: scale(0.8);
+    background-color: #00B657;
+    box-shadow: 0 0 0 0 rgba(0, 182, 87, 0.6);
+  }
+}`;
 
 export default Loader;

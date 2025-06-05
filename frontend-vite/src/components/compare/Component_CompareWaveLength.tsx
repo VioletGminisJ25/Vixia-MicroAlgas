@@ -15,7 +15,7 @@ export default function GraficaComparar() {
     // Estado para almacenar los datos seleccionados por el usuario
     const [datos, setDatos] = useState<CompareData | null>(null);
     const [data, setData] = useState<string | null>(null);
-    const { data: datosWebSocket } = useWebSocketLastData(import.meta.env.VITE_API_URL);
+    const { data: datosWebSocket, isConnected } = useWebSocketLastData(import.meta.env.VITE_API_URL);
 
     const nivoLineData: CompareData = {
         last_data: datosWebSocket ?? null, // Asumiendo que datosWebSocket tiene la misma estructura que SampleData
@@ -115,14 +115,17 @@ export default function GraficaComparar() {
                 {/* Panel izquierdo */}
                 <div className="flex flex-col items-center gap-4">
                     <PanelInfo sampleData={nivoLineData.last_data} titulo="Últimos Datos" />
+
                     <button
                         id='takeLast'
                         onClick={handleOnExportLast}
-                        className={`
-                            w-[65%] h-10 rounded text-white bg-green-700 hover:bg-green-800`}
+                        disabled={!isConnected}
+                        className={`px-4 py-2 rounded transition
+    ${isConnected ? 'bg-green-600 hover:bg-green-700 text-white' : 'bg-gray-400 text-gray-700 cursor-not-allowed'}`}
                     >
                         Guardar en Excel
                     </button>
+
                 </div>
 
                 {/* Gráfica central */}
@@ -136,8 +139,10 @@ export default function GraficaComparar() {
                     <button
                         id='takeSelected'
                         onClick={handleOnExportaSelect}
-                        className={`
-                            w-[65%] h-10 rounded text-white bg-green-700 hover:bg-green-800`}
+                        disabled={!isConnected}
+                        className={`px-4 py-2 rounded transition
+    ${isConnected ? 'bg-green-600 hover:bg-green-700 text-white' : 'bg-gray-400 text-gray-700 cursor-not-allowed'}`}
+
                     >
                         Guardar en Excel
                     </button>

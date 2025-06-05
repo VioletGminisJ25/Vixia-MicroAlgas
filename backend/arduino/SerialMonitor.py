@@ -17,8 +17,8 @@ load_dotenv()
 
 # Valores de longitud de onda proporcionados
 WAVELENGTHS = [
-    311.93,
-    314.64,
+    # 311.93,
+    # 314.64,
     317.34,
     320.05,
     322.75,
@@ -357,6 +357,9 @@ class SerialMonitor:
         self.in_manual_mode = False
         self.active = True
         self.white_measurement_started = False
+        self.light_med=[]
+        self.dark_med=[]
+        self.counter=0
 
     def start(self):
         """
@@ -483,13 +486,13 @@ class SerialMonitor:
         """
 
         # print(f"\nBuffer actual: {self.buffer}\n")  # Depuración
-
         start_idx = self.buffer.find("h")
         end_idx = self.buffer.find("a", start_idx)
         if start_idx != -1 and end_idx != -1 and end_idx > start_idx:
             if not self.automatic_mode:
                 self.socketio.emit("manual_mode", False)
-            self.automatic_mode = True
+            if self.counter==1:
+                self.automatic_mode = True
         while True:
             start_idx = self.buffer.find("h")
             end_idx = self.buffer.find("a", start_idx)
@@ -522,22 +525,44 @@ class SerialMonitor:
             print(f"Error al convertir datos a números: {e}")
             return
 
+        print("Counter = ", self.counter)
         if self.waiting_for_manual:
-            self.manual_batch.append((espectrometro, temperatura, ph))
-            print(f"Medición manual {len(self.manual_batch)}/10 recibida.")
-            if len(self.manual_batch) == 10:
+            # self.manual_batch.append((espectrometro, temperatura, ph))
+            if self.counter==0:
+                self.dark_med.append((espectrometro, temperatura, ph))
+                print(f"Medición manual en negro{len(self.dark_med)}/10 recibida.")
+            elif self.counter==1:
+                self.light_med.append((espectrometro, temperatura, ph))
+                print(f"Medición manual en blanco{len(self.light_med)}/10 recibida.")
+            if len(self.dark_med) == 10:
+                self.counter = 1
+            if len(self.light_med) == 10 and len(self.dark_med) == 10:
                 timestamp = datetime.now().strftime("%Y-%m-%d %H:%M:%S")
                 self.save_manual_batch(timestamp)
-                self.manual_batch = []
+                self.counter = 0
+                # self.manual_batch = []
+                self.light_med=[]
+                self.dark_med=[]
                 self.waiting_for_manual = False
                 self.manual_name = None
-        else:
-            self.measurement_count += 1
-            self.current_batch.append((espectrometro, temperatura, ph))
-            print(
-                f"Medición automática {self.measurement_count % 10 if self.measurement_count % 10 != 0 else 10}/10 recibida."
-            )
-            if self.measurement_count % 10 == 0:
+        else:#cfes
+            # self.measurement_count += 1
+            # self.current_batch.append((espectrometro, temperatura, ph))
+            if self.counter==0:
+                self.dark_med.append((espectrometro, temperatura, ph))
+                print(
+                    #self.measurement_count % 10 if self.measurement_count % 10 != 0 else 10
+                    f"Medición automática en negro {len(self.dark_med)}/10 recibida."
+                )
+            elif self.counter==1:
+                self.light_med.append((espectrometro, temperatura, ph))
+                print(
+                    #self.measurement_count % 10 if self.measurement_count % 10 != 0 else 10
+                    f"Medición automática en blanco {len(self.light_med)}/10 recibida."
+                )
+            if len(self.dark_med) == 10:
+                self.counter = 1
+            if len(self.light_med)==10 and len(self.dark_med)==10:
                 timestamp = datetime.now().strftime("%Y-%m-%d %H:%M:%S")
                 tipo = (
                     "CALIBRACION DEL BLANCO"
@@ -545,7 +570,9 @@ class SerialMonitor:
                     else "MEDICION"
                 )
                 self.save_batch(timestamp, tipo)
-                self.current_batch = []
+                self.light_med=[]
+                self.dark_med=[]
+                self.counter = 0
                 if self.is_first_measurement:
                     self.is_first_measurement = False
                     print("Calibración del blanco completada.")
@@ -555,21 +582,33 @@ class SerialMonitor:
         Saves the spectrum and temperature/ph data to the database and sends it to the client with websockets.
         """
         # Crear DataFrame para el espectrómetro
-        espectro_data = []
-        for espectrometro, _, _ in self.current_batch:
-            espectro_data.append(espectrometro)
-        espectro_df = pd.DataFrame(espectro_data)
-        espectro_avg = espectro_df.mean(axis=0).values
+        espectro_data_dark = []
+        espectro_data_light = []
+        for espectrometro, _, _ in self.dark_med:
+            espectro_data_dark.append(espectrometro)
+        for espectrometro, _, _ in self.light_med:
+            espectro_data_light.append(espectrometro)
+
+        espectro_data_dark_avg = pd.DataFrame(espectro_data_dark).mean(axis=0).values
+        espectro_data_light_avg = pd.DataFrame(espectro_data_light).mean(axis=0).values
+        espectro_avg = espectro_data_light_avg - espectro_data_dark_avg
+        print(abs(espectro_avg[2]))
+        desplazamiento = min(espectro_avg)
+        espectro_avg = espectro_avg + abs(desplazamiento)
         print(espectro_avg)
 
         # Crear DataFrame para la temperatura
-        temp_data = [temp for _, temp, _ in self.current_batch]
+        temp_data_dark = [temp for _, temp, _ in self.dark_med]
+        temp_data_light = [temp for _, temp, _ in self.light_med]
+        temp_data = temp_data_light + temp_data_dark
         temp_df = pd.DataFrame(temp_data, columns=["Temperatura"])
         temp_avg = temp_df.mean().values[0]
         print(temp_avg)
 
         # Crear DataFrame para el pH
-        ph_data = [ph for _, _, ph in self.current_batch]
+        ph_data_dark = [ph for _, _, ph in self.dark_med]
+        ph_data_light = [ph for _, _, ph in self.light_med]
+        ph_data = ph_data_light + ph_data_dark
         ph_df = pd.DataFrame(ph_data, columns=["pH"])
         ph_avg = ph_df.mean().values[0]
         print(ph_avg)
@@ -593,7 +632,7 @@ class SerialMonitor:
                         self.queries.get_reference_wavelength_white(),
                     ),
                     "data": {"ph": float(ph_avg), "temperature": float(temp_avg)},
-                    "wave_length": espectro_avg.tolist(),
+                    "wave_length": espectro_avg.tolist()[2:],
                     "x": WAVELENGTHS,
                     "nc": calculate_nc(espectro_avg.tolist()),
                 },
@@ -613,21 +652,45 @@ class SerialMonitor:
         self.socketio.emit("wake_up_state", self.active)
 
         # Crear DataFrame para el espectrómetro
-        espectro_data = []
-        for espectrometro, _, _ in self.manual_batch:
-            espectro_data.append(espectrometro)
-        espectro_df = pd.DataFrame(espectro_data)
-        espectro_avg = espectro_df.mean(axis=0).values
+        espectro_data_dark = []
+        espectro_data_light = []
+        for espectrometro, _, _ in self.dark_med:
+            espectro_data_dark.append(espectrometro)
+        for espectrometro, _, _ in self.light_med:
+            espectro_data_light.append(espectrometro)
+
+        espectro_data_dark_avg = pd.DataFrame(espectro_data_dark).mean(axis=0).values
+        espectro_data_light_avg = pd.DataFrame(espectro_data_light).mean(axis=0).values
+        espectro_avg = espectro_data_light_avg - espectro_data_dark_avg
+        desplazamiento = abs(min(espectro_avg))
+        print(desplazamiento)
+        espectro_avg = espectro_avg + abs(desplazamiento)
+        # for i in range(len(espectro_avg)):
+        # # Si es el segundo elemento, lo dejamos como está o aplicamos una lógica diferente
+        #     if espectro_avg[i] < 0:
+        #         espectro_avg[i] = espectro_avg[i] + desplazamiento
+        #     # elif espectro_avg[i] > 0:
+            #     espectro_avg[i] = espectro_avg[i] - desplazamiento
+
+
+        print(espectro_avg)
 
         # Crear DataFrame para la temperatura
-        temp_data = [temp for _, temp, _ in self.manual_batch]
+        temp_data_dark = [temp for _, temp, _ in self.dark_med]
+        temp_data_light = [temp for _, temp, _ in self.light_med]
+        temp_data = temp_data_light + temp_data_dark
         temp_df = pd.DataFrame(temp_data, columns=["Temperatura"])
         temp_avg = temp_df.mean().values[0]
+        print(temp_avg)
 
         # Crear DataFrame para el pH
-        ph_data = [ph for _, _, ph in self.manual_batch]
+        ph_data_dark = [ph for _, _, ph in self.dark_med]
+        ph_data_light = [ph for _, _, ph in self.light_med]
+        ph_data = ph_data_light + ph_data_dark
         ph_df = pd.DataFrame(ph_data, columns=["pH"])
         ph_avg = ph_df.mean().values[0]
+        print(ph_avg)
+
 
         datetime_med = datetime.now().strftime("%Y-%m-%d %H:%M:%S")
         data = {
@@ -636,7 +699,8 @@ class SerialMonitor:
             "temperature": temp_avg,
             "ph": ph_avg,
         }
-
+        print( "Automatc mode = ", self.automatic_mode)
+        wave =espectro_avg.tolist()
         if self.automatic_mode:
             self.socketio.emit(
                 "arduino_data",
@@ -648,7 +712,7 @@ class SerialMonitor:
                         self.queries.get_reference_wavelength_white(),
                     ),
                     "data": {"ph": float(ph_avg), "temperature": float(temp_avg)},
-                    "wave_length": espectro_avg.tolist(),
+                    "wave_length": espectro_avg.tolist()[2:],
                     "x": WAVELENGTHS,
                     "nc": calculate_nc(espectro_avg.tolist()),
                 },
@@ -700,7 +764,7 @@ def calculate_nc(wave_length):
         # 26.83 * math.pow(wave_length[WAVELENGTHS.index(638.42)], 2)
         # - 47448 * wave_length[WAVELENGTHS.index(638.42)]
         # + 2 * math.pow(10, 7)
-        (5 * math.pow(10, 7))
+        (16.213 * math.pow(10, 6))
         * math.exp(-0.005 * wave_length[WAVELENGTHS.index(638.42)])
     )
 
