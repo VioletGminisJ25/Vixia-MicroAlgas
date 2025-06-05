@@ -30,7 +30,6 @@ export default function useWebSocketLastData(
     const [isManual, setManual] = useState<boolean | null>(null);
     const [isWake, setWake] = useState<boolean | null>(null);
     const [error, setError] = useState<Error | null>(null);
-
     const socketRef = useRef<Socket | null>(null);
 
     const connect = useCallback(() => {

@@ -12,8 +12,8 @@ interface NivoLineProps {
 }
 
 export default function NivoLine({ arduino_data: data }: NivoLineProps) {
-    
-    
+
+
     console.log(data)
     const serie = []
     if (data != null) {
@@ -37,6 +37,28 @@ export default function NivoLine({ arduino_data: data }: NivoLineProps) {
     }
     return (<div className="w-full h-full p-4"> {/* altura fija */}
         <ResponsiveLine
+            markers={
+                data?.x
+                    ? [
+                        {
+                            axis: 'x',
+                            value: data.x.findIndex((v) => v === 638.42) + 1, // +1 porque tus x empiezan en 1
+                            lineStyle: {
+                                stroke: '#e63946',
+                                strokeWidth: 2,
+                                strokeDasharray: '6 6',
+                            },
+                            legend: '638.42',
+                            legendPosition: 'top',
+                            textStyle: {
+                                fill: '#e63946',
+                                fontSize: 12,
+                                fontWeight: 600,
+                            },
+                        },
+                    ]
+                    : []
+            }
             data={serie}
             margin={{ top: 30, right: 25, bottom: 25, left: 35 }}
             xScale={{ type: 'linear', min: 'auto', max: 'auto' }}
@@ -83,11 +105,11 @@ export default function NivoLine({ arduino_data: data }: NivoLineProps) {
                         borderRadius: '4px',
                     }}
                 >
-                    <strong>{"valor"}:</strong> {point.data.yFormatted}<br></br>
+                    <strong>{"valor"}:</strong> {Math.round(point.data.y * 100) / 100}<br></br>
                     <strong>Rango Espectro:</strong> {data?.x && data.x[point.data.x - 1] !== undefined ? data.x[point.data.x - 1] : 'N/A'}<br></br>
                 </div>
             )}
-           
+
         />
     </div>)
 }

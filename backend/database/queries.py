@@ -29,8 +29,8 @@ from sqlalchemy import func
 load_dotenv()
 
 WAVELENGTHS = [
-    311.93,
-    314.64,
+    # 311.93,
+    # 314.64,
     317.34,
     320.05,
     322.75,
@@ -518,7 +518,7 @@ class DataQueries:
             )
 
             # Extraer solo los valores de la lista de tuplas [(valor,), (valor,), ...]
-            selected_data["wave_length"] = [item[0] for item in wavelength_results]
+            selected_data["wave_length"] = [item[0] for item in wavelength_results[2:]]
             selected_data["nc"] = calculate_nc(selected_data["wave_length"])
             selected_data["datetime"] = str(fecha_dt)
 
@@ -852,7 +852,7 @@ class DataQueries:
                     self.get_reference_wavelength_white(),
                 ),
                 "data": {"temperature": result.temperature, "ph": result.ph},
-                "wave_length": [item[0] for item in result_wavelength],
+                "wave_length": [item[0] for item in result_wavelength[2:]],
                 "x": WAVELENGTHS,
                 "nc": nc,
             }
@@ -1170,6 +1170,8 @@ class DataQueries:
                 f"Error al exportar datos a Excel: {e}", exc_info=True
             )
             abort(500, description=f"Error interno al exportar datos: {e}")
+    
+
 
     def get_proc_name(self):
         try:
@@ -1295,15 +1297,10 @@ def calculate_nc(wave_length, value=None):
     Calcula el número de componentes de una onda.
     """
     if wave_length is None or len(wave_length) == 0:
-        result = round((5 * math.pow(10, 7)) * math.exp(-0.005 * value))
+        result = round((16.213 * math.pow(10, 6))* math.exp(-0.005 * wave_length[WAVELENGTHS.index(638.42)]))
     else:
         result = round(
-            # math.pow(wave_length[WAVELENGTHS.index(541.22)], -2.28) * math.pow(10, 12), 2
-            # 26.83 * math.pow(wave_length[WAVELENGTHS.index(638.42)], 2)
-            # - 47448 * wave_length[WAVELENGTHS.index(638.42)]
-            # + 2 * math.pow(10, 7)
-            (5 * math.pow(10, 7))
-            * math.exp(-0.005 * wave_length[WAVELENGTHS.index(638.42)])
+            (16.213 * math.pow(10, 6)) * math.exp(-0.005 * wave_length[WAVELENGTHS.index(638.42)])
         )
     return result
 

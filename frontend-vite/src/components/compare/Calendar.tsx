@@ -52,7 +52,7 @@ export default function Calendar({ setDatos, setData }: CalendarProps) {
       setHoursOptions(data);
     }).catch(error => {
       console.error('Error al conectar con el servidor:', error);
-      setErrorHours('No se pudo conectar con el servidor. Por favor, verifica tu conexión a internet.');
+      setErrorHours('No se pudo conectar con el servidor.');
       toast.error('Error de conexion con el servidor', {});
     }).finally(() => {
       setLoadingHours(false);
@@ -134,8 +134,6 @@ export default function Calendar({ setDatos, setData }: CalendarProps) {
 
       {loadingHours ? (
         <Loader />
-      ) : errorHours ? (
-        <span className="text-red-600">{errorHours}</span>
       ) : (
         <select
           onChange={handleHour}
@@ -143,7 +141,7 @@ export default function Calendar({ setDatos, setData }: CalendarProps) {
           disabled={hoursOptions.length === 0}
           className=" bg-white dark:bg-[#1d1f21] text-black dark:text-white border dark:border-white border-black rounded px-2 py-2 text-sm text-center"
         >
-          <option value="">Selecciona una hora</option>
+          <option value="">{errorHours ?? 'Selecciona una hora'}</option>
           {hoursOptions.map((h) => (
             <option key={h} value={h}>
               {h}

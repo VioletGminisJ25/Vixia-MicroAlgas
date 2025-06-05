@@ -75,17 +75,17 @@ async def async_measurement_config_send(
     values[4] = data.get("light_red")
     values[5] = data.get("light_blue")
     if manual:
-        await asyncio.sleep(30)
+        await asyncio.sleep(60)
     await asyncio.sleep(5)
 
     monitor.send_command("aa")
     print(f"\n{Fore.RED}Enviando: aa\n")
-    await asyncio.sleep(22)
+    await asyncio.sleep(44)
 
     if reboot:
         monitor.send_command("aa")
         print(f"\n{Fore.RED}Enviando: aa\n")
-        await asyncio.sleep(22)
+        await asyncio.sleep(44)
 
     monitor.white_measurement_started = False
     # websockets.socketio_intance.socketio.emit("manual_mode", "False")
