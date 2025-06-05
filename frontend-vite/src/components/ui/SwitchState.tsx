@@ -1,10 +1,19 @@
+import React from 'react';
 import styled from 'styled-components';
 
-const Switch = () => {
+interface SwitchProps {
+  checked: boolean | null;
+  onChange: (event: React.ChangeEvent<HTMLInputElement>) => void;
+}
+
+const Switch: React.FC<SwitchProps> = ({ checked, onChange }) => {
   return (
     <StyledWrapper>
+      <span className="text-sm text-black dark:text-white mr-6">
+        {checked ? 'Encendido' : 'Apagado'}
+      </span>
       <label className="switch">
-        <input type="checkbox" />
+        <input type="checkbox" checked={checked ?? false} onChange={onChange} />
         <span className="slider" />
       </label>
     </StyledWrapper>
@@ -67,8 +76,9 @@ const StyledWrapper = styled.div`
     background-color: rgb(255, 255, 255);
   }
 
-  .switch input:checked + .slider:before{
-    background-color: rgb(255, 255, 255) !important;
-  }`;
+.switch input:checked + .slider:before {
+    transform: translateX(1.5em);
+    box-shadow: inset 15px -4px 0px 15px #ffffff !important;
+}`;
 
 export default Switch;

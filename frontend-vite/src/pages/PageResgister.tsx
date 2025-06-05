@@ -153,7 +153,7 @@ export default function RegisterPage() {
             </form>
             {/* ToastContainer para mostrar las notificaciones */}
             <ToastContainer
-                position="top-right"
+                position="bottom-right"
                 autoClose={5000}
                 hideProgressBar={false}
                 newestOnTop={false}
