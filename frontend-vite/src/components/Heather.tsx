@@ -25,32 +25,33 @@ export default function Heather({
     return (<header className="h-[10dvh] bg-white shadow-lg px-6 flex justify-between items-center dark:bg-[#0f1011] dark:shadow-lg/100">
         <div className="text-2xl font-bold bg-gradient-to-r from-green-700 to-green-400 text-transparent bg-clip-text">{texto}</div>
 
-        <div className="relative flex items-center">
-            <span
-                className={`w-3 h-3 rounded-full ${isConnected
-                        ? 'bg-green-500 animate-pulse'
-                        : 'bg-red-500 animate-ping'
-                    }`}
-            ></span>
-            {!isConnected && (
-                <svg
-                    xmlns="http://www.w3.org/2000/svg"
-                    className="w-3 h-3 text-red-500 absolute -right-2 -top-2"
-                    fill="currentColor"
-                    viewBox="0 0 20 20"
-                >
-                    <path
-                        fillRule="evenodd"
-                        d="M8.257 3.099c.366-.446.957-.446 1.323 0l6.518 7.938c.329.4.05.963-.462.963H2.201c-.512 0-.791-.563-.462-.963l6.518-7.938zM11 13a1 1 0 10-2 0 1 1 0 002 0zm-1-2a.75.75 0 01-.75-.75v-2.5a.75.75 0 011.5 0v2.5A.75.75 0 0110 11z"
-                        clipRule="evenodd"
-                    />
-                </svg>
-            )}
-        </div>
+
 
 
         <nav className="space-x-10 flex items-center">
             <div className="flex items-center gap-10 text-black dark:text-white">
+                <div className="relative flex items-center">
+                    <span
+                        className={`w-3 h-3 rounded-full ${isConnected
+                            ? 'bg-green-500 animate-ping'
+                            : 'bg-red-500 animate-ping'
+                            }`}
+                    ></span>
+                    {!isConnected && (
+                        <svg
+                            xmlns="http://www.w3.org/2000/svg"
+                            className="w-3 h-3 text-red-500 absolute -right-2 -top-2"
+                            fill="currentColor"
+                            viewBox="0 0 20 20"
+                        >
+                            <path
+                                fillRule="evenodd"
+                                d="M8.257 3.099c.366-.446.957-.446 1.323 0l6.518 7.938c.329.4.05.963-.462.963H2.201c-.512 0-.791-.563-.462-.963l6.518-7.938zM11 13a1 1 0 10-2 0 1 1 0 002 0zm-1-2a.75.75 0 01-.75-.75v-2.5a.75.75 0 011.5 0v2.5A.75.75 0 0110 11z"
+                                clipRule="evenodd"
+                            />
+                        </svg>
+                    )}
+                </div>
                 {
                     showCompare && (
                         <Link to="/comparacion">

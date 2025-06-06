@@ -36,7 +36,7 @@ export default function NivoLine({ arduino_data: data }: NivoLineProps) {
     if (serie.length == 0) {
         return (<div className="w-full h-full p-4"> {/* altura fija */}
             <div className="flex flex-col items-center justify-center h-full w-full">
-                <p className="text-center text-black dark:text-white">No hay datos para mostrar</p>
+                <p className="text-center text-red-500">No hay datos para mostrar</p>
             </div>
         </div>)
     }

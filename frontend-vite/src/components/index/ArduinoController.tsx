@@ -201,13 +201,16 @@ const ArduinoController: React.FC<BotonesEstadosProps> = ({ isManual, isWake, da
             {/* Clase para el título y un margen inferior */}
             <div className="flex flex-col justify-center items-center w-full h-full gap-4">
                 <div
-                    className="flex flex-row justify-center items-center w-full
-                    text-black dark:text-white"
+                    className={`
+    flex flex-row justify-center items-center
+    w-[75%] h-12 rounded
+    text-black dark:text-white
+    bg-white dark:bg-[#1d1f21]
+    transition-colors duration-200 ease-in-out
+  `}
                 >
                     <SwitchState checked={isWake} onChange={handleRecibirMuestras} isConnected={isConnected} />
-
                 </div>
-
                 <div
                     className="flex flex-row justify-center items-center w-full
                              text-black dark:text-white"
@@ -230,6 +233,7 @@ const ArduinoController: React.FC<BotonesEstadosProps> = ({ isManual, isWake, da
                         Tomar muestra manual
                     </button>
                 </div>
+
                 <div
                     className="flex flex-row justify-center items-center w-full
                              text-black dark:text-white"
@@ -391,7 +395,7 @@ const ArduinoController: React.FC<BotonesEstadosProps> = ({ isManual, isWake, da
 
                 {/* Contenedor del Select y el Botón de Descarga */}
                 <div
-                    className="flex flex-row justify-center items-center w-full gap-2
+                    className="flex flex-row justify-center items-center w-[75%] gap-2
                              text-black dark:text-white"
                 >
                     <select
@@ -400,7 +404,7 @@ const ArduinoController: React.FC<BotonesEstadosProps> = ({ isManual, isWake, da
                         onChange={(e) => setSelectedSensor(e.target.value)}
                         id="sensor-select"
                         className={`
-                                 w-[55%] h-12 rounded
+                                 w-full h-12 rounded
                                  transition-colors duration-200 ease-in-out
                                  ${isConnected
                                 ? `bg-white dark:bg-[#1d1f21] text-black dark:text-white
@@ -426,7 +430,7 @@ const ArduinoController: React.FC<BotonesEstadosProps> = ({ isManual, isWake, da
                         onClick={handleOnExport}
                         value={selectedSensor}
                         className={`
-                        w-[20%] h-12 rounded
+                        w-[40%] h-12 rounded
                         flex justify-center items-center
                         transition-colors duration-200 ease-in-out
                         ${isConnected
