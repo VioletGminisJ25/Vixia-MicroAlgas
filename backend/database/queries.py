@@ -1139,7 +1139,7 @@ class DataQueries:
 
                     df = pd.DataFrame(data_for_df[2:])
                     if sheet_name in ["WaveLength_Data", "WaveLength_White"]:
-                        df["WAVELENGTHS"] = WAVELENGTHS[: len(df)]
+                        df["WAVELENGTHS"] = WAVELENGTHS[:len(df)]
                     if sheet_name == "Sensor_Data":
                         wave_length_values = (
                             self.session.query(WaveLength.value)
@@ -1171,7 +1171,126 @@ class DataQueries:
             )
             abort(500, description=f"Error interno al exportar datos: {e}")
     
+    def export_process_to_excel(self, process_name):
+        """
+        Exporta los datos de un proceso específico a un archivo Excel.
 
+        Args:
+            process_name (str): El nombre del proceso para el cual se exportarán los datos.
+
+        Returns:
+            file: Archivo Excel con los datos del proceso exportados.
+        """
+        try:
+            # Obtener los datos del proceso utilizando tu función get_proc
+            data, status = self.get_proc(process_name)
+
+            if status != 200:
+                print(f"Error al obtener los datos del proceso: {data.get('message', 'Mensaje desconocido')}")
+                self.session.rollback() # Asegura el rollback si get_proc falla
+                return None
+
+            excel_buffer = io.BytesIO()
+            with pd.ExcelWriter(excel_buffer, engine="openpyxl") as writer:
+                # --- 1. Exportar datos DIRECTAMENTE de la salida de get_proc ---
+
+                # Hoja para datos de pH
+                if data["sensors"][0]["data"]:
+                    df_ph = pd.DataFrame(data["sensors"][0]["data"])
+                    # 'x' es el datetime en formato ISO, convertir a datetime de Pandas
+                    df_ph['x'] = pd.to_datetime(df_ph['x'])
+                    df_ph.rename(columns={'x': 'Fecha_Hora', 'y': 'pH'}, inplace=True)
+                    df_ph.to_excel(writer, sheet_name="Datos_pH", index=False)
+                    print("Exportando hoja: Datos_pH")
+                else:
+                    print("No hay datos de pH para exportar.")
+
+                # Hoja para datos de Temperatura
+                if data["sensors"][1]["data"]:
+                    df_temp = pd.DataFrame(data["sensors"][1]["data"])
+                    df_temp['x'] = pd.to_datetime(df_temp['x'])
+                    df_temp.rename(columns={'x': 'Fecha_Hora', 'y': 'Temperatura'}, inplace=True)
+                    df_temp.to_excel(writer, sheet_name="Datos_Temperatura", index=False)
+                    print("Exportando hoja: Datos_Temperatura")
+                else:
+                    print("No hay datos de Temperatura para exportar.")
+
+                # Hoja para datos de NC vs. Tiempo
+                if data["nc_time"]["data"]:
+                    df_nc_time = pd.DataFrame(data["nc_time"]["data"])
+                    df_nc_time['x'] = pd.to_datetime(df_nc_time['x'])
+                    df_nc_time.rename(columns={'x': 'Fecha_Hora', 'y': 'Valor_NC'}, inplace=True)
+                    df_nc_time.to_excel(writer, sheet_name="NC_vs_Tiempo", index=False)
+                    print("Exportando hoja: NC_vs_Tiempo")
+                else:
+                    print("No hay datos de NC vs. Tiempo para exportar.")
+
+                # Hoja para datos de NC vs. Valor de Longitud de Onda
+                if data["nc_value"]["data"]:
+                    df_nc_value = pd.DataFrame(data["nc_value"]["data"])
+                    # Aquí 'x' es el valor de la longitud de onda, 'y' es el valor NC
+                    df_nc_value.rename(columns={'x': 'Longitud_Onda', 'y': 'Valor_NC'}, inplace=True)
+                    df_nc_value.to_excel(writer, sheet_name="NC_vs_Longitud_Onda", index=False)
+                    print("Exportando hoja: NC_vs_Longitud_Onda")
+                else:
+                    print("No hay datos de NC vs. Longitud de Onda para exportar.")
+
+                # --- 2. Determinar el rango de fechas del proceso ---
+                # Usamos el primer y último 'datetime' de los datos de pH como referencia
+                start_date = None
+                end_date = None
+                if data["sensors"][0]["data"]:
+                    # Asegurarse de que hay al menos un elemento para obtener las fechas
+                    start_date = pd.to_datetime(data["sensors"][0]["data"][0]['x'])
+                    end_date = pd.to_datetime(data["sensors"][0]["data"][-1]['x'])
+                
+                if not start_date or not end_date:
+                    print("Advertencia: No se pudieron determinar las fechas de inicio/fin del proceso para filtrar otros modelos (WaveLength_White, Configuracion). Estos modelos no serán exportados.")
+                else:
+                    # --- 3. Exportar otros modelos que no están en la salida directa de get_proc ---
+                    # Asumo que tus modelos tienen una columna 'datetime' para el filtrado.
+                    # Ajusta 'datetime_col' si el nombre de tu columna de fecha/hora es diferente.
+                    other_models_to_export = {
+                        "WaveLength_White_Datos": {"model": WaveLength_White, "datetime_col": "datetime"},
+                        "Configuracion_Datos": {"model": Config, "datetime_col": "datetime"},
+                    }
+
+                    for sheet_name, model_info in other_models_to_export.items():
+                        Model = model_info["model"]
+                        datetime_column_name = model_info["datetime_col"]
+                        
+                        print(f"Exportando tabla: {sheet_name} (filtrado por rango de fechas)")
+                        
+                        try:
+                            # Realiza la consulta a la base de datos usando el rango de fechas
+                            # Importante: getattr(Model, datetime_column_name) permite usar el nombre de la columna dinámicamente
+                            query = self.session.query(Model).filter(
+                                getattr(Model, datetime_column_name) >= start_date,
+                                getattr(Model, datetime_column_name) <= end_date
+                            )
+                            
+                            # Convertir los resultados de la consulta a un DataFrame de Pandas
+                            # Si tu 'session.bind' no funciona con pd.read_sql, es posible que necesites
+                            # primero convertir los resultados de la query a una lista de diccionarios/objetos
+                            # y luego a DataFrame, por ejemplo:
+                            # df = pd.DataFrame([row.__dict__ for row in query.all()])
+                            df = pd.read_sql(query.statement, self.session.bind)
+                            
+                            if not df.empty:
+                                df.to_excel(writer, sheet_name=sheet_name, index=False)
+                            else:
+                                print(f"No hay datos para la tabla: {sheet_name} en el rango de fechas.")
+                        except Exception as query_error:
+                            print(f"Error al consultar o exportar la tabla {sheet_name}: {query_error}")
+                            # No hacemos rollback aquí para no afectar las exportaciones anteriores.
+
+            excel_buffer.seek(0)  # Rebobina el búfer al principio
+            return excel_buffer
+
+        except Exception as e:
+            print(f"Error general en la exportación a Excel: {e}")
+            self.session.rollback()
+            return None
 
     def get_proc_name(self):
         try:

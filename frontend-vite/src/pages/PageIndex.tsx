@@ -5,9 +5,17 @@ import { ToastContainer } from 'react-toastify';
 
 import WebSocket from '../hooks/WebSockect_lasData'
 import { useState, useEffect } from 'react';
+import type { LightsState, SampleData } from '../interface/Global_Interface';
 
-export default function GraficoLongitudDeOndaPage() {
-    const { data, isManual, isWake, lightsState } = WebSocket(import.meta.env.VITE_API_URL)
+interface IndexProps {
+    data: SampleData | null;
+    isManual: boolean | null;
+    isWake: boolean | null;
+    lightsState: LightsState | null;
+    isConnected: boolean;
+}
+export default function PageIndex({ data, isManual, isWake, lightsState, isConnected }: IndexProps) {
+    //const { data, isManual, isWake, lightsState, isConnected } = WebSocket(import.meta.env.VITE_API_URL)
     const [name, setName] = useState<string>('')
 
     useEffect(() => {
@@ -73,22 +81,10 @@ export default function GraficoLongitudDeOndaPage() {
                     <div className="flex items-center justify-center h-full w-[60%] bg-white p-4 rounded-lg shadow-md mr-10 ml-10">
                         <Nivo_ResponsiveLine arduino_data={data} />
                     </div>
-                    <ArduinoController isManual={isManual} isWake={isWake} datetime={data?.datetime ?? null} />
+                    <ArduinoController isManual={isManual} isWake={isWake} datetime={data?.datetime ?? null} isConnected={isConnected} />
                 </div>
 
-                <ToastContainer
-                    position="bottom-right"
-                    autoClose={2000}
-                    limit={3}
-                    hideProgressBar={false}
-                    newestOnTop={true}
-                    closeOnClick={false}
-                    rtl={false}
-                    pauseOnFocusLoss
-                    draggable
-                    pauseOnHover
-                    theme={localStorage.getItem('theme') === 'dark' ? 'dark' : 'light'}
-                />
+               
             </div>
         </div >
     );

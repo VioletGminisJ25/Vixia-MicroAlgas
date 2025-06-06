@@ -1,5 +1,5 @@
 import { useState } from 'react';
-import type { CompareData } from '../../interface/Global_Interface';
+import type { CompareData, LightsState, SampleData } from '../../interface/Global_Interface';
 import DatePickerWithData from './Calendar'
 import Nivo_ResponsiveLine_compare from './Nivo_ResponsiveLine_compare'
 import useWebSocketLastData from '../../hooks/WebSockect_lasData';
@@ -10,12 +10,15 @@ import PanelInfo from './PanelInfo';
 /// la fecha se selecciona en el componente DatePickerWithData y se pasa al componente SelectedData mediante props
 /// 'lastCurrentData' es el componente que muestra la fecha más reciente de los datos obtenidos por el WebSocket, en tiempo real
 /// Se utiliza el hook useWebSocket_lastData para obtener los datos del WebSocket.
-
-export default function GraficaComparar() {
+interface ComprareProps {
+    datosWebSocket: SampleData | null;
+    isConnected: boolean;
+}
+export default function GraficaComparar({ datosWebSocket, isConnected }: ComprareProps) {
     // Estado para almacenar los datos seleccionados por el usuario
     const [datos, setDatos] = useState<CompareData | null>(null);
     const [data, setData] = useState<string | null>(null);
-    const { data: datosWebSocket, isConnected } = useWebSocketLastData(import.meta.env.VITE_API_URL);
+
 
     const nivoLineData: CompareData = {
         last_data: datosWebSocket ?? null, // Asumiendo que datosWebSocket tiene la misma estructura que SampleData
@@ -26,7 +29,7 @@ export default function GraficaComparar() {
         // Construye la URL con el query parameter
         // Asumo que tu VITE_SAVE_EXPORT es algo como "http://localhost:5000/api/save_export"
         const baseUrl = import.meta.env.VITE_SAVE_EXPORT;
-        const urlWithQuery = `${baseUrl}?fecha=${data}`; // Añade ?parametro=valor
+        const urlWithQuery = `${baseUrl}?fecha=${encodeURIComponent(data ?? "")}`; // Añade ?parametro=valor
         console.log(urlWithQuery);
 
         toast.promise(
@@ -59,18 +62,17 @@ export default function GraficaComparar() {
     }
 
     const handleOnExportLast = () => {
+        console.log("exportando ultimos datos");
         const now = new Date();
 
         // Formato YYYY-MM-DDTHH:mm:ss en hora local
         const pad = (n: number) => n.toString().padStart(2, '0');
         const formattedDate = `${now.getFullYear()}-${pad(now.getMonth() + 1)}-${pad(now.getDate())}T${pad(now.getHours())}:${pad(now.getMinutes())}:${pad(now.getSeconds())}`;
-
-        console.log(formattedDate);
-
         const encodedDate = encodeURIComponent(formattedDate);
         const baseUrl = import.meta.env.VITE_SAVE_EXPORT;
         const urlWithQuery = `${baseUrl}?fecha=${encodedDate}`;
 
+        console.log("->" + urlWithQuery);
         toast.promise(
             fetch(urlWithQuery, { method: "GET" })
                 .then((response) => {
@@ -136,16 +138,18 @@ export default function GraficaComparar() {
                 {/* Panel derecho con botón debajo */}
                 <div className="flex flex-col items-center gap-4">
                     <PanelInfo sampleData={nivoLineData.selected_data} titulo="Datos Seleccionados" />
-                    <button
-                        id='takeSelected'
-                        onClick={handleOnExportaSelect}
-                        disabled={!isConnected}
-                        className={`px-4 py-2 rounded transition
+                    {nivoLineData.selected_data?.datetime && (
+                        <button
+                            id='takeSelected'
+                            onClick={handleOnExportaSelect}
+                            disabled={!isConnected}
+                            className={`px-4 py-2 rounded transition
     ${isConnected ? 'bg-green-600 hover:bg-green-700 text-white' : 'bg-gray-400 text-gray-700 cursor-not-allowed'}`}
 
-                    >
-                        Guardar en Excel
-                    </button>
+                        >
+                            Guardar en Excel
+                        </button>
+                    )}
                 </div>
             </div>
 

@@ -1,6 +1,5 @@
 import { useEffect, useState } from 'react';
-import { ToastContainer } from "react-toastify";
-import 'react-toastify/dist/ReactToastify.css'; // Make sure to import toastify styles
+import 'react-toastify/dist/ReactToastify.css';
 import NivoLine2 from '../components/sensores/Nivo_ResponsiveLine_Sensores2';
 import ScatterPlot from '../components/sensores/Nivo_ScatterPlot';
 import type { SensorData, NivoLineData, Sensor } from '../interface/Global_Interface';
@@ -8,8 +7,8 @@ import type { SensorData, NivoLineData, Sensor } from '../interface/Global_Inter
 export default function PageSensores() {
     const [sensorNames, setSensorNames] = useState<string[]>([]);
     const [selectedSensor, setSelectedSensor] = useState<string>('');
-    const [ncTime, setNcTime] = useState<NivoLineData | null>(null); // Initialize with null
-    const [ncValue, setNcValue] = useState<NivoLineData | null>(null); // Initialize with null
+    const [ncTime, setNcTime] = useState<NivoLineData | null>(null);
+    const [ncValue, setNcValue] = useState<NivoLineData | null>(null);
     const [sensor, setsensor] = useState<Sensor | null>(null);
 
     useEffect(() => {
@@ -87,23 +86,8 @@ export default function PageSensores() {
                 <div className='h-[400px] bg-slate-100 rounded-lg'>{ncValue && <ScatterPlot data={ncValue} />}</div>
                 <div className='h-[400px] bg-slate-100 rounded-lg'> {ncTime && <NivoLine2 data={ncTime} />}</div>
                 <div className='h-[400px] bg-slate-100 rounded-lg'> {sensor && <NivoLine2 data={sensor[0]} />}</div>
-                  <div className='h-[400px] bg-slate-100 rounded-lg'> {sensor && <NivoLine2 data={sensor[1]} />}</div>
+                <div className='h-[400px] bg-slate-100 rounded-lg'> {sensor && <NivoLine2 data={sensor[1]} />}</div>
             </div>
-
-
-            <ToastContainer
-                position="bottom-right"
-                autoClose={2000}
-                limit={3}
-                hideProgressBar={false}
-                newestOnTop={true}
-                closeOnClick={false}
-                rtl={false}
-                pauseOnFocusLoss
-                draggable
-                pauseOnHover
-                theme={localStorage.getItem('theme') === 'dark' ? 'dark' : 'light'}
-            />
         </div >
     );
 }

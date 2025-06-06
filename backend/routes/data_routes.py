@@ -144,3 +144,14 @@ def export_route():
 
     # Pasa el datetime a tu función de exportación
     return queries.export_all_data_to_excel(fecha_obj)
+
+
+@data_routes.route("/export/proc", methods=["GET"])
+def export_process_route():
+    name = request.args.get("name")  # Lee el parámetro `fecha` de la URL
+
+    if not name:
+        abort(400, description="Falta el parámetro 'fecha' en la URL.")
+
+    # Pasa el datetime a tu función de exportación
+    return queries.export_all_data_to_excel(name)
