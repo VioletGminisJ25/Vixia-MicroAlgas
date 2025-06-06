@@ -1,5 +1,5 @@
 // src/App.tsx
-
+import WebSocket from './hooks/WebSockect_lasData'
 import { Routes, Route, useLocation } from 'react-router-dom';
 import Heather from './components/Heather';
 
@@ -9,11 +9,14 @@ import PageNotFound from './pages/404';
 import Login from './pages/PageLogin';
 import Register from './pages/PageResgister'
 import Sensores from './pages/PageSensores';
+import { ToastContainer } from 'react-toastify';
 
 
 function App() {
+  const { data, isManual, isWake, lightsState, isConnected } = WebSocket(import.meta.env.VITE_API_URL)
+
   const location = useLocation();
-  
+
 
   // useEffect(() => {
   //   const url = import.meta.env.VITE_CHECK_AUTH;
@@ -38,6 +41,7 @@ function App() {
     showBack: true,
     showPh: true,
     showTemp: true,
+    isConnected: isConnected
   };
 
   switch (location.pathname) {
@@ -50,6 +54,7 @@ function App() {
         showBack: false,
         showPh: true,
         showTemp: true,
+        isConnected: isConnected
       };
       break;
     case '/comparacion':
@@ -61,6 +66,7 @@ function App() {
         showBack: true,
         showPh: true,
         showTemp: true,
+        isConnected: isConnected
       };
       break;
     case '/ph':
@@ -72,6 +78,7 @@ function App() {
         showBack: true,
         showPh: false,
         showTemp: true,
+        isConnected: isConnected
       };
       break;
     case '/temperature':
@@ -83,6 +90,7 @@ function App() {
         showBack: true,
         showPh: true,
         showTemp: false,
+        isConnected: isConnected
       };
       break;
     case '/login':
@@ -94,6 +102,7 @@ function App() {
         showBack: false,
         showPh: false,
         showTemp: false,
+        isConnected: isConnected
       };
       break;
     case '/register':
@@ -105,6 +114,7 @@ function App() {
         showBack: false,
         showPh: false,
         showTemp: false,
+        isConnected: isConnected
       };
       break;
     case '/sensores':
@@ -116,6 +126,7 @@ function App() {
         showBack: true,
         showPh: true,
         showTemp: true,
+        isConnected: isConnected
       };
       break;
 
@@ -134,6 +145,7 @@ function App() {
         showBack: false,
         showPh: false,
         showTemp: false,
+        isConnected: isConnected
       };
       break;
   }
@@ -146,11 +158,11 @@ function App() {
         <Route path='/register' element={<Register />} />
 
         <Route path='/' element={
-          <Index />
+          <Index data={data} isManual={isManual} isWake={isWake} lightsState={lightsState} isConnected={isConnected} />
 
         } />
         <Route path='/comparacion' element={
-          <Compare />
+          <Compare datosWebSocket={data} isConnected={isConnected} />
         } />
         <Route path='/sensores' element={
           <Sensores />
@@ -159,6 +171,20 @@ function App() {
           <PageNotFound />
         } />
       </Routes>
+
+      <ToastContainer
+        position="bottom-right"
+        autoClose={2000}
+        limit={3}
+        hideProgressBar={false}
+        newestOnTop={true}
+        closeOnClick={false}
+        rtl={false}
+        pauseOnFocusLoss
+        draggable
+        pauseOnHover
+        theme={localStorage.getItem('theme') === 'dark' ? 'dark' : 'light'}
+      />
     </>
   );
 }

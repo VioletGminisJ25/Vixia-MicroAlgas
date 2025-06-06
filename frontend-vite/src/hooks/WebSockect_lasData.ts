@@ -34,7 +34,7 @@ export default function useWebSocketLastData(
 
     const connect = useCallback(() => {
         if (!socketRef.current) {
-            const newSocket = io(url, { timeout: 10000, reconnectionDelay: 5000, });
+            const newSocket = io(url, { timeout: 10000, reconnectionDelay: 10000, reconnectionDelayMax: 10000 });
             socketRef.current = newSocket;
 
             newSocket.on('connect', () => {

@@ -53,7 +53,7 @@ export default function Calendar({ setDatos, setData }: CalendarProps) {
     }).catch(error => {
       console.error('Error al conectar con el servidor:', error);
       setErrorHours('No se pudo conectar con el servidor.');
-      toast.error('Error de conexion con el servidor', {});
+
     }).finally(() => {
       setLoadingHours(false);
     });
