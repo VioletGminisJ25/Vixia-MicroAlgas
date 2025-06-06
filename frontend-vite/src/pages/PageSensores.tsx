@@ -87,23 +87,8 @@ export default function PageSensores() {
                 <div className='h-[400px] bg-slate-100 rounded-lg'>{ncValue && <ScatterPlot data={ncValue} />}</div>
                 <div className='h-[400px] bg-slate-100 rounded-lg'> {ncTime && <NivoLine2 data={ncTime} />}</div>
                 <div className='h-[400px] bg-slate-100 rounded-lg'> {sensor && <NivoLine2 data={sensor[0]} />}</div>
-                  <div className='h-[400px] bg-slate-100 rounded-lg'> {sensor && <NivoLine2 data={sensor[1]} />}</div>
+                <div className='h-[400px] bg-slate-100 rounded-lg'> {sensor && <NivoLine2 data={sensor[1]} />}</div>
             </div>
-
-
-            <ToastContainer
-                position="bottom-right"
-                autoClose={2000}
-                limit={3}
-                hideProgressBar={false}
-                newestOnTop={true}
-                closeOnClick={false}
-                rtl={false}
-                pauseOnFocusLoss
-                draggable
-                pauseOnHover
-                theme={localStorage.getItem('theme') === 'dark' ? 'dark' : 'light'}
-            />
         </div >
     );
 }

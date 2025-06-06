@@ -3,17 +3,18 @@ import styled from 'styled-components';
 
 interface SwitchProps {
   checked: boolean | null;
+  isConnected: boolean | null;
   onChange: (event: React.ChangeEvent<HTMLInputElement>) => void;
 }
 
-const Switch: React.FC<SwitchProps> = ({ checked, onChange }) => {
+const Switch: React.FC<SwitchProps> = ({ checked, onChange, isConnected }) => {
   return (
     <StyledWrapper>
       <span className="text-sm text-black dark:text-white mr-6">
-        {checked ? 'Encendido' : 'Apagado'}
+        {(checked && isConnected) ? 'Encendido' : 'Apagado'}
       </span>
       <label className="switch">
-        <input type="checkbox" checked={checked ?? false} onChange={onChange} />
+        <input type="checkbox" checked={(checked && isConnected) ?? false} onChange={onChange} />
         <span className="slider" />
       </label>
     </StyledWrapper>
