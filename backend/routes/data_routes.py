@@ -154,4 +154,4 @@ def export_process_route():
         abort(400, description="Falta el parámetro 'fecha' en la URL.")
 
     # Pasa el datetime a tu función de exportación
-    return queries.export_all_data_to_excel(name)
+    return queries.export_process_to_excel(name)
