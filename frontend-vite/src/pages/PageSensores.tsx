@@ -1,6 +1,5 @@
 import { useEffect, useState } from 'react';
-import { ToastContainer } from "react-toastify";
-import 'react-toastify/dist/ReactToastify.css'; // Make sure to import toastify styles
+import 'react-toastify/dist/ReactToastify.css';
 import NivoLine2 from '../components/sensores/Nivo_ResponsiveLine_Sensores2';
 import ScatterPlot from '../components/sensores/Nivo_ScatterPlot';
 import type { SensorData, NivoLineData, Sensor } from '../interface/Global_Interface';
@@ -8,8 +7,8 @@ import type { SensorData, NivoLineData, Sensor } from '../interface/Global_Inter
 export default function PageSensores() {
     const [sensorNames, setSensorNames] = useState<string[]>([]);
     const [selectedSensor, setSelectedSensor] = useState<string>('');
-    const [ncTime, setNcTime] = useState<NivoLineData | null>(null); // Initialize with null
-    const [ncValue, setNcValue] = useState<NivoLineData | null>(null); // Initialize with null
+    const [ncTime, setNcTime] = useState<NivoLineData | null>(null);
+    const [ncValue, setNcValue] = useState<NivoLineData | null>(null);
     const [sensor, setsensor] = useState<Sensor | null>(null);
 
     useEffect(() => {

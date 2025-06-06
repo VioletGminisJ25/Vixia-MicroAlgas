@@ -35,6 +35,15 @@ export default function NivoLine({ arduino_data: data }: NivoLineProps) {
         // 👇 Añade un punto personalizado a x = 10, y = 0.82
 
     }
+
+    if (serie.length == 0) {
+        return (<div className="w-full h-full p-4"> {/* altura fija */}
+            <div className="flex flex-col items-center justify-center h-full w-full">
+                <p className="text-center text-red-500">No hay datos para mostrar</p>
+            </div>
+        </div>)
+    }
+    
     return (<div className="w-full h-full p-4"> {/* altura fija */}
         <ResponsiveLine
             markers={

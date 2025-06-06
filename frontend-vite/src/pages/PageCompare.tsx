@@ -102,54 +102,56 @@ export default function GraficaComparar({ datosWebSocket, isConnected }: Comprar
     }
 
     return (
-        <div className="flex flex-col items-center h-[90%] w-full"> {/* Añadido relative para el posicionamiento absoluto si lo quisieras flotante */}
-            {/* Selector de fecha */}
-            <div className="mt-10
+        <div className="h-[90%] w-full flex flex-row items-center justify-center">
+            <div className="flex flex-col items-center h-[90%] w-full ">
+                {/* Selector de fecha */}
+                <div className="
                 flex justify-center items-center h-[10%] w-[60%] rounded-lg shadow-lg bg-slate-100 dark:bg-[#0f1011] dark:ring-0 shadow-lg/100">
-                <DatePickerWithData setDatos={setDatos} setData={setData} />
-            </div>
-
-
-
-            {/* Contenedor de gráficas con divisiones laterales */}
-            <div className="flex flex-row justify-center h-[71.3%] w-[100%] mx-auto mt-4 gap-4">
-
-                {/* Panel izquierdo */}
-                <div className="flex flex-col items-center gap-4">
-                    <PanelInfo sampleData={nivoLineData.last_data} titulo="Últimos Datos" />
-
-                    <button
-                        id='takeLast'
-                        onClick={handleOnExportLast}
-                        disabled={!isConnected}
-                        className={`px-4 py-2 rounded transition
-    ${isConnected ? 'bg-green-600 hover:bg-green-700 text-white' : 'bg-gray-400 text-gray-700 cursor-not-allowed'}`}
-                    >
-                        Guardar en Excel
-                    </button>
-
+                    <DatePickerWithData setDatos={setDatos} setData={setData} />
                 </div>
 
-                {/* Gráfica central */}
-                <div className="flex items-center justify-center h-full w-[60%] bg-white p-4 rounded-lg shadow-md mr-10 ml-10">
-                    <Nivo_ResponsiveLine_compare arduino_data={nivoLineData} />
-                </div>
 
-                {/* Panel derecho con botón debajo */}
-                <div className="flex flex-col items-center gap-4">
-                    <PanelInfo sampleData={nivoLineData.selected_data} titulo="Datos Seleccionados" />
-                    {nivoLineData.selected_data?.datetime && (
+
+                {/* Contenedor de gráficas con divisiones laterales */}
+                <div className="flex flex-row justify-center h-[80%] w-[100%] mx-auto mt-4 gap-4">
+
+                    {/* Panel izquierdo */}
+                    <div className="flex flex-col items-center gap-4">
+                        <PanelInfo sampleData={nivoLineData.last_data} titulo="Últimos Datos" />
+
                         <button
-                            id='takeSelected'
-                            onClick={handleOnExportaSelect}
+                            id='takeLast'
+                            onClick={handleOnExportLast}
                             disabled={!isConnected}
                             className={`px-4 py-2 rounded transition
     ${isConnected ? 'bg-green-600 hover:bg-green-700 text-white' : 'bg-gray-400 text-gray-700 cursor-not-allowed'}`}
-
                         >
                             Guardar en Excel
                         </button>
-                    )}
+
+                    </div>
+
+                    {/* Gráfica central */}
+                    <div className="flex items-center justify-center h-full w-[60%] bg-white p-4 rounded-lg shadow-md mr-10 ml-10">
+                        <Nivo_ResponsiveLine_compare arduino_data={nivoLineData} />
+                    </div>
+
+                    {/* Panel derecho con botón debajo */}
+                    <div className="flex flex-col items-center gap-4">
+                        <PanelInfo sampleData={nivoLineData.selected_data} titulo="Datos Seleccionados" />
+                        {nivoLineData.selected_data?.datetime && (
+                            <button
+                                id='takeSelected'
+                                onClick={handleOnExportaSelect}
+                                disabled={!isConnected}
+                                className={`px-4 py-2 rounded transition
+    ${isConnected ? 'bg-green-600 hover:bg-green-700 text-white' : 'bg-gray-400 text-gray-700 cursor-not-allowed'}`}
+
+                            >
+                                Guardar en Excel
+                            </button>
+                        )}
+                    </div>
                 </div>
             </div>
         </div>

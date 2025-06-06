@@ -9,8 +9,8 @@ interface SwitchProps {
 
 const Switch: React.FC<SwitchProps> = ({ checked, onChange, isConnected }) => {
   return (
-    <StyledWrapper>
-      <span className="text-sm text-black dark:text-white mr-6">
+    <StyledWrapper className="flex items-center justify-center">
+      <span className="text-md text-black dark:text-white mr-3">
         {(checked && isConnected) ? 'Encendido' : 'Apagado'}
       </span>
       <label className="switch">

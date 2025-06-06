@@ -139,7 +139,8 @@ export default function Calendar({ setDatos, setData }: CalendarProps) {
           onChange={handleHour}
           value={selectedHour}
           disabled={hoursOptions.length === 0}
-          className=" bg-white dark:bg-[#1d1f21] text-black dark:text-white border dark:border-white border-black rounded px-2 py-2 text-sm text-center"
+          className={`bg-white dark:bg-[#1d1f21] border rounded px-2 py-2 text-sm text-center
+    ${errorHours ? 'text-red-500 border-red-500 dark:border-red-500' : 'text-black dark:text-white border-black dark:border-white'}`}
         >
           <option value="">{errorHours ?? 'Selecciona una hora'}</option>
           {hoursOptions.map((h) => (
