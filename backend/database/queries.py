@@ -1137,7 +1137,7 @@ class DataQueries:
                                 row_data[col_name] = str(value)
                         data_for_df.append(row_data)
 
-                    df = pd.DataFrame(data_for_df)
+                    df = pd.DataFrame(data_for_df[2:])
                     if sheet_name in ["WaveLength_Data", "WaveLength_White"]:
                         df["WAVELENGTHS"] = WAVELENGTHS[: len(df)]
                     if sheet_name == "Sensor_Data":
