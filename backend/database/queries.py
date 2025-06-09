@@ -29,8 +29,8 @@ from sqlalchemy import func
 load_dotenv()
 
 WAVELENGTHS = [
-    # 311.93,
-    # 314.64,
+    311.93,
+    314.64,
     317.34,
     320.05,
     322.75,
@@ -469,7 +469,7 @@ class DataQueries:
                 400,
             )
 
-        selected_data = {"x": WAVELENGTHS}
+        selected_data = {"x": WAVELENGTHS[2:]}
         try:
             # --- Consulta Principal Optimizada (Query 1) ---
             # Une SensorData, Rgb y Colors filtrando por el timestamp exacto
@@ -853,7 +853,7 @@ class DataQueries:
                 ),
                 "data": {"temperature": result.temperature, "ph": result.ph},
                 "wave_length": [item[0] for item in result_wavelength[2:]],
-                "x": WAVELENGTHS,
+                "x": WAVELENGTHS[2:],
                 "nc": nc,
             }
             print(last_data)
@@ -1137,9 +1137,9 @@ class DataQueries:
                                 row_data[col_name] = str(value)
                         data_for_df.append(row_data)
 
-                    df = pd.DataFrame(data_for_df[2:])
+                    df = pd.DataFrame(data_for_df)
                     if sheet_name in ["WaveLength_Data", "WaveLength_White"]:
-                        df["WAVELENGTHS"] = WAVELENGTHS[:len(df)]
+                        df["WAVELENGTHS"] = WAVELENGTHS
                     if sheet_name == "Sensor_Data":
                         wave_length_values = (
                             self.session.query(WaveLength.value)

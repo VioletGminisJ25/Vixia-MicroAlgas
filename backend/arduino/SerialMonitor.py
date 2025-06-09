@@ -17,8 +17,8 @@ load_dotenv()
 
 # Valores de longitud de onda proporcionados
 WAVELENGTHS = [
-    # 311.93,
-    # 314.64,
+    311.93,
+    314.64,
     317.34,
     320.05,
     322.75,
@@ -633,7 +633,7 @@ class SerialMonitor:
                     ),
                     "data": {"ph": float(ph_avg), "temperature": float(temp_avg)},
                     "wave_length": espectro_avg.tolist()[2:],
-                    "x": WAVELENGTHS,
+                    "x": WAVELENGTHS[2:],
                     "nc": calculate_nc(espectro_avg.tolist()),
                 },
             )
@@ -713,7 +713,7 @@ class SerialMonitor:
                     ),
                     "data": {"ph": float(ph_avg), "temperature": float(temp_avg)},
                     "wave_length": espectro_avg.tolist()[2:],
-                    "x": WAVELENGTHS,
+                    "x": WAVELENGTHS[2:],
                     "nc": calculate_nc(espectro_avg.tolist()),
                 },
             )
