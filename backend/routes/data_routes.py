@@ -155,3 +155,13 @@ def export_process_route():
 
     # Pasa el datetime a tu función de exportación
     return queries.export_process_to_excel(name)
+
+@data_routes.route("/delete", methods=["DELETE"])
+def delete_route():
+    date_to_delete_str = request.args.get("date")  # Lee el parámetro `fecha` de la URL
+
+    if not date_to_delete_str:
+        abort(400, description="Falta el parámetro 'fecha' en la URL.")
+
+    # Pasa el datetime a tu función de exportación
+    return queries.delete_data_by_date(date_to_delete_str)

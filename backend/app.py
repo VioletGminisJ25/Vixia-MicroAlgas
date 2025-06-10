@@ -50,9 +50,6 @@ def create_app(test_config=None):
     init_executor(app, executor_type="thread", max_workers=4)
     
 
-    socketio = socketio_init(app) 
-    register_socketio_events(socketio)
-    
     # Registra tus Blueprints
     app.register_blueprint(auth_routes)
     app.register_blueprint(socket_routes)
@@ -60,15 +57,16 @@ def create_app(test_config=None):
 
 
     
-    return app, socketio # Retorna app y socketio si lo necesitas en el main o para tests de websockets
+    return app # Retorna app y socketio si lo necesitas en el main o para tests de websockets
 
 
 def main():
     """
     Función principal que inicializa y ejecuta la aplicación Flask con SocketIO.
     """
-    app, socketio = create_app()
-
+    app = create_app()
+    socketio = socketio_init(app) 
+    register_socketio_events(socketio)
     with app.app_context():
 
         monitor = create_monitor(app, socketio)
