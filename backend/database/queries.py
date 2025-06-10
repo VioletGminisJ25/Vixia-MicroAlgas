@@ -1170,7 +1170,7 @@ class DataQueries:
                 f"Error al exportar datos a Excel: {e}", exc_info=True
             )
             abort(500, description=f"Error interno al exportar datos: {e}")
-    
+
     def export_process_to_excel(self, process_name):
         """
         Exporta los datos de un proceso específico a un archivo Excel, filtrando por un intervalo de fechas.
@@ -1214,7 +1214,7 @@ class DataQueries:
                         records = (
                             self.session.query(Model)
                             .filter(Model.datetime >= date_init)
-                            .filter(Model.datetime <= date_fin)
+                            .filter(Model.datetime < date_fin)
                             .all()
                         )
                     else:
@@ -1242,7 +1242,9 @@ class DataQueries:
                     df = pd.DataFrame(data_for_df)  # Elimina el slice [2:]
                     if sheet_name in ["WaveLength_Data", "WaveLength_White"]:
                         # Utiliza el operador módulo para repetir WAVELENGTHS
-                        wavelengths_cyclic = [WAVELENGTHS[i % len(WAVELENGTHS)] for i in range(len(df))]
+                        wavelengths_cyclic = [
+                            WAVELENGTHS[i % len(WAVELENGTHS)] for i in range(len(df))
+                        ]
                         df["WAVELENGTHS"] = wavelengths_cyclic
                     if sheet_name == "Sensor_Data":
                         wave_length_values = (
@@ -1275,6 +1277,7 @@ class DataQueries:
                 f"Error al exportar datos a Excel: {e}", exc_info=True
             )
             abort(500, description=f"Error interno al exportar datos: {e}")
+
     def get_proc_name(self):
         try:
             query = (
@@ -1363,7 +1366,11 @@ class DataQueries:
         data_temp = []
         data_nc = []
         data_nc_value = []
+        cont = 0
         for item in query:
+            cont += 1
+            if cont == 1 or cont == 2:
+                continue
             data_ph.append({"x": item[0].isoformat(), "y": item[1]})
             data_temp.append({"x": item[0].isoformat(), "y": item[2]})
             nc_value = item[3]
@@ -1393,16 +1400,76 @@ class DataQueries:
         }
         return output, 200
 
+    def delete_data_by_date(self, date_to_delete_str):
+        """
+        Elimina los datos de la tabla MainDatetime para una fecha y hora específica,
+        y los datos relacionados serán eliminados en cascada por la base de datos.
+
+        Args:
+            date_to_delete_str (str): La fecha y hora a eliminar en formato 'YYYY-MM-DD HH:MM:SS'.
+
+        Returns:
+            tuple: Un jsonify con un mensaje de éxito o error y el código de estado HTTP.
+        """
+        try:
+            if not date_to_delete_str or len(date_to_delete_str) != 19:
+                raise ValueError(
+                    "Formato de fecha no válido, se requiere 'YYYY-MM-DD HH:MM:SS'"
+                )
+            date_dt = datetime.strptime(date_to_delete_str, "%Y-%m-%d %H:%M:%S")
+
+            session = self.session  # Usar self.session de la inicialización
+
+            # Simplemente eliminamos el registro en MainDatetime
+            # La base de datos se encargará de eliminar los registros relacionados
+            # en Rgb, SensorData y WaveLength debido a ON DELETE CASCADE.
+            num_deleted = (
+                session.query(MainDatetime)
+                .filter(MainDatetime.datetime == date_dt)
+                .delete()
+            )
+
+            session.commit()
+
+            if num_deleted > 0:
+                print("✔ Datos eliminados de la base de datos (cascada activa).")
+                # return jsonify({"message": f"Datos eliminados exitosamente para la fecha: {date_to_delete_str}"}), 200
+                return {
+                    "message": f"Datos eliminados exitosamente para la fecha: {date_to_delete_str}"
+                }, 200
+            else:
+                print(
+                    f"No se encontraron datos para eliminar para la fecha: {date_to_delete_str}"
+                )
+                # return jsonify({"error": f"No se encontraron datos para la fecha: {date_to_delete_str}"}), 404
+                return {
+                    "error": f"No se encontraron datos para la fecha: {date_to_delete_str}"
+                }, 404
+
+        except ValueError as e:
+            print(f"Error de validación: {e}")
+            # return jsonify({"error": str(e)}), 400
+            return {"error": str(e)}, 400
+        except Exception as e:
+            session.rollback()
+            print(f"Error al eliminar datos: {e}")
+            # return jsonify({"error": "Error interno del servidor al eliminar datos."}), 500
+            return {"error": "Error interno del servidor al eliminar datos."}, 500
+
 
 def calculate_nc(wave_length, value=None):
     """
     Calcula el número de componentes de una onda.
     """
     if wave_length is None or len(wave_length) == 0:
-        result = round((16.213 * math.pow(10, 6))* math.exp(-0.005 * wave_length[WAVELENGTHS.index(638.42)]))
+        result = round(
+            (16.213 * math.pow(10, 6))
+            * math.exp(-0.005 * wave_length[WAVELENGTHS.index(638.42)])
+        )
     else:
         result = round(
-            (16.213 * math.pow(10, 6)) * math.exp(-0.005 * wave_length[WAVELENGTHS.index(638.42)])
+            (16.213 * math.pow(10, 6))
+            * math.exp(-0.005 * wave_length[WAVELENGTHS.index(638.42)])
         )
     return result
 
