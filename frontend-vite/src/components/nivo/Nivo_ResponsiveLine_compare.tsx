@@ -1,40 +1,35 @@
-// install (please try to align the version of installed @nivo packages)
-// yarn add @nivo/line
+/*
+Este archivo contiene un componente React que utiliza la librería @nivo/line para renderizar un gráfico de líneas responsivo. 
+El componente está diseñado para mostrar datos comparativos provenientes de un dispositivo Arduino, 
+como los últimos datos registrados y los datos seleccionados por el usuario.
+*/
 import { ResponsiveLine } from '@nivo/line'
-import type { SampleData } from '../../interface/Global_Interface';
-// make sure parent container have a defined height when using
-// responsive component, otherwise height will be 0 and
-// no chart will be rendered.
-// website examples showcase many properties,
-// you'll often use just a few of them.
+import type { CompareData } from '../../interface/Global_Interface';
+
 interface NivoLineProps {
-    arduino_data?: SampleData | null;
+    arduino_data?: CompareData | null;
 }
 
 export default function NivoLine({ arduino_data: data }: NivoLineProps) {
-
-
-    console.log(data)
     const serie = []
-    if (data != null) {
+    if (data?.last_data != null) {
         const last_data = {
-            id: 'Last Data',
-            data: data?.wave_length?.map((value, index) => ({ x: index + 1, y: value })) || [],
+            id: 'Ultimos Datos',
+            data: data?.last_data?.wave_length?.map((value, index) => ({ x: index + 1, y: value })) || [],
         }
 
         serie.push(last_data)
     }
-    if (data != null) {
+    if (data?.selected_data != null) {
         const selected_data = {
-            id: 'Selected Data',
-            data: data?.wave_length?.map((value, index) => ({ x: index + 1, y: value })) || [],
+            id: data.selected_data.datetime,
+            data: data?.selected_data?.wave_length?.map((value, index) => ({ x: index + 1, y: value })) || [],
         }
 
         serie.push(selected_data)
-
-        // 👇 Añade un punto personalizado a x = 10, y = 0.82
-
     }
+
+    console.log("Datos de la NivoLine Comparar: "+serie)
 
     if (serie.length == 0) {
         return (<div className="w-full h-full p-4"> {/* altura fija */}
@@ -43,18 +38,17 @@ export default function NivoLine({ arduino_data: data }: NivoLineProps) {
             </div>
         </div>)
     }
-    
     return (<div className="w-full h-full p-4"> {/* altura fija */}
         <ResponsiveLine
             markers={
-                data?.x
+                data?.last_data?.x
                     ? [
                         {
                             axis: 'x',
-                            value: data.x.findIndex((v) => v === 638.42) + 1, // +1 porque tus x empiezan en 1
+                            value: data.last_data.x.findIndex((v) => v === 638.42) + 1, // +1 porque tus x empiezan en 1
                             lineStyle: {
                                 stroke: '#e63946',
-                                strokeWidth: 2,
+                                strokeWidth: 1,
                                 strokeDasharray: '6 6',
                             },
                             legend: '638.42',
@@ -73,7 +67,6 @@ export default function NivoLine({ arduino_data: data }: NivoLineProps) {
             xScale={{ type: 'linear', min: 'auto', max: 'auto' }}
             yScale={{ type: 'linear', min: 'auto', max: 'auto' }}
             curve="monotoneX"
-            colors={['#008b1e']}
             axisTop={null}
             axisRight={null}
             enablePoints={false}
@@ -86,8 +79,8 @@ export default function NivoLine({ arduino_data: data }: NivoLineProps) {
                 legendPosition: 'middle',
 
                 format: (value) => {
-                    if (data?.x && data.x[Number(value) - 1] !== undefined) {
-                        return data.x[Number(value) - 1];
+                    if (data?.last_data?.x && data.last_data?.x[Number(value) - 1] !== undefined) {
+                        return data.last_data.x[Number(value) - 1];
                     }
                     return '';
                 },
@@ -100,6 +93,7 @@ export default function NivoLine({ arduino_data: data }: NivoLineProps) {
                 legendOffset: -40,
                 legendPosition: 'start',
             }}
+            colors={['#008b1e', '#000000']}
             pointSize={6}
             useMesh={true}
             enableGridX={true}
@@ -115,10 +109,23 @@ export default function NivoLine({ arduino_data: data }: NivoLineProps) {
                     }}
                 >
                     <strong>{"valor"}:</strong> {Math.round(point.data.y * 100) / 100}<br></br>
-                    <strong>Rango Espectro:</strong> {data?.x && data.x[point.data.x - 1] !== undefined ? data.x[point.data.x - 1] : 'N/A'}<br></br>
+                    <strong>Rango Espectro:</strong> {data?.last_data?.x && data.last_data?.x[point.data.x - 1] !== undefined ? data.last_data.x[point.data.x - 1] : 'N/A'}<br></br>
                 </div>
             )}
+            legends={[
+                {
+                    anchor: 'top-right',
+                    direction: 'row',
+                    translateX: 35,
+                    translateY: -15,
+                    itemWidth: 130,
+                    itemHeight: 0,
+                    symbolShape: 'circle'
+                }
+            ]}
 
         />
     </div>)
 }
+
+

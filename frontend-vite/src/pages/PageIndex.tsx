@@ -1,9 +1,6 @@
-import ArduinoController from '../components/index/ArduinoController'
-import PanelInfo from '../components/compare/PanelInfo';
-import Nivo_ResponsiveLine from '../components/index/Nivo_ResponsiveLine_Index';
-import { ToastContainer } from 'react-toastify';
-
-import WebSocket from '../hooks/WebSockect_lasData'
+import ArduinoController from '../components/ArduinoController'
+import PanelInfo from '../components/PanelInfo';
+import Nivo_ResponsiveLine from '../components/nivo/Nivo_ResponsiveLine_Index';
 import { useState, useEffect } from 'react';
 import type { LightsState, SampleData } from '../interface/Global_Interface';
 
@@ -79,7 +76,7 @@ export default function PageIndex({ data, isManual, isWake, lightsState, isConne
                 <div className="flex flex-row justify-center h-[80%] w-[100%] mx-auto mt-4 gap-4">
                     <PanelInfo sampleData={data} titulo='Ultimos Datos'></PanelInfo>
                     <div className="flex items-center justify-center h-full w-[60%] bg-white p-4 rounded-lg shadow-md mr-10 ml-10">
-                        <Nivo_ResponsiveLine arduino_data={data} />
+                        <Nivo_ResponsiveLine data={data} />
                     </div>
                     <ArduinoController isManual={isManual} isWake={isWake} datetime={data?.datetime ?? null} isConnected={isConnected} />
                 </div>

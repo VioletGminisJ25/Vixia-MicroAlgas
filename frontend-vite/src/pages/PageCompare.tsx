@@ -1,10 +1,9 @@
 import { useState } from 'react';
-import type { CompareData, LightsState, SampleData } from '../interface/Global_Interface';
-import DatePickerWithData from '../components/compare/Calendar'
-import Nivo_ResponsiveLine_compare from '../components/compare/Nivo_ResponsiveLine_compare'
-import useWebSocketLastData from '../hooks/WebSockect_lasData';
-import { toast, ToastContainer } from 'react-toastify';
-import PanelInfo from '../components/compare/PanelInfo';
+import type { CompareData, SampleData } from '../interface/Global_Interface';
+import DatePickerWithData from '../components/Calendar'
+import Nivo_ResponsiveLine_compare from '../components/nivo/Nivo_ResponsiveLine_compare'
+import { toast } from 'react-toastify';
+import PanelInfo from '../components/PanelInfo';
 
 /// Componente principal que contiene el selector de fecha
 /// la fecha se selecciona en el componente DatePickerWithData y se pasa al componente SelectedData mediante props
@@ -139,18 +138,16 @@ export default function GraficaComparar({ datosWebSocket, isConnected }: Comprar
                     {/* Panel derecho con botón debajo */}
                     <div className="flex flex-col items-center gap-4">
                         <PanelInfo sampleData={nivoLineData.selected_data} titulo="Datos Seleccionados" />
-                        {nivoLineData.selected_data?.datetime && (
-                            <button
-                                id='takeSelected'
-                                onClick={handleOnExportaSelect}
-                                disabled={!isConnected}
-                                className={`px-4 py-2 rounded transition
-    ${isConnected ? 'bg-green-600 hover:bg-green-700 text-white' : 'bg-gray-400 text-gray-700 cursor-not-allowed'}`}
+                        <button
+                            id='takeSelected'
+                            onClick={handleOnExportaSelect}
+                            disabled={!isConnected || !nivoLineData.selected_data}
+                            className={`px-4 py-2 rounded transition
+    ${nivoLineData.selected_data && isConnected ? 'bg-green-600 hover:bg-green-700 text-white' : 'bg-gray-400 text-gray-700 cursor-not-allowed'}`}
 
-                            >
-                                Guardar en Excel
-                            </button>
-                        )}
+                        >
+                            Guardar en Excel
+                        </button>
                     </div>
                 </div>
             </div>

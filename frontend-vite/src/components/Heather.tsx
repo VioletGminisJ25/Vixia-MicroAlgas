@@ -124,11 +124,11 @@ export default function Heather({
                                     <rect x="24" y="24" width="16" height="16" rx="3" />
 
 
-                                    <line x1="32" y1="12" x2="32" y2="24" stroke="#FB923C" stroke-width="4" stroke-linecap="round" />
+                                    <line x1="32" y1="12" x2="32" y2="24" stroke="#FB923C" strokeWidth="4" strokeLinecap="round" />
                                     <circle cx="32" cy="10" r="2" fill="#FB923C" />
 
-                                    <line x1="24" y1="32" x2="40" y2="32" stroke="#fff" stroke-width="2" />
-                                    <line x1="32" y1="24" x2="32" y2="40" stroke="#fff" stroke-width="2" />
+                                    <line x1="24" y1="32" x2="40" y2="32" stroke="#fff" strokeWidth="2" />
+                                    <line x1="32" y1="24" x2="32" y2="40" stroke="#fff" strokeWidth="2" />
                                 </svg>
 
                                 Prediciones

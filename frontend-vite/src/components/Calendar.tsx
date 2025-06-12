@@ -2,9 +2,9 @@ import React, { useState, useEffect } from 'react';
 import DatePicker from 'react-datepicker';
 import 'react-datepicker/dist/react-datepicker.css';
 import { format } from 'date-fns';
-import type { CompareData } from '../../interface/Global_Interface';
+import type { CompareData } from '../interface/Global_Interface';
 import { toast } from 'react-toastify';
-import Loader from '../ui/Loader'
+import Loader from './ui/Loader'
 
 //fuente https://www.npmjs.com/package/react-datepicker
 
@@ -23,15 +23,16 @@ export default function Calendar({ setDatos, setData }: CalendarProps) {
   const [selectedHour, setSelectedHour] = useState<string>('');
   const [loadingHours, setLoadingHours] = useState(false);
   const [errorHours, setErrorHours] = useState<string | null>(null);
-  //const [noDataForHour, setNoDataForHour] = useState(false);
 
+
+  //Se envia la fecha a la api para obtener las horas.
+  //Se informa de los errores por consola o toast, si todo va bien lo mismo.
   const fetchHours = async (date: Date) => {
-    //Al cargar restauramos valores, se reinican los valores de.
+    //Al cargar restauramos valores, se reinican los valores.
     setHoursOptions([]);
     setSelectedHour('');
     setLoadingHours(true);
     setErrorHours(null);
-    //setNoDataForHour(false);
 
     const hour_send = JSON.stringify({ date: format(date, 'yyyy-MM-dd') });
 
@@ -44,7 +45,7 @@ export default function Calendar({ setDatos, setData }: CalendarProps) {
     }).then(async response => {
       const data = await response.json();
       if (!response.ok) {
-        console.log(response);
+        console.log(data.error + format(date, 'yyyy-MM-dd'));
         toast.warn(data.error + format(date, 'yyyy-MM-dd'), {});
         setErrorHours(data.error);
         return;
@@ -65,6 +66,7 @@ export default function Calendar({ setDatos, setData }: CalendarProps) {
     }
   }, []);
 
+  //Se cambia la fecha y se llama a la función fetchHours para obtener las horas.
   const handleDateChange = async (date: Date | null) => {
     setStartDate(date);
     if (date) {
@@ -72,11 +74,14 @@ export default function Calendar({ setDatos, setData }: CalendarProps) {
     }
   };
 
+  //Al selecionar una hora se envia a la api fecha - hora para obtener los datos.
+  //Puede haber errores por consola o toast, si todo va bien lo mismo.
+  //Al selecionar una hora se guardan los datos en el state de la aplicación.
+  //Este state se usa para mostrar los datos en la grafica.
   const handleHour = (e: React.ChangeEvent<HTMLSelectElement>) => {
     const selectedTime = e.target.value;
     setSelectedHour(selectedTime);
-    //setNoDataForHour(false);
-
+    
     if (!startDate || !selectedTime) return;
 
     const [hours, minutes, seconds] = selectedTime.split(':');
@@ -87,7 +92,7 @@ export default function Calendar({ setDatos, setData }: CalendarProps) {
 
     const formattedDateTime = format(combinedDateTime, 'yyyy-MM-dd HH:mm:ss');
 
-    console.log(formattedDateTime);
+    console.log("Formato de fecha para el back: " + formattedDateTime);
 
     fetch(urlGetComparasion, {
       method: 'POST',
@@ -98,7 +103,7 @@ export default function Calendar({ setDatos, setData }: CalendarProps) {
     }).then(async response => {
       const data = await response.json();
       if (!response.ok) {
-        console.log('Error datos', data);
+        console.log('Error datos: ', data.error);
         toast.warn(data.error, {});
         setDatos(data)
         return;
@@ -109,7 +114,7 @@ export default function Calendar({ setDatos, setData }: CalendarProps) {
         return;
       }
 
-      console.log('Comparación recibida:', data);
+      console.log('Comparación recibida: ', data.selected_data);
       setDatos(data);
       setData(formattedDateTime)
       toast.success('Datos obtenidos', {});
@@ -119,6 +124,7 @@ export default function Calendar({ setDatos, setData }: CalendarProps) {
     });
   };
 
+  //Cuerpo de la componente
   return (
     <div className="flex flex-row justify-center items-center space-x-4">
       <p className='text-black dark:text-white font-bold'>SELECIONAR UNA FECHA</p>

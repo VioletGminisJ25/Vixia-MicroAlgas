@@ -1,18 +1,28 @@
+/**
+ * Este archivo contiene un componente React que muestra los botones de control de la aplicación.
+ * Los botones tienen diferentes acciones como;
+ *  - Apagar el control del arduino, es decir deja de recibir datos y GUARDARLOS en la base de datos
+ *  - Tomar una muestra manual, toma una  muestra de forma manual
+ *  - Cambiar parámetros, saca un formulario modal para cambiar los parámetros
+ *  - Cambiar configuración
+ *  - Exportar datos, se exportan por procedimientos
+ */
+
 
 import React, { useEffect, useState } from 'react';
 import { toast } from 'react-toastify';
-import type { Config } from '../../interface/Global_Interface';
-import Close from "../ui/Close"
+import type { Config } from '../interface/Global_Interface';
+import Close from "./ui/Close"
 import { data } from 'react-router-dom';
-import SwitchState from '../ui/SwitchState';
+import SwitchState from './ui/SwitchState';
 
 interface BotonesEstadosProps {
     isManual: boolean | null;
     isConnected: boolean | null;
     isWake: boolean | null;
     datetime: string | null;
-    // ... otras posibles props
 }
+
 const ArduinoController: React.FC<BotonesEstadosProps> = ({ isManual, isWake, datetime, isConnected }) => {
     const [sensorNames, setSensorNames] = useState<string[]>([]);
     const [selectedSensor, setSelectedSensor] = useState<string>('');
@@ -27,7 +37,7 @@ const ArduinoController: React.FC<BotonesEstadosProps> = ({ isManual, isWake, da
         light_red: ''
     });
 
-
+    // Se obtienen el nombre de los procedimientos disponibles para exportar a excel, se ejecuta al cargar
     useEffect(() => {
         const fetchSensorNames = async () => {
             try {
@@ -40,7 +50,6 @@ const ArduinoController: React.FC<BotonesEstadosProps> = ({ isManual, isWake, da
                 setSensorNames(data);
                 if (data.length > 0) {
                     setSelectedSensor(data[0]);
-                    // await handleSensorChange({ target: { value: data[0] } } as React.ChangeEvent<HTMLSelectElement>);
                 }
             } catch (error) {
                 console.error("Error al obtener la configuración:", error);
@@ -50,9 +59,9 @@ const ArduinoController: React.FC<BotonesEstadosProps> = ({ isManual, isWake, da
         fetchSensorNames();
     }, []);
 
+    // Se comunica con el servidor para tomar una muestra manual
     const handleTomarMuestra = () => {
         console.log("¡Botón 'Tomar muestra manual' clickeado!");
-        // Aquí podrías añadir la lógica para solicitar la muestra manual
         const boton = document.getElementById('muestraManual') as HTMLButtonElement | null;
         if (boton) {
             boton.disabled = true;
@@ -79,7 +88,8 @@ const ArduinoController: React.FC<BotonesEstadosProps> = ({ isManual, isWake, da
         })
     };
 
-    const handleRecibirMuestras = () => {
+    // Se comunica con el servidor para cambiar el estado de on/off
+    const handleOnOff = () => {
         console.log("¡Botón 'Recibir Muestras' clickeado!");
 
         const boton = document.getElementById('recibirDatos') as HTMLButtonElement | null;
@@ -92,6 +102,7 @@ const ArduinoController: React.FC<BotonesEstadosProps> = ({ isManual, isWake, da
 
     };
 
+    //Se rellenan los campos del formulario con la configuración actual del arduino
     const handleRellenarCampos = () => {
         fetch(import.meta.env.VITE_GET_CONFIG, { method: 'GET' })
             .then(response => {
@@ -99,7 +110,7 @@ const ArduinoController: React.FC<BotonesEstadosProps> = ({ isManual, isWake, da
                     throw new Error(`HTTP error! status: ${response.status}`);
                 }
                 console.log(response)
-                return response.json(); // Devuelve la promesa del JSON
+                return response.json();
             })
             .then(data => {
                 console.log(data);
@@ -111,6 +122,7 @@ const ArduinoController: React.FC<BotonesEstadosProps> = ({ isManual, isWake, da
             });
     };
 
+    //Se envía el formulario con los cambios de configuración
     const handleOnSubmit = (event: React.FormEvent) => {
 
         event.preventDefault();
@@ -118,9 +130,6 @@ const ArduinoController: React.FC<BotonesEstadosProps> = ({ isManual, isWake, da
         const blue = Number(config?.light_blue);
         const red = Number(config?.light_red);
 
-
-
-        // Verifica suma total
         if ((white + blue + red) > 100) {
             toast.warn("La suma total de las luces no puede superar el 100%.");
             return;
@@ -158,11 +167,7 @@ const ArduinoController: React.FC<BotonesEstadosProps> = ({ isManual, isWake, da
         );
     };
 
-    // const handleSensorChange = (event: React.ChangeEvent<HTMLSelectElement>) => {
-    //     setSelectedSensor(event.target.value);
-
-    // };
-
+    //Se exportan los datos del sensor seleccionado
     const handleOnExport = () => {
         const baseUrl = import.meta.env.VITE_SAVE_EXPORT_PROC;
         const urlWithQuery = `${baseUrl}?name=${encodeURIComponent(selectedSensor)}`;
@@ -198,7 +203,7 @@ const ArduinoController: React.FC<BotonesEstadosProps> = ({ isManual, isWake, da
     return (
         <div className="h-fit w-60 bg-slate-100 dark:bg-[#0f1011] rounded-lg p-4 mt-20">
             <p className="text-black dark:text-white text-xl font-semibold mb-8 text-center">Controles</p>{" "}
-            {/* Clase para el título y un margen inferior */}
+    
             <div className="flex flex-col justify-center items-center w-full h-full gap-4">
                 <div
                     className={`
@@ -209,7 +214,7 @@ const ArduinoController: React.FC<BotonesEstadosProps> = ({ isManual, isWake, da
     transition-colors duration-200 ease-in-out
   `}
                 >
-                    <SwitchState checked={isWake} onChange={handleRecibirMuestras} isConnected={isConnected} />
+                    <SwitchState checked={isWake} onChange={handleOnOff} isConnected={isConnected} />
                 </div>
                 <div
                     className="flex flex-row justify-center items-center w-full
@@ -262,13 +267,13 @@ const ArduinoController: React.FC<BotonesEstadosProps> = ({ isManual, isWake, da
                     <div className="fixed inset-0 bg-black/80 flex justify-center items-center z-50 backdrop-blur-sm">
                         <div className="bg-white dark:bg-black p-6 rounded-lg shadow-lg w-96 relative">
                             {" "}
-                            {/* Añadimos 'relative' aquí */}
+                            
                             <div className="flex justify-between items-baseline">
                                 <h2 className="text-lg font-semibold mb-4 dark:text-white">
                                     Cambiar parámetros
                                 </h2>
                                 <Close onClick={() => setShowModal(false)} />{" "}
-                                {/* Usamos el componente Close */}
+                              
                             </div>
                             <form
                                 className="space-y-4 text-sm text-gray-800 dark:text-white"
@@ -393,7 +398,6 @@ const ArduinoController: React.FC<BotonesEstadosProps> = ({ isManual, isWake, da
                     </div>
                 )}
 
-                {/* Contenedor del Select y el Botón de Descarga */}
                 <div
                     className="flex flex-row justify-center items-center w-[75%] gap-2
                              text-black dark:text-white"
