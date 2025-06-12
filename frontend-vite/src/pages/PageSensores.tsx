@@ -1,7 +1,7 @@
 import { useEffect, useState } from 'react';
 import 'react-toastify/dist/ReactToastify.css';
-import NivoLine2 from '../components/sensores/Nivo_ResponsiveLine_Sensores2';
-import ScatterPlot from '../components/sensores/Nivo_ScatterPlot';
+import NivoLine2 from '../components/nivo/Nivo_ResponsiveLine_Sensores2';
+import ScatterPlot from '../components/nivo/Nivo_ScatterPlot';
 import type { SensorData, NivoLineData, Sensor } from '../interface/Global_Interface';
 
 export default function PageSensores() {
