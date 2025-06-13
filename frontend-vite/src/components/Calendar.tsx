@@ -1,7 +1,7 @@
 import React, { useState, useEffect } from 'react';
 import DatePicker from 'react-datepicker';
 import 'react-datepicker/dist/react-datepicker.css';
-import { format } from 'date-fns';
+import { format, set } from 'date-fns';
 import type { CompareData } from '../interface/Global_Interface';
 import { toast } from 'react-toastify';
 import Loader from './ui/Loader'
@@ -84,7 +84,12 @@ export default function Calendar({ setDatos, setData, isConnected }: CalendarPro
     const selectedTime = e.target.value;
     setSelectedHour(selectedTime);
 
-    if (!startDate || !selectedTime) return;
+    // Si el usuario selecciona el valor por defecto, no actualices deleteData
+  if (!startDate || !selectedTime || selectedTime === '') {
+    setDeleteData(null);
+    setDatos(null);
+    return;
+  }
 
     const [hours, minutes, seconds] = selectedTime.split(':');
     const combinedDateTime = new Date(startDate);
