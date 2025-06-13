@@ -5,7 +5,7 @@ import { format } from 'date-fns';
 import type { CompareData } from '../interface/Global_Interface';
 import { toast } from 'react-toastify';
 import Loader from './ui/Loader'
-
+import ConfirmModal from './ui/ConfirmModal';
 //fuente https://www.npmjs.com/package/react-datepicker
 
 //env de conexion
@@ -15,15 +15,17 @@ const urlGetComparasion: string = import.meta.env.VITE_GET_COMPARASION;
 interface CalendarProps {
   setDatos: React.Dispatch<React.SetStateAction<CompareData | null>>;
   setData: React.Dispatch<React.SetStateAction<string | null>>;
+  isConnected: boolean | null;
 }
 
-export default function Calendar({ setDatos, setData }: CalendarProps) {
+export default function Calendar({ setDatos, setData, isConnected }: CalendarProps) {
   const [startDate, setStartDate] = useState<Date | null>(new Date());
   const [hoursOptions, setHoursOptions] = useState<string[]>([]);
   const [selectedHour, setSelectedHour] = useState<string>('');
   const [loadingHours, setLoadingHours] = useState(false);
   const [errorHours, setErrorHours] = useState<string | null>(null);
-
+  const [deleteData, setDeleteData] = useState<string | null>(null);
+  const [isModalOpen, setIsModalOpen] = useState(false);
 
   //Se envia la fecha a la api para obtener las horas.
   //Se informa de los errores por consola o toast, si todo va bien lo mismo.
@@ -81,7 +83,7 @@ export default function Calendar({ setDatos, setData }: CalendarProps) {
   const handleHour = (e: React.ChangeEvent<HTMLSelectElement>) => {
     const selectedTime = e.target.value;
     setSelectedHour(selectedTime);
-    
+
     if (!startDate || !selectedTime) return;
 
     const [hours, minutes, seconds] = selectedTime.split(':');
@@ -102,6 +104,8 @@ export default function Calendar({ setDatos, setData }: CalendarProps) {
       body: JSON.stringify({ date: formattedDateTime })
     }).then(async response => {
       const data = await response.json();
+      setDeleteData(formattedDateTime)
+
       if (!response.ok) {
         console.log('Error datos: ', data.error);
         toast.warn(data.error, {});
@@ -122,6 +126,44 @@ export default function Calendar({ setDatos, setData }: CalendarProps) {
       console.error('Error al enviar hora:', error);
       toast.error('Error de conexion con el servidor', {});
     });
+  };
+
+  const handleDelete = () => {
+    setIsModalOpen(true); // Mostrar el modal
+  };
+  const confirmDelete = () => {
+    const baseUrl = import.meta.env.VITE_DELETE;
+    const urlWithQuery = `${baseUrl}?date=${encodeURIComponent(deleteData ?? "")}`;
+    console.log("borrando " + urlWithQuery);
+
+    fetch(urlWithQuery, { method: "DELETE" })
+      .then(async (response) => {
+        const data = await response.json();
+        if (!response.ok) {
+          console.log("Error al borrar datos: ", data.error);
+          toast.error("Error al borrar datos");
+          return;
+        }
+
+        console.log("Datos borrados: ", data.message);
+        toast.success(data.message, {});
+        setDatos(null);
+        setData(null);
+        setDeleteData(null);
+
+        fetchHours(startDate ?? new Date()); // Actualiza las horas disponibles
+      })
+      .catch((error) => {
+        console.error("Error al borrar datos:", error);
+        toast.error("Error al borrar datos");
+      })
+      .finally(() => {
+        setIsModalOpen(false); // Cerrar el modal
+      });
+  };
+
+  const cancelDelete = () => {
+    setIsModalOpen(false); // Cerrar el modal sin borrar
   };
 
   //Cuerpo de la componente
@@ -156,6 +198,36 @@ export default function Calendar({ setDatos, setData }: CalendarProps) {
           ))}
         </select>
       )}
+      <button
+        onClick={handleDelete}
+        disabled={!deleteData || !isConnected}
+        className={`w-10 h-10 flex justify-center items-center rounded transition border font-bold shadow-md duration-300 ease-in-out focus:outline-none focus:ring-2 
+    ${deleteData && isConnected ? 'border-red-500 text-red-500 hover:bg-red-500 hover:text-white active:scale-95 focus:ring-red-300 dark:focus:ring-red-900' : 'border-gray-400 text-gray-400 cursor-not-allowed'}`}
+        aria-label="Eliminar"
+      >
+        <svg
+          xmlns="http://www.w3.org/2000/svg"
+          className="h-5 w-5"
+          fill="none"
+          viewBox="0 0 24 24"
+          stroke="currentColor"
+          strokeWidth={2}
+        >
+          <path
+            strokeLinecap="round"
+            strokeLinejoin="round"
+            d="M19 7l-.867 12.142A2 2 0 0116.138 21H7.862a2 2 0 
+         01-1.995-1.858L5 7m5 4v6m4-6v6M9 7h6m2 
+         0a2 2 0 00-2-2H9a2 2 0 00-2 2m12 0H5"
+          />
+        </svg>
+      </button>
+      <ConfirmModal
+        isOpen={isModalOpen}
+        onConfirm={confirmDelete}
+        onCancel={cancelDelete}
+      />
+
     </div>
   );
 }

@@ -106,7 +106,7 @@ export default function GraficaComparar({ datosWebSocket, isConnected }: Comprar
                 {/* Selector de fecha */}
                 <div className="
                 flex justify-center items-center h-[10%] w-[60%] rounded-lg shadow-lg bg-slate-100 dark:bg-[#0f1011] dark:ring-0 shadow-lg/100">
-                    <DatePickerWithData setDatos={setDatos} setData={setData} />
+                    <DatePickerWithData setDatos={setDatos} setData={setData} isConnected={isConnected} />
                 </div>
 
 
